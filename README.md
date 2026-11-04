@@ -2,7 +2,7 @@
 
 **只读的 Agent / Harness / Runtime 执行轨迹可视化 Demo。** 本仓沿用 [Skill Studio](https://github.com/odango-chan/ca-skill-studio-demo) 的轻量 Web 与文档治理方式，继承 [CA Console 的 DSH-inspired Trajectory 阅读模型](https://github.com/odango-chan/ca-console/blob/main/docs/design/tasks-and-runs.md)，不把轨迹简化为一张确定性 Procedure 图。
 
-> 当前状态：**D0 基线 + D0.5 原生 Trace 输入格式盘点**。示例是明确标注的合成数据，不代表真实 Agent、Runtime 或 5GC 验收。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
+> 当前状态：**D0 基线 + D0.5 原生 Trace 输入盘点 + D0.6 Phoenix/OTel 合成 PoC PASS**。示例是明确标注的合成数据，不代表真实 Agent、Runtime 或 5GC 验收。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
 
 ## 定位
 
@@ -26,6 +26,6 @@ npm run dev
 
 ## 文档
 
-[AGENTS.md](AGENTS.md) · [文档地图](docs/README.md) · [当前状态](docs/WORK.md) · [实现追溯](docs/TRACEABILITY.md) · [架构边界](docs/architecture/ownership.md) · [UX 基线](docs/design/trajectory-viewer.md) · [输入格式要求](docs/contracts/trace-inputs.md) · [Adapter 方案](docs/design/source-adapters.md) · [里程碑](docs/ROADMAP.md)
+[AGENTS.md](AGENTS.md) · [文档地图](docs/README.md) · [当前状态](docs/WORK.md) · [实现追溯](docs/TRACEABILITY.md) · [架构边界](docs/architecture/ownership.md) · [UX 基线](docs/design/trajectory-viewer.md) · [输入格式要求](docs/contracts/trace-inputs.md) · [OTel GenAI 字段映射](docs/design/otel-genai-mapping.md) · [Phoenix PoC 实测](docs/experiments/phoenix-otel-poc.md) · [Adapter 方案](docs/design/source-adapters.md) · [里程碑](docs/ROADMAP.md)
 
 本仓不直接修改其他仓的业务行为、Schema、Source/Runtime 规则。Pages 发布和真实浏览器验收只有在工作流实际通过后才标记为 PASS。
