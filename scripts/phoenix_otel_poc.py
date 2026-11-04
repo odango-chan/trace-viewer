@@ -119,7 +119,22 @@ def check_phoenix_query():
                 assert "invoke_agent synthetic-agent" in names
                 assert "Procedure synthetic-root" in names
                 assert "Reconcile result" in names
+                expected_attributes = {
+                    ("Operation uncertain", "ca.operation.outcome"): "OUTCOME_UNKNOWN",
+                    ("Reconcile result", "ca.reconcile.resolution"): "COMMITTED",
+                    ("Procedure synthetic-root", "ca.external.disposition"): "UNAVAILABLE",
+                    ("chat synthetic-model followup", "ca.tool.result.source_ref"): "synthetic-tool-result-1",
+                    ("Predicate observation", "ca.evidence.ref"): "synthetic-evidence-1",
+                }
+                for (name, attr), expected in expected_attributes.items():
+                    column = "attributes." + attr
+                    if column not in frame:
+                        raise AssertionError(f"Phoenix did not expose {column}; available columns: {list(frame.columns)[:25]}")
+                    actual = frame.loc[frame["name"] == name, column].iloc[0]
+                    if actual != expected:
+                        raise AssertionError(f"Phoenix readback {column}: expected {expected!r}, got {actual!r}")
                 return {"spanCount": len(frame), "rootCountExpected": 2,
+                        "nativeAttributeChecks": len(expected_attributes),
                         "matched": ["invoke_agent synthetic-agent", "Procedure synthetic-root",
                                     "Reconcile result"]}
             last_error = f"queried {len(frame)} spans; expected >=9"
