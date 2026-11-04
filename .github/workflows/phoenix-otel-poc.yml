@@ -1,0 +1,59 @@
+name: Phoenix OpenTelemetry synthetic PoC
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/phoenix-otel-poc.yml'
+      - 'scripts/phoenix_otel_poc.py'
+      - 'docs/experiments/phoenix-otel-poc.md'
+  workflow_dispatch:
+
+jobs:
+  local-phoenix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    env:
+      PHOENIX_WORKING_DIR: /tmp/trace-viewer-phoenix
+      PHOENIX_ENABLE_AUTH: 'false'
+      PHOENIX_COLLECTOR_ENDPOINT: http://127.0.0.1:6006
+      PHOENIX_PROJECT_NAME: trace-viewer-synthetic-poc
+      POC_PROOF_FILE: /tmp/trace-viewer-phoenix-proof.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Phoenix, OpenTelemetry and Phoenix client
+        run: |
+          python -m pip install --disable-pip-version-check arize-phoenix arize-phoenix-otel arize-phoenix-client
+          python -m pip freeze | grep -Ei 'phoenix|opentelemetry|openinference' | sort
+      - name: Start private local Phoenix
+        run: |
+          mkdir -p "$PHOENIX_WORKING_DIR"
+          nohup python -m phoenix.server.main serve --host 127.0.0.1 --port 6006 >/tmp/trace-viewer-phoenix.log 2>&1 </dev/null &
+          echo $! >/tmp/trace-viewer-phoenix.pid
+          for n in $(seq 1 100); do
+            if curl -fsS http://127.0.0.1:6006/ >/dev/null; then
+              echo 'Phoenix HTTP server ready'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'Phoenix failed to initialize:'
+          tail -n 120 /tmp/trace-viewer-phoenix.log
+          exit 1
+      - name: Send two synthetic traces and verify Phoenix readback
+        run: python scripts/phoenix_otel_poc.py
+      - name: Print Phoenix server errors on failure
+        if: failure()
+        run: tail -n 100 /tmp/trace-viewer-phoenix.log || true
+      - name: Upload synthetic proof summary
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phoenix-otel-synthetic-proof
+          path: /tmp/trace-viewer-phoenix-proof.json
+          retention-days: 7
