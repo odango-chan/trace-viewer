@@ -128,9 +128,24 @@ def check_phoenix_query():
                 }
                 for (name, attr), expected in expected_attributes.items():
                     column = "attributes." + attr
-                    if column not in frame:
+                    row = frame.loc[frame["name"] == name].iloc[0]
+                    if column in frame:
+                        actual = row[column]
+                    elif "attributes.ca" in frame:
+                        # Phoenix Client may return nested custom attributes as one object,
+                        # instead of one dot-separated flattened column per leaf.
+                        raw = row["attributes.ca"]
+                        if isinstance(raw, str):
+                            raw = json.loads(raw)
+                        suffix = attr.removeprefix("ca.")
+                        if isinstance(raw, dict) and suffix in raw:
+                            actual = raw[suffix]
+                        else:
+                            actual = raw
+                            for part in suffix.split("."):
+                                actual = actual.get(part) if isinstance(actual, dict) else None
+                    else:
                         raise AssertionError(f"Phoenix did not expose {column}; available columns: {list(frame.columns)[:25]}")
-                    actual = frame.loc[frame["name"] == name, column].iloc[0]
                     if actual != expected:
                         raise AssertionError(f"Phoenix readback {column}: expected {expected!r}, got {actual!r}")
                 return {"spanCount": len(frame), "rootCountExpected": 2,
