@@ -11,8 +11,9 @@
 1. `README.md`、`docs/README.md`
 2. `docs/WORK.md`（当前状态）、`docs/TRACEABILITY.md`（实现→测试→证据）
 3. `docs/architecture/ownership.md`
-4. `docs/design/trajectory-viewer.md`、`docs/design/source-adapters.md`
-5. 变更页面前读现有 `site/` 和 `tests/`
+4. `docs/contracts/trace-inputs.md`（D1/D2 输入格式与验证前置要求）
+5. `docs/design/trajectory-viewer.md`、`docs/design/source-adapters.md`
+6. 变更页面前读现有 `site/` 和 `tests/`
 
 上游基线：
 - CA Console: https://github.com/odango-chan/ca-console/blob/main/docs/design/tasks-and-runs.md

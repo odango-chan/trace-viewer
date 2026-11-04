@@ -8,6 +8,7 @@
 - `docs/architecture/ownership.md` 是内部 ownership 与 authority 唯一真源。
 - `docs/design/trajectory-viewer.md` 是 Viewer UX 唯一真源。
 - `docs/design/source-adapters.md` 是 Adapter 非权威投影约定。
+- `docs/contracts/trace-inputs.md` 是 Viewer 对现有 owner-native 输入格式的只读消费要求与资格清单（不拥有 producer Schema）。
 - `docs/decisions/` 记录架构取舍原因；`docs/ROADMAP.md` 记录阶段目标，执行工作使用 Issue。
 - 上游专用契约不要复制成私有 `v2`；直接引用上游 owner 的文档与具体 pin。
 - 不将本地绝对路径、未经脱敏的 model payload、订阅者身份或私有日志作为公开验收附件。

@@ -9,10 +9,11 @@
 3. [TRACEABILITY](TRACEABILITY.md) — 规范 → 代码 → 测试 → 验收
 4. [Owner / Authority](architecture/ownership.md) — 权限与跨仓边界
 5. [Trajectory UX](design/trajectory-viewer.md) — DSH-inspired 折叠轨迹与确定性下钻
-6. [Source Adapters](design/source-adapters.md) — 多来源只读适配
-7. [ROADMAP](ROADMAP.md) — 后续里程碑
-8. [ADR-0001](decisions/0001-owner-native-viewer.md) — Owner-native、无第二真源
-9. [DOCUMENTATION](DOCUMENTATION.md) — 文档规范
+6. [Trace 输入格式要求](contracts/trace-inputs.md) — **D0.5：基于当前真实 owner 格式冻结消费要求**
+7. [Source Adapters](design/source-adapters.md) — 多来源只读适配
+8. [ROADMAP](ROADMAP.md) — 后续里程碑
+9. [ADR-0001](decisions/0001-owner-native-viewer.md) — Owner-native、无第二真源
+10. [DOCUMENTATION](DOCUMENTATION.md) — 文档规范
 
 外部 canonical 阅读材料： [CA Console 设计](https://github.com/odango-chan/ca-console/blob/main/docs/design/tasks-and-runs.md)、[Console 完整轨迹原型](https://github.com/odango-chan/ca-console/blob/main/docs/examples/trajectory-prototype.html)、[异常场景](https://github.com/odango-chan/ca-console/blob/main/docs/examples/trajectory-anomaly-prototype.html)、[Agent Demo Trace](https://github.com/odango-chan/ca-agent-demo/blob/main/docs/design/run-trace.md)。
 

@@ -2,6 +2,8 @@
 
 **Status: Proposed D1/D2, with D0 synthetic adapter · 2026-11-04**
 
+**D0.5 输入格式与验收前置门禁见 [Trace 输入格式要求](../contracts/trace-inputs.md)。** 本文只讲 Adapter/Projection 架构，不复制 owner-native 字段表。
+
 ## 目标
 
 不要建设第三个跨 owner 的 canonical Trace Schema。每个 Adapter 只验证所属真实 owner 的**原生契约**，以只读 `SourceRecord` + presentation fields 输出；保存 exact sourceAuthority、record family/type、version/profile digest、ref、owner sequence/revision、material digest、explicit causal refs 和 raw-locator。Presentation Card/Step/edge 不可回写 owner。
