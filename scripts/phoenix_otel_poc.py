@@ -13,10 +13,12 @@ import time
 from collections import Counter
 from pathlib import Path
 
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from phoenix.client import Client
-from phoenix.otel import register
 
 PROJECT = "trace-viewer-synthetic-poc"
 ENDPOINT = os.getenv("PHOENIX_COLLECTOR_ENDPOINT", "http://127.0.0.1:6006")
@@ -130,8 +132,14 @@ def check_phoenix_query():
 def main():
     # Local-server export only; no external backend, telemetry, LLM or provider.
     os.environ["PHOENIX_DISCOVER_CONFIG"] = "false"
-    provider = register(project_name=PROJECT, endpoint=ENDPOINT, protocol="http/protobuf",
-                        batch=False, auto_instrument=False)
+    provider = TracerProvider(resource=Resource.create({
+        "service.name": PROJECT,
+        "openinference.project.name": PROJECT,
+    }))
+    # Two independent processors: OTLP delivery AND local structure evidence.
+    provider.add_span_processor(SimpleSpanProcessor(OTLPSpanExporter(
+        endpoint=ENDPOINT.rstrip("/") + "/v1/traces", timeout=10,
+    )))
     memory = InMemorySpanExporter()
     provider.add_span_processor(SimpleSpanProcessor(memory))
     run_synthetic_traces(provider.get_tracer("trace-viewer-poc"))
