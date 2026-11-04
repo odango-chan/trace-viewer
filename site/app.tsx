@@ -218,7 +218,7 @@ function App() {
               </dl>
               <div className="inspector-label">EXPLICIT CAUSAL REFS</div>
               {causalLinks.length ? (
-                <div className="ref-list">{causalLinks.map(link => (
+                <div className="ref-list">{causalLinks.map((link: { ref: string; target: TraceRecord | null }) => (
                   <button type="button" key={link.ref} className="ref-item" onClick={() => { if (link.target) { setFilter('all'); const section = run.sections.find(item => item.records.some(record => record.ref === link.ref)); if (section) setExpanded(previous => new Set(previous).add(section.id)); setSelectedRef(link.ref) } }} disabled={!link.target}>
                     <span>↳</span><span className="mono">{link.ref}</span>
                     <small>{link.target ? 'VIEW' : 'UNAVAILABLE'}</small>
