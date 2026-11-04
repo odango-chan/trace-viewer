@@ -18,6 +18,8 @@ jobs:
     env:
       PHOENIX_WORKING_DIR: /tmp/trace-viewer-phoenix
       PHOENIX_ENABLE_AUTH: 'false'
+      PHOENIX_HOST: 127.0.0.1
+      PHOENIX_PORT: '6006'
       PHOENIX_COLLECTOR_ENDPOINT: http://127.0.0.1:6006
       PHOENIX_PROJECT_NAME: trace-viewer-synthetic-poc
       POC_PROOF_FILE: /tmp/trace-viewer-phoenix-proof.json
@@ -33,10 +35,15 @@ jobs:
       - name: Start private local Phoenix
         run: |
           mkdir -p "$PHOENIX_WORKING_DIR"
-          nohup python -m phoenix.server.main serve --host 127.0.0.1 --port 6006 >/tmp/trace-viewer-phoenix.log 2>&1 </dev/null &
+          nohup python -m phoenix.server.main serve >/tmp/trace-viewer-phoenix.log 2>&1 </dev/null &
           echo $! >/tmp/trace-viewer-phoenix.pid
-          for n in $(seq 1 100); do
-            if curl -fsS http://127.0.0.1:6006/ >/dev/null; then
+          for n in $(seq 1 45); do
+            if ! kill -0 "$(cat /tmp/trace-viewer-phoenix.pid)" 2>/dev/null; then
+              echo 'Phoenix process exited during startup:'
+              tail -n 120 /tmp/trace-viewer-phoenix.log
+              exit 1
+            fi
+            if curl -fsS http://127.0.0.1:6006/ >/dev/null 2>&1; then
               echo 'Phoenix HTTP server ready'
               exit 0
             fi
