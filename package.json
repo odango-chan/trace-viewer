@@ -1,0 +1,23 @@
+{
+  "name": "trace-viewer",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}

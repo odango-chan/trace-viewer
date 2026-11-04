@@ -1,0 +1,27 @@
+name: Verify Trace Viewer
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Unit tests
+        run: npm test
+      - name: Type check
+        run: npm run typecheck
+      - name: Build
+        run: npm run build
+      - name: Assert static artifacts
+        run: test -s dist/index.html && test -s dist/app.js && test -s dist/light.css
