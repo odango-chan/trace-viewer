@@ -5,8 +5,15 @@
 export const EXCEPTION_STATUSES = Object.freeze(new Set(['FAILED', 'UNRESOLVED', 'OUTCOME_UNKNOWN', 'RESULT_UNKNOWN', 'BLOCKED', 'DENIED', 'SAFE_STOPPED']))
 
 export function validateSyntheticRun(run) {
-  if (!run || run.sourceKind !== 'SYNTHETIC' || !Array.isArray(run.sections)) {
+  if (!run || run.sourceKind !== 'SYNTHETIC') {
     throw new Error('Only explicitly synthetic D0 fixtures are supported')
+  }
+  return validatePresentationRun(run)
+}
+
+export function validatePresentationRun(run) {
+  if (!run || !['SYNTHETIC','NATIVE_LOCAL'].includes(run.sourceKind) || !Array.isArray(run.sections)) {
+    throw new Error('Only validated synthetic or local native presentation is supported')
   }
   const ids = new Set()
   const ownerSequences = new Set()
@@ -34,7 +41,7 @@ export function validateSyntheticRun(run) {
 }
 
 export function allRecords(run) {
-  validateSyntheticRun(run)
+  validatePresentationRun(run)
   return run.sections.flatMap(section => section.records)
 }
 
@@ -58,7 +65,7 @@ export function runSummary(run) {
 }
 
 export function defaultOpenSections(run) {
-  validateSyntheticRun(run)
+  validatePresentationRun(run)
   return run.sections.filter(section => section.records.some(item => EXCEPTION_STATUSES.has(item.status))).map(section => section.id)
 }
 
