@@ -15,7 +15,7 @@
 | [真实 P8-D4 Runtime 诊断归档](https://github.com/odango-chan/ca-agent-demo/blob/main/artifacts/reviews/20261104-createdsession-p8d4-final-live-e2e/evidence/runtime-trace-attempt2.jsonl) | 2026-11-04 真实 E2E；106 行：21 个 timed span / 85 个诊断事件。事件包括 14 Call Result、18 Graph Transition、21 Predicate Evaluated、21 Verify Result、6 Procedure Terminal、5 Skill Result | **这是导出/诊断形态**，非 TraceStore v2。事件顶层 \`kind/data/diag/material/summary\` 没有原生 sequence、eventId、occurredAt；不能把 JSONL 行号伪装成 owner sequence |
 | [ca-runtime RunEvent.v1](https://github.com/odango-chan/ca-runtime/blob/main/schemas/v1alpha1/run-event.schema.yaml) | 已有 \`eventId/runId/sequence>=1/eventType/occurredAt/producer/payload/correlation/evidenceRefs\`，是 Runtime authoritative fact | 单独表达 Runtime typed facts，不包含 Agent/Model/Tool 全部活动；不应因 Trace 统一删除 Runtime RunEvent 源事实 |
 | [ca-runtime RunEvidenceMaterial](https://github.com/odango-chan/ca-runtime/blob/main/schemas/v1alpha1/run-evidence-material.schema.yaml) | \`run/events/firstSequence/lastSequence/eventCount/materialDigest/complete=true\` | 审计完整性/不可变 Evidence，不等同于普通 Span；Trace 可以引用它，而不是重建它 |
-| [DSH Agent trajectory](https://github.com/odango-chan/connectionagent/blob/main/docs/design/agent-trajectory.md) | Session/Turn/Step、模型实际输入输出 Snapshot、Tool Call/Result、host-knowledge、显式请求/结果 refs，SessionEvent owner-local seq | Agent source fact 是 DSH 的责任；与 Runtime 通过确切 request/run refs 关联，不可用单一全局事件序号代替 |
+| [DSH Agent trajectory（设计基线，非运行验收）](https://github.com/odango-chan/connectionagent/blob/main/docs/design/agent-trajectory.md) | Session/Turn/Step、模型实际输入输出 Snapshot、Tool Call/Result、host-knowledge、显式请求/结果 refs，SessionEvent owner-local seq | Agent source fact 是 DSH 的责任；与 Runtime 通过确切 request/run refs 关联，不可用单一全局事件序号代替 |
 | [CA Console trajectoryProjection](https://github.com/odango-chan/ca-console/blob/main/src/modules/runs/trajectoryProjection.ts) | 四泳道、Model/Tool folding、异常、Inspector；使用 Runtime RunEvent 与 Agent Material | **只是 UI read model**，不能当作新的 Trace wire/source |
 | [Phoenix/OTLP synthetic PoC](../experiments/phoenix-otel-poc.md) | 2 traces / 9 spans / 5 个 \`ca.*\` 属性 Phoenix readback，Chromium 浏览器可浏览 | 只证实 Span 及属性路径；尚未验证 LogRecord、完整 Model Snapshot、真实诊断/Otel 无损转换、Evidence closure |
 
@@ -42,7 +42,7 @@
 | **LogRecord / Span Event** | Runtime RunEvent、Predicate/Verification、Graph Transition、CALL_RESULT、ToolResult delivered、terminal、其他离散事实 | 保存 event type、业务 payload 的**经授权字段或不可变 source ref**、owner identity、owner-local order（存在时）、显式 refs |
 | **属性 / 关联 / 材料引用** | Trace/Span ID、Agent Session/Task ID、Runtime Run ID、sourceAuthority、owner eventRef、causalRefs、evidenceRefs、schema/profile/version | 不把 OTel traceId 当作业务 runId；不把 Span status 当作 domain mutation outcome |
 
-这里的 **Span 与 LogRecord 不是“分别设计两套 Trace”**，而是复用 OTel 原有的统一数据模型与一个 OTLP 导出通道。无需额外发明 \`UnifiedTraceEvent\`、另一套 canonical JSONL 或 Runtime 专用封装。
+这里的 **Span 与 LogRecord 不是“分别设计两套 Trace”**，而是复用 OTel 原有的数据模型和**同一 OTLP 协议**（Traces 与 Logs 属于不同 Signal、使用各自标准导出端点）。无需额外发明 \`UnifiedTraceEvent\`、另一套 canonical JSONL 或 Runtime 专用封装。
 
 ### 对不同执行路径的表达
 

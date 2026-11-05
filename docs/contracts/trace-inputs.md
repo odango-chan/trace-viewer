@@ -1,9 +1,9 @@
 # Trace 输入格式要求与兼容性清单
 
 **Status: D0.5 — Accepted for Viewer consumption; owner-native implementations are the authority**
-**Reviewed: 2026-11-04**
+**Reviewed: 2026-11-04 · historical source inventory; prospective one-contract direction updated 2026-11-05**
 
-本页是 `trace-viewer` 在开始 D1 前的**消费侧输入规范与现状盘点**，不是一份新的跨仓 Trace wire protocol。严禁要求 upstream 为 Viewer 改成一个统一 `TraceEvent`；每个 owner 的代码/Schema 仍是唯一机器契约。所有示例是**结构示意**，不冒充真实捕获文件。
+本页是 `trace-viewer` D0.5 阶段的**存量来源消费清单**，不是新的 Trace wire protocol。**2026-11-05 的统一目标已变更**：未来让各 Demo Producer 适配**一套统一 Trace 交换契约**，详见 [统一评估](../design/trace-unification-assessment.md)。此前的“不要让上游统一”只适用于保护现有 Owner 事实不被 Viewer 改写，**不再视为禁止 Producer 做 Trace 格式统一**。原生 RunEvent、DSH SessionEvent 和 Evidence 的独立权威仍要保留。本页历史格式样例并非新契约。
 
 ## 0. 固定审阅基线与区别
 

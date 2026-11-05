@@ -4,6 +4,10 @@
 
 > 当前状态：**D1 原生 TraceStore v2 合成 Golden PASS；D1.1 真实 P8-D4 诊断 JSONL 的独立只读导入与私有 Chromium PASS；完整真实业务 TraceStore v2 仍未验收**。默认示例均为合成数据；额外可手动导入经验证的本地真实诊断文件，但不能把诊断导出当作原生全量执行证据。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
 
+## 统一 Trace 方向（方案评估中）
+
+未来只保留**一套对外 Trace 契约**，包含 Agent、Harness、Runtime 诊断与纯确定性流程；当前多种导入格式仅服务存量兼容，不是长期架构。[现状全景与统一评估](docs/design/trace-unification-assessment.md)。**当前只完成分析，尚未冻结 OTLP Profile 或改动 Producer。**
+
 ## 定位
 
 - **Trace Viewer**：从 owner-native records **只读**呈现 Turn/Step、Model Interaction、Tool Interaction、Harness gates、Runtime、Observation、Evidence、Reconcile 与异常恢复。
