@@ -45,9 +45,11 @@
 | Owner sequence / Stream epoch | 来源本就提供有作用域的顺序，或**声明完整范围**依赖它 | 没有该来源特征时 N/A；不能用文件行号伪造 |
 | OTel TraceId / SpanId | 真的存在 OTel 上下文时作遥测关联 | 无 OTel 时 N/A；不能由 TraceId 反推 Execution ID |
 
-缺少可信上游 Execution 的回调，保留本地身份并标记未关联；以后以独立关联事实和可核查依据补充，禁止凭时间邻近推断或悄悄改写旧记录。真正独立的新根任务才创建新 Execution。
+缺少可信上游 Execution 的回调，保留本地身份并标记未关联；以后以独立关联 Fact 和可核查依据补充，禁止凭时间邻近推断或悄悄改写旧记录。**ORPHAN 是记录产生时“尚无可信执行归属”的不可变来源断言**；后续确认的关联不回写 ORPHAN 记录，视图可依据新链接 Fact 展示“原为 ORPHAN，现已关联到 Execution E”，原断言仍可追溯。真正独立的新根任务才创建新 Execution。
 
-**Fact 不可静默覆盖**。冲突判定以**同一记录 ID**为键：规范化后的类型、类型版本、内容均相同才是同一记录重发；任一不同即报 CONFLICT（**不能因 typeVersion 不同而绕过冲突**）。一个 Activity 可以有共享的 `activityRef`，但“开始 Fact”“结束 Fact”和最终 Activity 记录各有**不同 recordRef**，所以合法地共存，不会误判冲突。Activity 可以是一条完整记录，也可以由开始/结束事实表达；**不强制双重记录**。没有结束依据就标为未知，不臆测失败、取消或零耗时。活动技术完成不等于业务副作用成功。
+**Fact 不可静默覆盖；recordRef 与 typeVersion 是不同维度**：recordRef 是**一次已发布源事实**的身份，其身份不依赖 typeVersion 字符串，发布后所关联的类型与版本也**不可原地升级**。冲突以同一 recordRef 为键：源事实的规范类型、版本和内容均等价才视为重发；同一 ID 的类型/版本/内容有实质差异，须报 **IDENTITY_CONFLICT**，不能利用新版本覆盖旧事实。
+
+**合法版本演进分两种**：① 新发生的事实采用新 typeVersion，使用自己的新 recordRef；② 对历史事实的编码或查看投影升级，原始 source recordRef、source typeVersion 和原文保持不变，投影独立标注 `projectionVersion`；若权威 Owner 确实发布替代/更正事实，必须新建 recordRef，并用明确的 `supersedes` 关联旧 recordRef、保留两者。不得借换版重写旧身份。一个 Activity 可以有共享的 `activityRef`，但“开始 Fact”“结束 Fact”和最终 Activity 记录各有**不同 recordRef**，所以合法地共存，不会误判冲突。Activity 可以是一条完整记录，也可以由开始/结束事实表达；**不强制双重记录**。没有结束依据就标为未知，不臆测失败、取消或零耗时。活动技术完成不等于业务副作用成功。
 
 ## 3. 因果、交付与独立状态
 
@@ -55,7 +57,7 @@
 
 **Tool 产生结果 ≠ Host 获得结果 ≠ 模型下一次请求实际包含结果。** 异步、结果丢失或 Host 未知时须保留独立事实；简单同步请求允许用一条有类型的交互记录无损呈现请求、结果及交付，无须机械拆成多条事件。
 
-技术 Activity 状态、Runtime terminal、Operation 副作用确定性、Host knowledge、Reconcile 和外部世界状态属于**不同维度**。多个 Owner 声称的不同结果都必须保留，不能折叠成通用 SUCCESS。允许具有明确权限的 Owner **另记裁决/调和 Fact**，写明裁决者、所裁决的对象与作用范围、来源证据和采用的规则版本；Consumer 可以据此展示“当前有依据的结论”，但不能改写/隐藏原始分歧。没有授权裁决就显示多方结论与未知，不让 Viewer 猜。
+技术 Activity 状态、Runtime terminal、Operation 副作用确定性、Host knowledge、Reconcile 和外部世界状态属于**不同维度**。多个 Owner 声称的不同结果都必须保留，不能折叠成通用 SUCCESS。允许具有明确权限的 Owner **另记裁决/调和 Fact**，写明裁决者、所裁决的对象与作用范围、来源证据和采用的规则版本；Consumer 可以据此展示“当前有依据的结论”，但不能改写/隐藏原始分歧。**不同裁决 Fact 使用不同 recordRef**：两名有权 Owner 的裁决相反，是合法的**跨事实分歧**，而非同 ID 内容冲突。只有预先声明的授权范围/优先级/规则版本能够证明某裁决优先时，视图才可显示相应结论并保留其他裁决；无法决定优先级时显示 **DISPUTED / UNRESOLVED** 和来源，不自行排序或改写为一个成功状态。没有授权裁决就显示多方结论与未知，不让 Viewer 猜。
 
 **复合 Interaction 的最小可寻址规则：** 无论同步调用合并为一条记录，还是拆成多个 Facts，都必须能准确区分**请求、结果、交付**三个实际发生的阶段及各自的状态、接收者和材料角色。关系可以指向独立 recordRef，或指向复合记录内稳定、版本化的阶段/材料位置（不得只指向含糊的整条 Activity）。`consumes` 必须由当次实际外发模型请求的完整有效输入证明；ToolResult 已保存/已交付并不证明下一轮模型见过它。不存在某阶段时标记 N/A，不能补造交付事实。
 
@@ -118,7 +120,7 @@ Material 可内嵌在受控文件，也可通过受控引用读取；**不要求
 | ARCHIVE | 对**有限且已声明的来源范围**证明记录与材料覆盖、丢失/截断及读回保真 |
 | LEARNING_CANDIDATE | 独立的质量判定、许可、来源/版本、敏感筛查、训练/评测集隔离 |
 
-**目标产品责任不是 Producer 自由选择：** 新 Producer 只要产出记录就须满足 CORE；有 Predicate/Verification 等实际判断的 Owner 须满足该记录的 DIAGNOSTIC；真正调用模型的 Agent/Adapter 须对**当次交互**提供 AGENT_L0；跨 Owner 请求边界须满足适用的 DISTRIBUTED；产品声称某一有限执行范围能完整离线复核时，须满足该范围的 ARCHIVE；独立的数据评测/准备环节负责 LEARNING_CANDIDATE，普通 Recorder 不替样本打正标签。组件可如实声明缺失，但**目标产品必须报告 TARGET_GAP，不能通过全部自选 CORE 来宣称已达成诊断和复现目标**。
+**目标产品责任不是 Producer 自由选择，但由谁评估必须明确：** 目标产品的责任主体（例如应用集成方/验收负责人）必须在验收前登记**产品 Profile 声明**，至少写明产品标识、版本、目标范围（Run、Execution 或有限来源段）、参与 Producer/消费者及其角色、要求的能力、评价者和测试配置/版本。**TARGET_GAP 是该声明的范围级聚合验收结果**，由产品验收者计算/发布，不是某单一 Producer 的运行事实；没有产品声明时不得凭“你应该属于某产品”默认赋予 TARGET_GAP。新 Producer 只要产出记录就须满足 CORE；有 Predicate/Verification 等实际判断的 Owner 须满足该记录的 DIAGNOSTIC；真正调用模型的 Agent/Adapter 须对**当次交互**提供 AGENT_L0；跨 Owner 请求边界须满足适用的 DISTRIBUTED；产品声称某一有限执行范围能完整离线复核时，须满足该范围的 ARCHIVE；独立的数据评测/准备环节负责 LEARNING_CANDIDATE，普通 Recorder 不替样本打正标签。组件可如实声明缺失，但**目标产品必须报告 TARGET_GAP，不能通过全部自选 CORE 来宣称已达成诊断和复现目标**。
 
 **能力 PASS 必须带判定单位与覆盖依据**：至少区分单记录、单次交互、Run、Execution、有限来源段。内容完整性与来源捕获覆盖是两项独立判断。一个 Model Interaction 的 L0 PASS **不推导**整个 Run/Execution L0 PASS；一个 Predicate 可诊断 **不证明**整个 Run 没漏事件。范围覆盖未知则范围级 `UNKNOWN/PARTIAL`，不能因现存记录都通过就判完整；不适用为 N/A，未执行测试为 NOT_RUN，应发生却没采集为缺口而非 N/A。
 
