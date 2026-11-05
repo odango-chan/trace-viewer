@@ -38,7 +38,11 @@ export function projectSectionRows(run, section, mode = 'readable') {
   const rows = []
   // For source-oriented modes, do not fold or reorder source records.
   const selected = (mode === 'model')
-    ? section.records.filter(item => laneOf(item) === 'agent')
+    ? section.records.filter(item =>
+        laneOf(item) === 'agent' && (
+          String(item.sourceAuthority).includes('agent') ||
+          item.kind.startsWith('MODEL_') || item.kind.startsWith('TOOL_')
+        ))
     : section.records
   const fold = mode === 'readable' || mode === 'model'
   if (fold) {
