@@ -103,6 +103,7 @@ def main():
             assert page.locator(".inspector-title").inner_text() == "PREDICATE_EVALUATED"
             assert page.locator(".inspector .status.uncertain").inner_text() == "UNKNOWN"
             page.get_by_role("button", name="Show allowed local fields").click()
+            page.get_by_text("Await selector did not match", exact=True).wait_for(timeout=10000)
             detail = page.locator(".local-detail")
             assert "Await selector did not match" in detail.inner_text()
             for secret in ("imsi-synthetic-private", "synthetic-hidden-material",
@@ -119,6 +120,7 @@ def main():
             page.locator(".timeline .trace-event").filter(has_text="CALL_RESULT").first.click()
             assert page.locator(".local-detail-fields").count() == 0
             page.get_by_role("button", name="Show allowed local fields").click()
+            page.get_by_text("smf.create_context", exact=True).wait_for(timeout=10000)
             assert "smf.create_context" in page.locator(".local-detail").inner_text()
             assert "synthetic-hidden-binding" not in page.locator(".app-shell").inner_text()
             page.get_by_role("button", name="Frozen Procedure · without a model call").click()
