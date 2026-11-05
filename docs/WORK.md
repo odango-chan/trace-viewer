@@ -2,7 +2,7 @@
 
 **Updated: 2026-11-05**
 **Reviewed baseline: D1.1 real archived P8-D4 report import at main@2680e6fae1225c3b39b000da3ce7cc700883678f**
-**Scope: D0–D1.1 importer/PoC 状态不变；2026-11-05 完成现有 Agent/Runtime/Console/OTel 的统一 Trace 方向分析。一个未来 Trace 交换契约仍是 PROPOSED，Producer 改造 NOT_STARTED。**
+**Scope: D0–D1.1 importer/PoC 状态不变；2026-11-05 完成 [统一 Trace 需求与现状审计](design/trace-requirements-audit.md)，R01–R13 / T1–T6 处于待评审；未来单一 Trace Profile 仍 PROPOSED，Producer 改造 NOT_STARTED。**
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
@@ -15,7 +15,7 @@
 | D0.8 Console Demo-inspired Viewer modes | ACCEPTED for synthetic UI | IMPLEMENTED (4 modes, exact folding, 4 lanes, Inspector, 2 anomaly fixtures) | **Node 10/10 + Python 8/8 CI PASS** [verify](https://github.com/odango-chan/trace-viewer/actions/runs/41956588953); **Chromium 8 checks PASS** [run](https://github.com/odango-chan/trace-viewer/actions/runs/41956396421) + [screenshot](https://github.com/odango-chan/trace-viewer/actions/runs/41956396421/artifacts/13383166824); Console full UI parity & owner import NOT_RUN; [matrix](design/console-prototype-parity.md) |
 | D1 ca-agent-demo TraceStore v2 本地目录导入 | IMPLEMENTED STRICT SUBSET | Browser read-only parser + material SHA / Source Inspector; producer runtime unchanged | **Owner Writer/Loader 2/2 PASS; JS 7/7 groups PASS; Chromium native folders PASS** [private owner CI](https://github.com/odango-chan/ca-agent-demo/actions/runs/41959276561); real 5GC run, full browser parity and all owner lineage cases NOT_RUN; [report](experiments/native-d1-import.md) |
 | D1.1 真实 5GC 归档诊断 JSONL | REVIEW EXPORT ONLY | Independent `REVIEW_DIAGNOSTIC` local reader; raw summary/data/material dropped; file line not owner seq | **REAL P8-D4 106 lines = 21 spans + 85 events; private JS 4/4, Chromium PASS, no external requests** [owner CI](https://github.com/odango-chan/ca-agent-demo/actions/runs/41961642639); no owner-native v2 closure; [report](experiments/real-p8d4-review-import.md) |
-| Unified Trace (future direction) | PROPOSED SINGLE CONTRACT | **Architecture assessment only** [analysis](design/trace-unification-assessment.md); prioritize OTLP + GenAI/CA semantics, not another hand-written event envelope | Producer migration, full OTLP LogRecord/evidence roundtrip, single capture conformance **NOT_RUN** |
+| Unified Trace (future direction) | REQUIREMENTS AUDITED, CONTRACT NOT FROZEN | **Architecture assessment only** [analysis](design/trace-unification-assessment.md); prioritize OTLP + GenAI/CA semantics, not another hand-written event envelope | Producer migration, full OTLP LogRecord/evidence roundtrip, single capture conformance **NOT_RUN** |
 | D2 ca-console / ca-runtime owner-native Run/Trajectory Adapter | PROPOSED | NOT_STARTED | NOT_RUN |
 | D3 Model Input/Output、ToolResult、Evidence 和 Unknown/Reconcile 详情 | PROPOSED | NOT_STARTED | NOT_RUN |
 | D4 Process / Procedure Flow、原文版本 identity、Skill Studio 深链 | PROPOSED | NOT_STARTED | NOT_RUN |

@@ -6,7 +6,8 @@
 
 1. [README](../README.md) / [AGENTS](../AGENTS.md) — 定位与贡献规则
 2. [WORK](WORK.md) — 当前事实（不把静态 Demo 视为生产 Trace）
-3. [Trace 统一评估](design/trace-unification-assessment.md) — 当前 Agent/Runtime/Console/OTel 对照，未来一个 Trace 契约的候选路线
+3. [Trace 需求与现状审计](design/trace-requirements-audit.md) — 目标、P0/P1、代码缺口、验收标准（先读）
+4. [Trace 统一评估](design/trace-unification-assessment.md) — 当前 Agent/Runtime/Console/OTel 对照，未来一个 Trace 契约的候选路线
 4. [TRACEABILITY](TRACEABILITY.md) — 规范 → 代码 → 测试 → 验收
 4. [Owner / Authority](architecture/ownership.md) — 权限与跨仓边界
 5. [Trajectory UX](design/trajectory-viewer.md) — DSH-inspired 折叠轨迹与确定性下钻
