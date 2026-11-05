@@ -1,0 +1,54 @@
+name: Trace Viewer Chromium UI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'tests/viewer_ui_smoke.py'
+      - '.github/workflows/viewer-ui.yml'
+  workflow_dispatch:
+
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install app
+        run: npm install --no-audit --no-fund
+      - name: Build app
+        run: npm run build
+      - name: Install browser
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.56.0
+          python -m playwright install --with-deps chromium --only-shell
+      - name: Start static Viewer
+        run: |
+          nohup python -m http.server 8123 --bind 127.0.0.1 --directory dist > /tmp/trace-viewer-http.log 2>&1 </dev/null &
+          echo $! > /tmp/trace-viewer-http.pid
+          for n in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8123/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/trace-viewer-http.log
+          exit 1
+      - name: Chromium interaction checks
+        run: python tests/viewer_ui_smoke.py
+      - name: Upload synthetic UI proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: viewer-synthetic-ui-proof
+          path: /tmp/viewer-ui-proof/
+          if-no-files-found: ignore
+          retention-days: 7
