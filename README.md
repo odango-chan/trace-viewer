@@ -4,6 +4,12 @@
 
 > 当前状态：**D1 原生 TraceStore v2 合成 Golden PASS；D1.1 真实 P8-D4 诊断 JSONL 的独立只读导入与私有 Chromium PASS；完整真实业务 TraceStore v2 仍未验收**。默认示例均为合成数据；额外可手动导入经验证的本地真实诊断文件，但不能把诊断导出当作原生全量执行证据。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
 
+## 本地只读 Viewer 使用方式
+
+页面左侧可以导入现有原生 TraceStore v2 目录、归档诊断 JSONL，或一份单独的诊断报告 JSON。诊断 JSONL 的有限字段需在 Inspector 中明确点击 **Show allowed local fields** 才展示。独立诊断报告只显示来源允许的安全摘要，**不是同一 Run 的轨迹或已经关联的 Owner 证据**；切换 Run 后会隐藏，需要手动再次打开。
+
+真实 P8-D4 attempt 2 JSONL 的 85 条诊断事件读取、以及独立 attempt 1 诊断报告的受限字段投影已在授权私有上下文验证；公开浏览器仅用合成文件通过 **13 项交互检查**。完整真实数据 Chromium 验收及跨 Owner 证据关联仍未完成。详见 [V1 归档实验](docs/experiments/real-p8d4-review-import.md) 与 [PR #2](https://github.com/odango-chan/trace-viewer/pull/2)。
+
 ## Viewer 当前主线与 Trace 规范状态
 
 **当前优先工作是 Viewer 的真实来源阅读、异常定位和 Inspector 下钻，而不是继续扩大 Trace 规范工作。** 先复用已实现的 TraceStore v2 和真实诊断 JSONL 本地导入，用真实故障故事验收 Q1–Q6；不要求等统一机器 Schema 冻结才改善 Viewer。
