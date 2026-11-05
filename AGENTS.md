@@ -2,13 +2,13 @@
 
 ## 责任与范围
 
-本仓 `odango-chan/trace-viewer` 只拥有只读 Web Viewer、源格式 Adapter、展示投影、合成 Fixtures、浏览器交互与本仓测试。它**不拥有** Agent/Model 的真实输入输出、Runtime terminal、Tool 权限、Harness 决策、Fabric/Provider/5GC 状态或 Evidence 认证结果。
+本仓的**既有运行代码**只拥有只读 Web Viewer、源格式 Adapter、展示投影、合成 Fixtures、浏览器交互与本仓测试。当前新增的跨仓 [Unified Trace v0.1 草案](docs/specs/unified-trace-v0.1.md) 是**候选规范设计工作**，不意味着本仓拥有 Runtime/Agent 的业务真值或已获授权改造其他仓。它**不拥有** Agent/Model 的真实输入输出、Runtime terminal、Tool 权限、Harness 决策、Fabric/Provider/5GC 状态或 Evidence 认证结果。
 
 保留 CA Console 中受 DeepSeek-style Harness / DSH Agent Session Trajectory 启发的阅读体验：Turn → Model Interaction → Tool Interaction → Runtime Gates/Execution/Outcome/Evidence/Reconcile/Delivery，正常折叠、异常优先展开。确定性 Procedure Flow 是**并列下钻**，不得取代 Agent 轨迹。
 
 ## 开发前阅读顺序
 
-1. `README.md`、`docs/README.md`
+1. `README.md`、`docs/specs/unified-trace-v0.1.md`（当前规范草案，**先设计后实现**）、`docs/README.md`
 2. `docs/WORK.md`（当前状态）、`docs/TRACEABILITY.md`（实现→测试→证据）
 3. `docs/architecture/ownership.md`
 4. `docs/contracts/trace-inputs.md`（D1/D2 输入格式与验证前置要求）
@@ -22,6 +22,12 @@
 - Exception prototype: https://github.com/odango-chan/ca-console/blob/main/docs/examples/trajectory-anomaly-prototype.html
 - Agent Demo: https://github.com/odango-chan/ca-agent-demo/blob/main/docs/design/run-trace.md
 - Skill Studio: https://github.com/odango-chan/ca-skill-studio-demo
+
+## 本阶段工作边界（2026-11-05）
+
+- **先评审统一规范，再实现**。当前只编辑 `docs/specs/unified-trace-v0.1.md` 及索引/决策说明；不得因为规范讨论自动推进 DSH、Agent Demo、Runtime、Console Producer、Replay Engine 或新的多格式 Adapter。
+- 旧 D1/D2 计划和 ADR-0001 适用于**已实现 Viewer**；它们不是未来统一 Trace 机器格式的既定约束。现有业务事实的真实性、安全性不得因重设计而牺牲。
+- 未经明确评审，不冻结 OTLP / Phoenix、存储文件格式、机器 Schema、跨 Owner 的唯一权威数据模型。
 
 ## 不可违背
 

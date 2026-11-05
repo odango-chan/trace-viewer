@@ -197,6 +197,10 @@ Trace 是**候选样本来源**，训练样本通过独立的 Evaluation/Oracle/
     {
       "role": "tool-result",
       "materialRef": "material://synthetic/result-2",
+      "mediaType": "application/json",
+      "contentVersion": "synthetic-profile-v1",
+      "classification": "RESTRICTED",
+      "sourceOwner": "synthetic-agent-host",
       "digestAlgorithm": "sha256",
       "digest": "SYNTHETIC_PLACEHOLDER_NOT_A_REAL_DIGEST",
       "availability": "NOT_VERIFIED"

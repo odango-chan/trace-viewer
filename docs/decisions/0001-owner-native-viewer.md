@@ -15,6 +15,12 @@ CA Console 已有 DSH-inspired Agent Trajectory、Model/Tool fold、Runtime stag
 5. DSH style normal-fold/anomaly-expand 保留为默认；确定性 Procedure 是并列视图。
 6. 逐步接入 Agent Demo 和 Console，不要求两个 owner 先迁移到同一个 Trace Schema。
 
+## 2026-11-05 范围说明（不是自动废止）
+
+本 ADR 的 Accepted 决策仍描述 **D0–D1 已实现 Viewer 的历史架构**。其中第 4、6 项（长期按各原生格式增加 Adapter、不要求 Producer 统一）与现在的 [Unified Trace v0.1 候选设计](../specs/unified-trace-v0.1.md) **存在方向冲突**。**不能悄悄把 Accepted ADR 当作新规范的永久约束，也不能在 v0.1 尚未批准时宣布 ADR 已被取代。**
+
+统一规范评审通过后应专门作出决策：保留只读 Viewer/权威事实来源边界，重新评估第 4、6 项；明确是否以一套统一 Trace Profile 替换长期多输入 Adapter 路线。当前仅记录冲突，不修改 Producer 或既有 Viewer。
+
 ## Consequences
 
 + 能独立进化 UI，减少两个旧仓的展示耦合。

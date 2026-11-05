@@ -2,6 +2,10 @@
 
 **Updated · 2026-11-05**
 
+**本轮纠偏（当前生效）**：正式进入 **Stage A — Unified Trace Specification v0.1 设计/评审**，见 [规范草案](specs/unified-trace-v0.1.md)。先评审四项未定决策（唯一交换编码、Execution/Run/Attempt 引用规则、Material/完整性、类型与状态 Registry），修订到可以冻结的规范，再考虑编写机器 Schema/Conformance 测试向量。
+
+**Stage B — Demo 重新实现：PAUSED / NOT_AUTHORIZED。** 规范批准之后再决定各 Producer/Consumer 一次性迁移顺序与旧 Adapter 清理。**下列 D0–D5 和 DSH 验收是历史工作/候选清单，不是当前要继续执行的步骤**；不要因阅读旧交接自动启动 DSH/Runtime/Agent Demo 代码开发。
+
 **当前主线已调整：** 第一版必须同时验证 [真实执行可排障](design/trace-debuggability-audit.md) 的 **Q1–Q6/S1–S3** 与 [Agent 可复现/可学习准备](design/trace-reproducibility-learning-audit.md) 的 **Q7–Q9/S4**。下表 D2–D5 是之前的功能候选，**不是需要按顺序全部建设的既定工作包**；OTLP/Profile/多 Producer 改造等待上述排障实证。
 
 **Agent 纵切进展：** 两份真实 ca-agent ProductTask Owner 归档的 Model Request/Response 摘要、**嵌入 user 消息的完整 Tool Catalog 与 Owner Surface Digest**、ToolResult/Next Model 精确关联全部 PASS；无副作用 Observation Stub 对照 PASS，[私有 CI](https://github.com/odango-chan/ca-console/actions/runs/41979646464)。Skill Context 对 **此 ProductTask 路线为 N/A**；L0 完整执行环境和全 L2 控制流重演仍待验收。**Skill-dependent DSH/Agent 路线首轮 source-only Owner Builder Golden 已 PASS**（Skill/Reference 可见、摘要/关联与负例），[证据](experiments/dsh-skill-replay-golden.md)；genuine DSH Session + 官方 JSONL 后端跨 Context 重开 **已 PASS（合成）**，**完整 Agent Loop 的 Session 集成与真实 Skill/Reference Owner closure 仍待验收**，不重复修已保存的 Catalog。详见 [ProductTask 实证](experiments/agent-replay-archive-audit.md)。
