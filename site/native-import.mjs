@@ -229,6 +229,7 @@ export async function importTraceStoreFiles(fileList) {
         reject('INVALID_SHAPE','invalid sorted pair-array at seq '+index)
       previous=pair[0]
     }
+    safe(Object.fromEntries(ev.data),'trace.jsonl#'+index+'.data')
     if(ev.material_ref!==null&&(typeof ev.material_ref!=='string'||!HASH.test(ev.material_ref)))
       reject('INVALID_SHAPE','invalid material reference at seq '+index)
     return {...ev,data:Object.fromEntries(ev.data)}
