@@ -34,8 +34,12 @@ function assessAdjudication(v){
  const rule=oracle.trustedRuleSnapshot.find(r=>r.recordRef===refs[0]);
  if(!rule||!oracle.publishedDecisionOrdersVerified||!rule.verifiedPublisher||rule.publisher!==oracle.allowedRulePublisher)return rt("UNRESOLVED","DISPUTED",["RULE_PUBLISHER_UNVERIFIED"]);
  if(rule.scope!==input.scope)return rt("UNRESOLVED","DISPUTED",["RULE_SCOPE_MISMATCH"]);
- const first=Math.min(...ds.map(d=>d.publicationOrder));
- if(rule.publicationOrder>=first||rule.effectiveFromOrder>first||rule.effectiveUntilOrder<first)return rt("UNRESOLVED","DISPUTED",["RULE_NOT_PREPUBLISHED"]);
+ const orders=ds.map(d=>oracle.trustedDecisionPublicationOrders?.[d.recordRef]);
+ if(orders.some(x=>!Number.isInteger(x)))return rt("UNRESOLVED","DISPUTED",["DECISION_ORDER_UNVERIFIED"]);
+ const first=Math.min(...orders);
+ if(rule.publicationOrder>=first)return rt("UNRESOLVED","DISPUTED",["RULE_NOT_PREPUBLISHED"]);
+ if(ds.some(d=>d.ruleVersion!==rule.ruleVersion))return rt("UNRESOLVED","DISPUTED",["RULE_VERSION_MISMATCH"]);
+ if(orders.some(order=>rule.effectiveFromOrder>order||rule.effectiveUntilOrder<order))return rt("UNRESOLVED","DISPUTED",["RULE_NOT_EFFECTIVE"]);
  const scores=ds.map(d=>rule.rankByOwner[d.owner]);
  if(scores.some(x=>!Number.isInteger(x)))return rt("UNRESOLVED","DISPUTED",["RULE_SELECTION_AMBIGUOUS"]);
  const min=Math.min(...scores);
