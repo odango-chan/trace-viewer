@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { samples } from './fixtures.mjs'
 import { allRecords, defaultOpenSections, getSourceLinks, isException, runSummary } from './projection.mjs'
 import { findPrimaryUnknown, projectLanes, projectSectionRows } from './console-parity.mjs'
+import { importTraceStoreFiles } from './native-import.mjs'
 
 type TraceRecord = {
   ref: string
@@ -13,6 +14,9 @@ type TraceRecord = {
   summary: string
   status: string
   causalRefs: string[]
+  materialRef?: string | null
+  sourceLocator?: string
+  stage?: string
 }
 type Section = {
   id: string
@@ -33,14 +37,14 @@ type ViewMode = 'readable' | 'model' | 'owners' | 'raw'
 type InspectorTab = 'summary' | 'source' | 'links'
 type ExampleRun = {
   id: string
-  sourceKind: 'SYNTHETIC'
+  sourceKind: 'SYNTHETIC' | 'NATIVE_LOCAL'
   mode: string
   title: string
   subtitle: string
   note: string
   sections: Section[]
 }
-const runs = samples as unknown as ExampleRun[]
+const syntheticRuns = samples as unknown as ExampleRun[]
 
 function statusClass(status: string): string {
   if (['FAILED', 'BLOCKED', 'OUTCOME_UNKNOWN', 'RESULT_UNKNOWN', 'UNRESOLVED', 'DENIED', 'SAFE_STOPPED'].includes(status)) return 'status danger'
@@ -59,9 +63,40 @@ function kindSymbol(kind: string): string {
 }
 
 function App() {
-  const [runId, setRunId] = useState(runs[0].id)
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(runs[0])))
-  const [selectedRef, setSelectedRef] = useState<string>(runs[0].sections[1].records[2].ref)
+  const [nativeRun, setNativeRun] = useState<ExampleRun | null>(null)
+  const [importError, setImportError] = useState<string | null>(null)
+  const [importing, setImporting] = useState(false)
+  const directoryRef = useRef<HTMLInputElement | null>(null)
+  const runs = nativeRun ? [nativeRun, ...syntheticRuns] : syntheticRuns
+  const [runId, setRunId] = useState(syntheticRuns[0].id)
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(syntheticRuns[0])))
+  const [selectedRef, setSelectedRef] = useState<string>(syntheticRuns[0].sections[1].records[2].ref)
+  useEffect(() => {
+    if (directoryRef.current) directoryRef.current.webkitdirectory = true
+  }, [])
+
+  async function importDirectory(event: React.ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget
+    const selectedFiles = input.files
+    if (!selectedFiles?.length) return
+    setImporting(true)
+    setImportError(null)
+    try {
+      const imported = await importTraceStoreFiles(selectedFiles) as ExampleRun
+      setNativeRun(imported)
+      setRunId(imported.id)
+      setExpanded(new Set(imported.sections.map(section => section.id)))
+      setSelectedRef(imported.sections.flatMap(section => section.records)[0]?.ref ?? '')
+      setFilter('all')
+      setViewMode('readable')
+      setInspectorTab('summary')
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : 'Native import failed')
+    } finally {
+      setImporting(false)
+      input.value = ''
+    }
+  }
   const [filter, setFilter] = useState<'all' | 'exceptions'>('all')
   const [viewMode, setViewMode] = useState<ViewMode>('readable')
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>('summary')
@@ -144,14 +179,21 @@ function App() {
         <span className="header-divider" />
         <span className="header-context">Execution observability</span>
         <div className="topbar-spacer" />
-        <span className="build-badge">D0 · PREVIEW</span>
-        <span className="synthetic-badge">SYNTHETIC DATA</span>
+        <span className="build-badge">D1 · LOCAL PREVIEW</span>
+        <span className="synthetic-badge">{run.sourceKind === 'SYNTHETIC' ? 'SYNTHETIC DATA' : 'LOCAL NATIVE · NOT OWNER VERIFIED'}</span>
       </header>
 
       <div className="workbench">
         <aside className="sidebar" aria-label="Run explorer">
           <div className="sidebar-heading">EXPLORER</div>
-          <div className="sidebar-caption">RUN EXAMPLES <span>{runs.length}</span></div>
+          <div className="sidebar-caption">RUNS & LOCAL INPUT <span>{runs.length}</span></div>
+          <div className="import-block">
+            <label htmlFor="native-directory">Import TraceStore v2 folder</label>
+            <input ref={directoryRef} id="native-directory" type="file" multiple
+              aria-label="Import TraceStore v2 directory" onChange={importDirectory} />
+            <small>{importing ? 'Checking local files…' : 'Browser-only · no upload · run.json + trace.jsonl + materials'}</small>
+            {importError && <p className="import-error" role="alert">{importError}</p>}
+          </div>
           <div className="run-list">
             {runs.map(item => (
               <button key={item.id} type="button" className={'run-option ' + (item.id === run.id ? 'active' : '')} onClick={() => selectRun(item)} aria-pressed={item.id === run.id}>
@@ -198,7 +240,7 @@ function App() {
 
           <div className="info-note">
             <span className="info-note-icon">i</span>
-            <span><strong>Illustration, not an execution result.</strong> {run.note}</span>
+            <span><strong>{run.sourceKind === 'SYNTHETIC' ? 'Illustration, not an execution result.' : 'Native local source · not owner-certified.'}</strong> {run.note}</span>
           </div>
 
           <div className="trace-heading">
@@ -227,7 +269,7 @@ function App() {
             {viewMode === 'readable' && 'Paired Model/Tool interactions are presentation-only; Runtime and external facts remain separate.'}
             {viewMode === 'model' && 'Agent/Model owner records only. Runtime omission here is a filter, not missing execution.'}
             {viewMode === 'owners' && 'Unfolded owner-native records in separate lanes. No global cross-owner sequence.'}
-            {viewMode === 'raw' && 'Source refs, kinds and owner-local sequences. Raw materials are not included in these synthetic fixtures.'}
+            {viewMode === 'raw' && 'Source refs, kinds and owner-local sequences. Imported material bodies are never shown automatically.'}
           </div>
 
           <div className="timeline" aria-label="Read-only execution trajectory">
@@ -272,7 +314,9 @@ function App() {
               return (filter === 'exceptions' ? rows.filter(row => row.members.some(isException)) : rows).length > 0
             }) && <div className="empty-state">No matching source records in this view. This is a filter result, not an execution conclusion.</div>}
           </div>
-          <div className="canvas-footer">D1 will add native TraceRun import. No live owner APIs are connected in D0.</div>
+          <div className="canvas-footer">{run.sourceKind === 'NATIVE_LOCAL'
+            ? 'Local v2 import · browser structure and file digests only · owner TraceStore.load_run not executed · no live services.'
+            : 'Synthetic-only sample. Choose a local TraceStore v2 folder to inspect its actual source records.'}</div>
         </main>
 
         <aside className="inspector" aria-label="Source record inspector">
@@ -324,13 +368,17 @@ function App() {
                 <>
                   <div className="inspector-label">SOURCE IDENTITY</div>
                   <pre className="source-preview">{JSON.stringify({
-                    sourceKind: 'SYNTHETIC', ref: activeRecord.ref,
+                    sourceKind: run.sourceKind, ref: activeRecord.ref,
                     sourceAuthority: activeRecord.sourceAuthority,
                     ownerSequence: activeRecord.ownerSequence,
                     kind: activeRecord.kind, status: activeRecord.status,
                     causalRefs: activeRecord.causalRefs,
+                    ...(run.sourceKind === 'NATIVE_LOCAL' ? {
+                      sourceLocator: activeRecord.sourceLocator,
+                      stage: activeRecord.stage, materialRef: activeRecord.materialRef ?? null,
+                    } : {}),
                   }, null, 2)}</pre>
-                  <div className="raw-placeholder"><strong>Presentation-only snapshot</strong><span>This is a safe subset of the authored fixture, not raw owner-native bytes.</span></div>
+                  <div className="raw-placeholder"><strong>Provenance subset only</strong><span>Raw material content is not included. The viewer does not transmit files or assert complete owner validation.</span></div>
                 </>
               )}
               {inspectorTab === 'links' && (
