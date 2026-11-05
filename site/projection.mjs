@@ -77,3 +77,41 @@ export function defaultOpenSections(run) {
 export function isException(record) {
   return EXCEPTION_STATUSES.has(record.status)
 }
+
+/**
+ * Source-aware Inspector claim, deliberately not a material reader.
+ * Labels describe what the current browser adapter actually verified;
+ * they never elevate imported reports to owner-native evidence.
+ */
+export function inspectorEvidenceStatus(run, record) {
+  if (!record) return {
+    label: 'NO SOURCE SELECTED',
+    detail: 'Select a source record to inspect its evidence availability.',
+  }
+  if (run.sourceKind === 'SYNTHETIC') return {
+    label: 'ILLUSTRATION ONLY',
+    detail: 'This is synthetic demo content, not actual owner evidence or material.',
+  }
+  if (run.sourceKind === 'REVIEW_DIAGNOSTIC') return {
+    label: 'WITHHELD BY REVIEW READER',
+    detail: 'The diagnostic JSONL reader intentionally removes raw data, diagnostic text and material. Their absence from this view is not proof they were absent in the source; owner identity, digests and completeness remain unverified.',
+  }
+  if (run.sourceKind === 'NATIVE_LOCAL' && record.materialRef) return {
+    label: 'DIGEST CHECKED · BODY HIDDEN',
+    detail: 'The local TraceStore v2 importer checked the referenced material file against its SHA-256 digest. The material body is not displayed; full upstream Owner Loader validation and evidence completeness have not been established.',
+  }
+  if (run.sourceKind === 'NATIVE_LOCAL') return {
+    label: 'NO MATERIAL REF ON RECORD',
+    detail: 'This native event does not carry a material_ref. Evidence may exist elsewhere; absence of an event-level reference does not prove that the run has no evidence.',
+  }
+  return {
+    label: 'UNVERIFIED SOURCE',
+    detail: 'Evidence provenance for this source is not established.',
+  }
+}
+
+export function sourceOverviewLabel(run) {
+  if (run.sourceKind === 'NATIVE_LOCAL') return 'Local TraceStore v2'
+  if (run.sourceKind === 'REVIEW_DIAGNOSTIC') return 'Diagnostic review export'
+  return run.mode === 'DETERMINISTIC' ? 'Deterministic' : 'Agent / Model'
+}
