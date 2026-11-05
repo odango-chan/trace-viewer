@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { samples } from './fixtures.mjs'
-import { allRecords, defaultOpenSections, getSourceLinks, isException, runSummary } from './projection.mjs'
+import { allRecords, defaultOpenSections, getSourceLinks, inspectorEvidenceStatus, isException, runSummary, sourceOverviewLabel } from './projection.mjs'
 import { findPrimaryUnknown, projectLanes, projectSectionRows } from './console-parity.mjs'
 import { importTraceStoreFiles } from './native-import.mjs'
 import { importReviewDiagnosticFile } from './review-diagnostic.mjs'
@@ -128,6 +128,7 @@ function App() {
   const run = runs.find(item => item.id === runId) ?? runs[0]
   const records = allRecords(run) as TraceRecord[]
   const activeRecord = records.find(record => record.ref === selectedRef) ?? null
+  const evidenceStatus = inspectorEvidenceStatus(run, activeRecord)
   const summary = runSummary(run)
   const causalLinks = activeRecord ? getSourceLinks(run, activeRecord) : []
   const activePresentationRow = run.sections.flatMap(section =>
@@ -234,7 +235,7 @@ function App() {
                 <span className="run-option-icon">{item.mode === 'DETERMINISTIC' ? '◇' : '◆'}</span>
                 <span className="run-option-copy">
                   <strong>{item.title}</strong>
-                  <small>{item.mode === 'DETERMINISTIC' ? 'Deterministic · No Model' : 'Agent / Model · Synthetic'}</small>
+                  <small>{item.sourceKind === 'SYNTHETIC' ? (item.mode === 'DETERMINISTIC' ? 'Deterministic · Synthetic' : 'Agent / Model · Synthetic') : sourceOverviewLabel(item) + ' · Local only'}</small>
                 </span>
               </button>
             ))}
@@ -266,7 +267,7 @@ function App() {
           </div>
 
           <div className="metric-row">
-            <div className="metric"><span>Execution mode</span><strong>{run.mode === 'DETERMINISTIC' ? 'Deterministic' : 'Agent / Model'}</strong></div>
+            <div className="metric"><span>{run.sourceKind === 'SYNTHETIC' ? 'Execution mode' : 'Imported source'}</span><strong>{sourceOverviewLabel(run)}</strong></div>
             <div className="metric"><span>Visible records</span><strong>{summary.events}</strong></div>
             <div className="metric"><span>Owner streams</span><strong>{summary.ownerStreams}</strong></div>
             <div className="metric"><span>Exception flags</span><strong className="warning-text">{summary.exceptions}</strong></div>
@@ -397,7 +398,7 @@ function App() {
                     </>
                   )}
                   <div className="inspector-label">EVIDENCE / MATERIAL</div>
-                  <div className="raw-placeholder"><strong>UNAVAILABLE — synthetic fixture</strong><span>No real source material, model snapshot or evidence closure was loaded.</span></div>
+                  <div className="raw-placeholder" role="status"><strong>{evidenceStatus.label}</strong><span>{evidenceStatus.detail}</span></div>
                 </>
               )}
               {inspectorTab === 'source' && (
