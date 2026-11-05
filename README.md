@@ -7,7 +7,7 @@
 ## 统一 Trace 规范设计（当前主线）
 
 **当前优先工作是规范设计，不是 DSH / Agent Demo / Runtime 的实现验收。**
-已形成 [**Unified Trace Specification v0.2（DRAFT，当前唯一候选）**](docs/specs/unified-trace-v0.2.md)，针对 [v0.1 评审指出的六项 P0](docs/reviews/unified-trace-v0.1-architecture-review.md) 完成了语义层修订；[**v0.2 独立反例评审**](docs/reviews/unified-trace-v0.2-minimality-review.md) 指出的六项减重问题已按正文修订；[**语义冻结复审**](docs/reviews/unified-trace-v0.2-semantic-freeze-review.md) 认为架构/轻量化基本通过，但仍有四项关键条款需要补齐，以**可诊断、可复现、可学习**为目标，覆盖执行身份、Activity/Fact、因果关系、诊断与模型可见材料、完整性和一致性门禁。现有多个 Viewer Adapter、DSH Session 测试与 Phoenix PoC 是**历史现状/选型证据**，不是规范标准；在 v0.2 评审定型前**暂停继续修改各 Producer**。v0.1 仅保留为[历史草案](docs/specs/unified-trace-v0.1.md)。
+已形成 [**Unified Trace Specification v0.2（DRAFT，当前唯一候选）**](docs/specs/unified-trace-v0.2.md)，针对 [v0.1 评审指出的六项 P0](docs/reviews/unified-trace-v0.1-architecture-review.md) 完成了语义层修订；[**v0.2 独立反例评审**](docs/reviews/unified-trace-v0.2-minimality-review.md) 指出的六项减重问题已按正文修订；[**语义冻结复审**](docs/reviews/unified-trace-v0.2-semantic-freeze-review.md) 认为架构/轻量化基本通过，但四项关键条款现已补入候选语义，仍需机器 Schema/一致性验收，以**可诊断、可复现、可学习**为目标，覆盖执行身份、Activity/Fact、因果关系、诊断与模型可见材料、完整性和一致性门禁。现有多个 Viewer Adapter、DSH Session 测试与 Phoenix PoC 是**历史现状/选型证据**，不是规范标准；在 v0.2 评审定型前**暂停继续修改各 Producer**。v0.1 仅保留为[历史草案](docs/specs/unified-trace-v0.1.md)。
 
 ## 统一 Trace 目标（规范先行）
 

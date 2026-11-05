@@ -4,7 +4,7 @@
 
 | Scope | Canonical design | Code / artifact | Test | Evidence |
 |---|---|---|---|---|
-| 统一 Trace v0.2（当前设计） | [中文精简修订稿](specs/unified-trace-v0.2.md)；[最新独立语义复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **DOCS_ONLY**；无 Producer 修改 | 四个最小场景与两个新反例完成文本审查；C01–C10 黑盒测试 **NOT_RUN** | 架构/减重基本通过，**4 P0 冻结阻塞** |
+| 统一 Trace v0.2（当前设计） | [中文精简修订稿](specs/unified-trace-v0.2.md)；[最新独立语义复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **DOCS_ONLY**；无 Producer 修改 | 四个最小场景与两个新反例完成文本审查；C01–C10 黑盒测试 **NOT_RUN** | 架构/减重基本通过，**4 P0 文本整改完成，机器/独立一致性验证未运行，仍未冻结** |
 | Repo governance | [DOCUMENTATION](DOCUMENTATION.md)、[ownership](architecture/ownership.md) | `AGENTS.md`、`README.md`、`docs/*` | doc links / review | [main commit](https://github.com/odango-chan/trace-viewer/commit/c21cdc97376209c5e5fb958d1ce7a406b88db488); [CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 synthetic, owner-labeled records | [source-adapters](design/source-adapters.md) | `site/fixtures.mjs`、`site/projection.mjs` | `tests/projection.test.mjs` | [CI unit tests 5/5 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423); [CI build/typecheck PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423); Browser NOT_RUN |
 | D0 DSH-inspired foldable Turn/Tool/Runtime UI | [trajectory-viewer](design/trajectory-viewer.md) | `site/app.tsx`、`site/light.css` | `tests/projection.test.mjs` + `tests/viewer_ui_smoke.py` | Chromium 8 synthetic interactions PASS at https://github.com/odango-chan/trace-viewer/actions/runs/41956396421; native adapter NOT_RUN |
