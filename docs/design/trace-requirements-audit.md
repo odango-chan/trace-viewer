@@ -5,7 +5,7 @@
 **范围：Agent / DSH、Harness、Runtime、诊断、Console / Trace Viewer；兼容确定性、纯 LLM、混合执行**
 **本轮不修改 Producer、不冻结 OTLP Profile，也不另建多种 Trace Schema。**
 
-> **优先阅读 [第二维：排障可回答性审计](trace-debuggability-audit.md)**。本页 R01–R13 是覆盖清单，**并非要求第一版 Demo 同时交付 13 个 P0/P1 领域**；当前第一版以 Q1–Q6 的诊断问题和 S1–S3 的三条执行故事作为实际通过门槛。
+> **优先阅读 [第二维：排障可回答性审计](trace-debuggability-audit.md)**。本页 R01–R16 是覆盖清单，**并非要求第一版 Demo 同时交付全部平台能力**；当前第一版以 [诊断 Q1–Q6/S1–S3](trace-debuggability-audit.md) + [复现 Q7–Q9/S4](trace-reproducibility-learning-audit.md) 为核心验收，不以字段数量代替实际可复核性。
 
 > **一句话目标：一个可采集、存储、关联、搜索、离线查看的执行轨迹体系；正常轨迹可读，异常诊断足够深，全部事实可追溯。** Runtime 诊断与 Agent Model/Tool 轨迹同等重要。现阶段都是 Demo，允许调整 Producer，而不是靠 Viewer 长期维护不同格式。
 
@@ -26,6 +26,9 @@
 | R11 | P1 | **存档/恢复与查询**：单次运行可离线导出并重开；支持按 Run/Task、失败原因、Model/Tool/Procedure、时间查询；保留版本与原生 source ref | 不接受只能连接运行中的 Phoenix 才能追溯历史；保留敏感材料需受控 |
 | R12 | P1 | **尽量复用开源组件**：优先评估 OTel SDK + GenAI SemConv + OTLP，Phoenix 作为 viewer/backend 候选；不重复造传输/树形查看 | 不因 Phoenix 能显示 9 spans，就认为 Trace Logs/证据全量入库/取回成功 |
 | R13 | P1 | **渐进式适配 Demo**：先改采集/契约最小闭环，再统一现有 Producer 和 Viewer；保留有限过渡导入工具，避免长期双轨 | 不要求 TLS、分布式生产级运维、海量遥测策略或重新搭建 Agent 平台 |
+| R14 | P0 | **Agent 精确可见输入与决策快照**：冻结 dispatch-time System Prompt、消息/上下文折叠、Tool Catalog/Schema、Skill/Reference 有效版本、model/provider/config、真实响应与全部 attempts；有可解析材料和摘要 | 只保存目前最新 Prompt、模型名、summary 或 SHA 但没有可恢复材料，并不构成可复现 |
+| R15 | P0 | **隔离可复验**：可离线重建完整 model-visible surface、Tool Call/Result 与实际交付顺序；最小一次无真实副作用的模型决策重跑/Tool stub 重演，明确 Replay 等级与不确定性 | 不复发真实 mutation，不保证非确定模型输出逐字节相同；Host 收到 ToolResult 与模型看到不是同一事实 |
+| R16 | P1 | **评测/训练样本准备能力**：依来源闭包提取有版本、权限、有效性和独立质量标签的候选样本；失败/UNKNOWN 保留并准确标注 | Runtime 成功不自动等于 Agent 决策正确；当前不自动训练、自我修改 Prompt/Skill 或将 evaluator-only 信息注入模型 |
 
 P0 是“不能删掉的需求”，P1 是“最小产品价值与后续实现”。权限控制/完整性在 Demo 里可以做轻量版本，但不能把所需能力从设计中删掉。
 
@@ -77,6 +80,6 @@ P0 是“不能删掉的需求”，P1 是“最小产品价值与后续实现�
 - 不先建设大平台、统一业务状态机、独立全局 sequence、复杂 Collector 集群、长生命周期兼容层。
 - 不用 UI 演示 PASS、Phoenix Span PASS 替代证据保真或真正 Owner Loader PASS。
 
-**尚未决策：** OTel/OTLP 是否满足全部 R01–R13；离线文件编码；敏感材料的最低受控访问实现；最终 Field/Profile 版本。以上需以 T1–T6 证据决定。
+**尚未决策：** OTel/OTLP 是否满足全部 R01–R16；离线文件编码；敏感材料的最低受控访问实现；最终 Field/Profile 版本。以上需以 T1–T6 以及 [S4 Agent Replay](trace-reproducibility-learning-audit.md) 证据决定。
 
 > **审计结论：先定“记录什么、如何证明没丢、怎样准确关联、谁能看明细”，再定“用 OTLP 还是补充什么”。** 若 OTel 满足，所有 Demo Producer 直接适配同一 Profile；旧导入器作为过渡，不再扩大架构。

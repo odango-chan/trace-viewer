@@ -3,6 +3,8 @@
 **Status: REQUIREMENTS REVIEW — 2026-11-05 · non-normative**
 **Purpose: 按开发者/Reviewer 排查一次执行的实际任务重新评审；尚不冻结机器格式、OTel Profile 或 Producer 迁移。**
 
+> **2026-11-05 补充：** 第三维已明确 [Agent 可复现与离线学习需求](trace-reproducibility-learning-audit.md)。本页 Q1–Q6/S1–S3 是诊断验收，**第一版还需 Q7–Q9/S4 的 Agent Replay 可复现门禁**；不把轨迹浏览等同于可重演。
+
 ## 0. 重新定位
 
 **统一 Trace 是一种可诊断的执行记录能力，不只是把多种 JSON 改成一种 JSON。**
@@ -107,4 +109,4 @@ Agent/Model/Tool 与 Runtime Procedure/Predicate/Verification/Graph Transition/C
 - Evidence 缺失/来源不完整时明确标记，不猜测；
 - 人工按 Q1–Q6 提问验收，记录每题 PASS/PARTIAL/NOT_AVAILABLE。
 
-**暂不修改 Agent、Runtime、Fabric Producer，也暂不冻结 OTLP 的离线持久化格式。** 只有 S1 的真实诊断路径证明“看得懂、看得深、可复核”后，再用 S2、S3 验证通用语义并制定唯一 Trace Profile。
+**暂不修改 Agent、Runtime、Fabric Producer，也暂不冻结 OTLP 的离线持久化格式。** 本段仍是诊断优先的第一条纵切；并行分析 [S4 Agent Replay / learning readiness](trace-reproducibility-learning-audit.md) 对精确 ModelInput、ToolResult delivery 和版本闭包的要求。

@@ -2,7 +2,7 @@
 
 **Updated: 2026-11-05**
 **Reviewed baseline: D1.1 real archived P8-D4 report import at main@2680e6fae1225c3b39b000da3ce7cc700883678f**
-**Scope: D0–D1.1 importer/PoC 状态不变；2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6 / S1–S3 驱动，R01–R13 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
+**Scope: D0–D1.1 importer/PoC 状态不变；2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
@@ -16,6 +16,7 @@
 | D1 ca-agent-demo TraceStore v2 本地目录导入 | IMPLEMENTED STRICT SUBSET | Browser read-only parser + material SHA / Source Inspector; producer runtime unchanged | **Owner Writer/Loader 2/2 PASS; JS 7/7 groups PASS; Chromium native folders PASS** [private owner CI](https://github.com/odango-chan/ca-agent-demo/actions/runs/41959276561); real 5GC run, full browser parity and all owner lineage cases NOT_RUN; [report](experiments/native-d1-import.md) |
 | D1.1 真实 5GC 归档诊断 JSONL | REVIEW EXPORT ONLY | Independent `REVIEW_DIAGNOSTIC` local reader; raw summary/data/material dropped; file line not owner seq | **REAL P8-D4 106 lines = 21 spans + 85 events; private JS 4/4, Chromium PASS, no external requests** [owner CI](https://github.com/odango-chan/ca-agent-demo/actions/runs/41961642639); no owner-native v2 closure; [report](experiments/real-p8d4-review-import.md) |
 | D1.2 真实排障可回答性评审 | Q1–Q6 / S1–S3 BASELINE | **DOCS ONLY**：[P8-D4 实证/缺口矩阵](design/trace-debuggability-audit.md)；确认 14 CALL_RESULT 有 material、21 PREDICATE_EVALUATED 有 evidence refs | 真实明细 Inspector、跨 Owner 可回答性、完整记录校验均 **NOT_RUN** |
+| Agent Replay / Learning readiness | REQUIREMENTS AUDITED, CODE NOT_STARTED | [第三维审计](design/trace-reproducibility-learning-audit.md)：L0 exact model-visible input、L1 model rerun、L2 sandbox Tool replay、Q7–Q9/S4、独立 Benchmark 标签；DSH 已有设计基础 | Owner source completeness、隔离 Replay、可训练资格报告均 **NOT_RUN**；不能从现有 D1 importer PASS 推断可复现 |
 | Unified Trace (future direction) | REQUIREMENTS AUDITED, CONTRACT NOT FROZEN | **Architecture assessment only** [analysis](design/trace-unification-assessment.md); prioritize OTLP + GenAI/CA semantics, not another hand-written event envelope | Producer migration, full OTLP LogRecord/evidence roundtrip, single capture conformance **NOT_RUN** |
 | D2 ca-console / ca-runtime owner-native Run/Trajectory Adapter | PROPOSED | NOT_STARTED | NOT_RUN |
 | D3 Model Input/Output、ToolResult、Evidence 和 Unknown/Reconcile 详情 | PROPOSED | NOT_STARTED | NOT_RUN |
