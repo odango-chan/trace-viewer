@@ -4,11 +4,13 @@ import { samples } from './fixtures.mjs'
 import { allRecords, defaultOpenSections, getSourceLinks, isException, runSummary } from './projection.mjs'
 import { findPrimaryUnknown, projectLanes, projectSectionRows } from './console-parity.mjs'
 import { importTraceStoreFiles } from './native-import.mjs'
+import { importReviewDiagnosticFile } from './review-diagnostic.mjs'
 
 type TraceRecord = {
   ref: string
   sourceAuthority: string
-  ownerSequence: number
+  ownerSequence: number | null
+  sourceLine?: number
   kind: string
   title: string
   summary: string
@@ -37,7 +39,7 @@ type ViewMode = 'readable' | 'model' | 'owners' | 'raw'
 type InspectorTab = 'summary' | 'source' | 'links'
 type ExampleRun = {
   id: string
-  sourceKind: 'SYNTHETIC' | 'NATIVE_LOCAL'
+  sourceKind: 'SYNTHETIC' | 'NATIVE_LOCAL' | 'REVIEW_DIAGNOSTIC'
   mode: string
   title: string
   subtitle: string
@@ -64,10 +66,33 @@ function kindSymbol(kind: string): string {
 
 function App() {
   const [nativeRun, setNativeRun] = useState<ExampleRun | null>(null)
+  const [reviewRun, setReviewRun] = useState<ExampleRun | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [importing, setImporting] = useState(false)
   const directoryRef = useRef<HTMLInputElement | null>(null)
-  const runs = nativeRun ? [nativeRun, ...syntheticRuns] : syntheticRuns
+  const runs = [reviewRun, nativeRun, ...syntheticRuns].filter(Boolean) as ExampleRun[]
+  async function importReview(event: React.ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    if (!file) return
+    setImporting(true)
+    setImportError(null)
+    try {
+      const imported = await importReviewDiagnosticFile(file) as ExampleRun
+      setReviewRun(imported)
+      setRunId(imported.id)
+      setExpanded(new Set(imported.sections.map(s => s.id)))
+      setSelectedRef(imported.sections[0]?.records[0]?.ref ?? '')
+      setFilter('all')
+      setViewMode('raw')
+      setInspectorTab('summary')
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : 'Diagnostic import failed')
+    } finally {
+      setImporting(false)
+      input.value = ''
+    }
+  }
   const [runId, setRunId] = useState(syntheticRuns[0].id)
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(syntheticRuns[0])))
   const [selectedRef, setSelectedRef] = useState<string>(syntheticRuns[0].sections[1].records[2].ref)
@@ -125,6 +150,9 @@ function App() {
     setInspectorTab('summary')
   }
 
+  function recordPosition(record: TraceRecord) {
+    return record.ownerSequence === null ? 'file line ' + (record.sourceLine ?? '?') : 'seq ' + record.ownerSequence
+  }
   function renderRecordRow(row: PresentationRow) {
     const active = row.members.some(member => member.ref === selectedRef)
     const source = row.source
@@ -139,11 +167,11 @@ function App() {
           <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}</span>
           <strong>{viewMode === 'raw' ? source.kind : source.title}</strong>
           <small>{viewMode === 'raw' ? source.ref : source.summary}</small>
-          {row.isFolded && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · seq ' + member.ownerSequence).join('  →  ')}</span>}
+          {row.isFolded && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · ' + recordPosition(member)).join('  →  ')}</span>}
         </span>
         <span className="event-side">
           <span className={statusClass(terminal.status)}>{terminal.status}</span>
-          <small>{row.isFolded ? row.members.length + ' exact sources' : 'seq ' + source.ownerSequence}</small>
+          <small>{row.isFolded ? row.members.length + ' exact sources' : recordPosition(source)}</small>
         </span>
       </button>
     )
@@ -180,7 +208,9 @@ function App() {
         <span className="header-context">Execution observability</span>
         <div className="topbar-spacer" />
         <span className="build-badge">D1 · LOCAL PREVIEW</span>
-        <span className="synthetic-badge">{run.sourceKind === 'SYNTHETIC' ? 'SYNTHETIC DATA' : 'LOCAL NATIVE · NOT OWNER VERIFIED'}</span>
+        <span className="synthetic-badge">{run.sourceKind === 'SYNTHETIC' ? 'SYNTHETIC DATA'
+          : run.sourceKind === 'NATIVE_LOCAL' ? 'LOCAL NATIVE · NOT OWNER VERIFIED'
+          : 'ARCHIVED DIAGNOSTIC · NOT OWNER NATIVE'}</span>
       </header>
 
       <div className="workbench">
@@ -192,6 +222,10 @@ function App() {
             <input ref={directoryRef} id="native-directory" type="file" multiple
               aria-label="Import TraceStore v2 directory" onChange={importDirectory} />
             <small>{importing ? 'Checking local files…' : 'Browser-only · no upload · run.json + trace.jsonl + materials'}</small>
+            <label htmlFor="review-jsonl">Import archived diagnostic JSONL</label>
+            <input id="review-jsonl" type="file" accept=".jsonl" aria-label="Import archived diagnostic JSONL"
+              onChange={importReview} />
+            <small>Separate unversioned review export; NOT TraceStore v2.</small>
             {importError && <p className="import-error" role="alert">{importError}</p>}
           </div>
           <div className="run-list">
@@ -240,7 +274,7 @@ function App() {
 
           <div className="info-note">
             <span className="info-note-icon">i</span>
-            <span><strong>{run.sourceKind === 'SYNTHETIC' ? 'Illustration, not an execution result.' : 'Native local source · not owner-certified.'}</strong> {run.note}</span>
+            <span><strong>{run.sourceKind === 'SYNTHETIC' ? 'Illustration, not an execution result.' : run.sourceKind === 'NATIVE_LOCAL' ? 'Native local source · not owner-certified.' : 'Real archived review export · not an owner-native TraceStore.'}</strong> {run.note}</span>
           </div>
 
           <div className="trace-heading">
@@ -269,7 +303,7 @@ function App() {
             {viewMode === 'readable' && 'Paired Model/Tool interactions are presentation-only; Runtime and external facts remain separate.'}
             {viewMode === 'model' && 'Agent/Model owner records only. Runtime omission here is a filter, not missing execution.'}
             {viewMode === 'owners' && 'Unfolded owner-native records in separate lanes. No global cross-owner sequence.'}
-            {viewMode === 'raw' && 'Source refs, kinds and owner-local sequences. Imported material bodies are never shown automatically.'}
+            {viewMode === 'raw' && 'Source refs and origin. Diagnostic file lines are not owner-local sequences. Material bodies are never shown automatically.'}
           </div>
 
           <div className="timeline" aria-label="Read-only execution trajectory">
@@ -315,8 +349,10 @@ function App() {
             }) && <div className="empty-state">No matching source records in this view. This is a filter result, not an execution conclusion.</div>}
           </div>
           <div className="canvas-footer">{run.sourceKind === 'NATIVE_LOCAL'
-            ? 'Local v2 import · browser structure and file digests only · owner TraceStore.load_run not executed · no live services.'
-            : 'Synthetic-only sample. Choose a local TraceStore v2 folder to inspect its actual source records.'}</div>
+            ? 'Local v2 import · browser checks only · owner TraceStore.load_run not executed · no live services.'
+            : run.sourceKind === 'REVIEW_DIAGNOSTIC'
+            ? 'Actual review-export JSONL · file line order only · no owner sequence, material digest, closure, or external status verification.'
+            : 'Synthetic-only sample. Select a local TraceStore v2 folder or archived diagnostic JSONL.'}</div>
         </main>
 
         <aside className="inspector" aria-label="Source record inspector">
@@ -344,7 +380,7 @@ function App() {
                   <dl className="properties">
                     <dt>Authority</dt><dd>{activeRecord.sourceAuthority}</dd>
                     <dt>Record kind</dt><dd>{activeRecord.kind}</dd>
-                    <dt>Local sequence</dt><dd>{activeRecord.ownerSequence}</dd>
+                    <dt>{activeRecord.ownerSequence === null ? 'Review file line' : 'Local sequence'}</dt><dd>{activeRecord.ownerSequence ?? activeRecord.sourceLine ?? 'UNAVAILABLE'}</dd>
                   </dl>
                   {activePresentationRow?.isFolded && (
                     <>
@@ -354,7 +390,7 @@ function App() {
                         {activePresentationRow.members.map(member => (
                           <button type="button" key={member.ref} onClick={() => { setSelectedRef(member.ref); setInspectorTab('source') }}>
                             <strong>{member.kind}</strong>
-                            <span>seq {member.ownerSequence} · {member.status}</span>
+                            <span>{recordPosition(member)} · {member.status}</span>
                           </button>
                         ))}
                       </div>
@@ -371,9 +407,10 @@ function App() {
                     sourceKind: run.sourceKind, ref: activeRecord.ref,
                     sourceAuthority: activeRecord.sourceAuthority,
                     ownerSequence: activeRecord.ownerSequence,
+                    ...(activeRecord.sourceLine ? { sourceLine: activeRecord.sourceLine } : {}),
                     kind: activeRecord.kind, status: activeRecord.status,
                     causalRefs: activeRecord.causalRefs,
-                    ...(run.sourceKind === 'NATIVE_LOCAL' ? {
+                    ...(run.sourceKind !== 'SYNTHETIC' ? {
                       sourceLocator: activeRecord.sourceLocator,
                       stage: activeRecord.stage, materialRef: activeRecord.materialRef ?? null,
                     } : {}),
