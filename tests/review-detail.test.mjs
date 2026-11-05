@@ -75,3 +75,15 @@ test('unsafe selection, unsupported event kinds and changed source line are reje
   const incomplete={...f,text:async()=>'{broken'}
   await assert.rejects(readLocalReviewDetail(incomplete,1,'CALL_RESULT'),/DETAIL_UNAVAILABLE/)
 })
+
+test('null reason is NOT PROVIDED rather than withheld, while structured data remains hidden',async()=>{
+  const file=localFile([
+    event('PREDICATE_EVALUATED',{verdict:'PASS',reason:null}),
+    event('PREDICATE_EVALUATED',{verdict:'UNKNOWN',reason:{details:'private-body'}}),
+  ])
+  const absent=await readLocalReviewDetail(file,1,'PREDICATE_EVALUATED')
+  const hidden=await readLocalReviewDetail(file,2,'PREDICATE_EVALUATED')
+  assert.equal(absent.fields.find(x=>x.label==='Reason').value,'[NOT PROVIDED IN SOURCE]')
+  assert.match(hidden.fields.find(x=>x.label==='Reason').value,/WITHHELD/)
+  assert.equal(JSON.stringify(hidden).includes('private-body'),false)
+})
