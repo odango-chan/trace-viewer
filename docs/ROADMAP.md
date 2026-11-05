@@ -4,7 +4,7 @@
 
 **当前主线已调整：** 第一版必须同时验证 [真实执行可排障](design/trace-debuggability-audit.md) 的 **Q1–Q6/S1–S3** 与 [Agent 可复现/可学习准备](design/trace-reproducibility-learning-audit.md) 的 **Q7–Q9/S4**。下表 D2–D5 是之前的功能候选，**不是需要按顺序全部建设的既定工作包**；OTLP/Profile/多 Producer 改造等待上述排障实证。
 
-**Agent 纵切进展：** 两份真实 ca-agent ProductTask Owner 归档的 Model Request/Response 摘要、**嵌入 user 消息的完整 Tool Catalog 与 Owner Surface Digest**、ToolResult/Next Model 精确关联全部 PASS；无副作用 Observation Stub 对照 PASS，[私有 CI](https://github.com/odango-chan/ca-console/actions/runs/41979646464)。Skill Context 对 **此 ProductTask 路线为 N/A**；L0 完整执行环境和全 L2 控制流重演仍待验收。**下一步改查 Skill-dependent DSH/Agent 路线**，不重复修已完整保存的 Catalog。详见 [归档审计](experiments/agent-replay-archive-audit.md)。
+**Agent 纵切进展：** 两份真实 ca-agent ProductTask Owner 归档的 Model Request/Response 摘要、**嵌入 user 消息的完整 Tool Catalog 与 Owner Surface Digest**、ToolResult/Next Model 精确关联全部 PASS；无副作用 Observation Stub 对照 PASS，[私有 CI](https://github.com/odango-chan/ca-console/actions/runs/41979646464)。Skill Context 对 **此 ProductTask 路线为 N/A**；L0 完整执行环境和全 L2 控制流重演仍待验收。**Skill-dependent DSH/Agent 路线首轮 source-only Owner Builder Golden 已 PASS**（Skill/Reference 可见、摘要/关联与负例），[证据](experiments/dsh-skill-replay-golden.md)；完整 DSH Session Integration/Reload 仍待执行，不重复修已保存的 Catalog。详见 [ProductTask 实证](experiments/agent-replay-archive-audit.md)。
 
 **两个最小实证纵切：** (A) 在授权私有环境，取 P8-D4 一个 Predicate、一个 CALL_RESULT 和一个异常转移，做受控诊断 Inspector，按 Q1–Q6 验收；(B) 取一轮真实生成的 Agent Model/Tool 输入输出，核验 exact model-visible snapshot / ToolResult delivery，完成 L0 离线重建与至少一个 L1/L2 隔离实验，按 Q7–Q9 验收。两条共享来源/材料原则，**不建设独立 Replay 平台或 Training Trace 合同**。**不得**以 106 行能加载替代诊断回答能力。
 
