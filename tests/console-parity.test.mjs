@@ -58,6 +58,8 @@ test('Model only excludes Runtime; All owners keeps four separate presentation l
   const sample = samples[0]
   const modelOnly = sample.sections.flatMap(section => projectSectionRows(sample, section, 'model'))
   assert.ok(modelOnly.every(row => row.lane === 'agent'))
+  const deterministic = samples.find(item => item.id === 'synthetic-deterministic')
+  assert.equal(deterministic.sections.flatMap(section => projectSectionRows(deterministic, section, 'model')).length, 0)
   const lanes = projectLanes(projectSectionRows(sample, sample.sections[1], 'owners'))
   assert.deepEqual(lanes.map(lane => lane.id), ['agent', 'runtime', 'fabric', 'world'])
   assert.ok(lanes.find(lane => lane.id === 'runtime').rows.length > 0)

@@ -1,6 +1,8 @@
 # Trajectory Viewer UX
 
-**Status: D0 baseline · 2026-11-04**
+**Status: D0.8 synthetic Console parity UI slice · 2026-11-05**
+
+实际交互实现与未完成项请看 [Console Demo 对照矩阵](console-prototype-parity.md)。
 
 ## 保留的 DSH-inspired Agent 轨迹阅读模型
 
