@@ -1,0 +1,72 @@
+name: Owner-generated TraceStore v2 golden interoperability
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/native-golden.yml'
+      - 'scripts/generate_owner_golden.py'
+      - 'site/native-import.mjs'
+      - 'site/app.tsx'
+      - 'site/console-parity.mjs'
+      - 'site/projection.mjs'
+      - 'tests/native-golden.test.mjs'
+      - 'tests/native_viewer_ui.py'
+  workflow_dispatch:
+
+jobs:
+  native-golden:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    permissions:
+      contents: read
+    env:
+      GOLDEN_ROOT: /tmp/owner-native-synthetic-golden
+      VIEWER_URL: http://127.0.0.1:8123
+      PYTHONPATH: owner-ca-agent-demo/src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: odango-chan/ca-agent-demo
+          ref: c7eada397930ee46b3e9e9950128eaf15ef8cb50
+          path: owner-ca-agent-demo
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate and reopen synthetic golden via upstream Writer/Loader
+        run: python scripts/generate_owner_golden.py --output "$GOLDEN_ROOT"
+      - name: Verify native v2 client interoperability and negative cases
+        run: node --test tests/native-golden.test.mjs
+      - name: Build Viewer
+        run: |
+          npm install --no-audit --no-fund
+          npm run typecheck
+          npm run build
+      - name: Install Chromium
+        run: |
+          python -m pip install --disable-pip-version-check playwright
+          python -m playwright install --with-deps chromium --only-shell
+      - name: Start local static Viewer
+        run: |
+          nohup python -m http.server 8123 --bind 127.0.0.1 --directory dist >/tmp/viewer-http.log 2>&1 </dev/null &
+          for n in $(seq 1 20); do
+            if curl -fsS http://127.0.0.1:8123/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/viewer-http.log
+          exit 1
+      - name: Chromium select local owner-generated golden folders
+        run: python tests/native_viewer_ui.py
+      - name: Upload synthetic owner writer proof only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-native-owner-proof
+          path: /tmp/owner-native-synthetic-golden/native-writer-proof.json
+          if-no-files-found: ignore
+          retention-days: 7
