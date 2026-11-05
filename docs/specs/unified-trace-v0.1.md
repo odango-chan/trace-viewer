@@ -1,6 +1,6 @@
 # Unified Trace Specification v0.1
 
-**状态：DRAFT / 讨论基线，尚未冻结机器 Schema**
+**状态：DRAFT / 讨论基线，尚未冻结机器 Schema；[v0.1 架构审查结论：方向接受、冻结阻塞（6 P0）](../reviews/unified-trace-v0.1-architecture-review.md)**
 **日期：2026-11-05**
 **定位：跨 Agent、Harness、Runtime 与外部工具的统一执行轨迹规范**
 **原则：规范先行，现有各仓 Demo 后续按它适配；此版本不要求也不启动 Producer 改造。**

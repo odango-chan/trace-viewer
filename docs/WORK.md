@@ -6,7 +6,7 @@
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
-| **Unified Trace v0.1（当前主线）** | **DRAFT / 待评审**：[唯一规范正文](specs/unified-trace-v0.1.md)，诊断/复现/学习、身份/因果/材料、C01–C08 | **DOCS_ONLY**：未冻结机器 Schema、OTLP/Profile，未修改任何 Producer | 规范评审 **PENDING**；C01–C08 的正式跨 Producer 一致性测试 **NOT_RUN** |
+| **Unified Trace v0.1（当前主线）** | **DRAFT / 方向接受，冻结阻塞**：[唯一规范正文](specs/unified-trace-v0.1.md)；[6 P0 架构评审](reviews/unified-trace-v0.1-architecture-review.md) | **DOCS_ONLY**：未冻结机器 Schema、OTLP/Profile，未修改任何 Producer | 已完成架构文本审查；冻结 **BLOCKED**，C01–C08 的正式跨 Producer 一致性测试 **NOT_RUN** |
 | D0 文档治理 / 责任边界 | ACCEPTED | IMPLEMENTED | main 已核验；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 浅色 Web 壳 / 合成 DSH 轨迹 | ACCEPTED (D0) | IMPLEMENTED | [CI 单测/类型检查/静态构建 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)；Browser NOT_RUN |
 | D0 Synthetic 异常、确定性对照样本 | ACCEPTED (D0) | IMPLEMENTED | 5 unit tests PASS（[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)） |

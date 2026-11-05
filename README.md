@@ -7,7 +7,7 @@
 ## 统一 Trace 规范设计（当前主线）
 
 **当前优先工作是规范设计，不是 DSH / Agent Demo / Runtime 的实现验收。**
-已形成 [**Unified Trace Specification v0.1（DRAFT）**](docs/specs/unified-trace-v0.1.md)，以**可诊断、可复现、可学习**为目标，覆盖执行身份、Activity/Fact、因果关系、诊断与模型可见材料、完整性和一致性门禁。现有多个 Viewer Adapter、DSH Session 测试与 Phoenix PoC 是**历史现状/选型证据**，不是规范标准；在 v0.1 评审定型前**暂停继续修改各 Producer**。
+已形成 [**Unified Trace Specification v0.1（DRAFT）**](docs/specs/unified-trace-v0.1.md)，且已完成 [**架构评审：六项冻结阻塞**](docs/reviews/unified-trace-v0.1-architecture-review.md)，以**可诊断、可复现、可学习**为目标，覆盖执行身份、Activity/Fact、因果关系、诊断与模型可见材料、完整性和一致性门禁。现有多个 Viewer Adapter、DSH Session 测试与 Phoenix PoC 是**历史现状/选型证据**，不是规范标准；在 v0.1 评审定型前**暂停继续修改各 Producer**。
 
 ## 统一 Trace 目标（先审计需求，再定格式）
 
