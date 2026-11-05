@@ -23,7 +23,7 @@ def main():
         page.get_by_role("button", name="Raw records", exact=True).click()
         assert "PROCEDURE_ENTER" in page.locator(".timeline").inner_text()
         page.get_by_role("button", name="All owners", exact=True).click()
-        assert "ca-agent-demo" in page.locator(".timeline").inner_text()
+        page.locator(".timeline .event-meta").filter(has_text="ca-agent-demo").first.wait_for(timeout=10000)
         directory.set_input_files(str(GOLDEN / "synthetic-owner-model-v2"))
         page.get_by_role("heading", name="TraceStore v2 · synthetic-owner-model-v2", exact=True).wait_for(timeout=15000)
         assert "Model Interaction" in page.locator(".timeline").inner_text()
