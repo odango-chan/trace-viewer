@@ -114,6 +114,7 @@ function App() {
     const file = input.files?.[0]
     if (!file) return
     hideLocalDetail()
+    setFindingVisible(false)
     setImporting(true)
     setImportError(null)
     try {
@@ -166,6 +167,7 @@ function App() {
     const selectedFiles = input.files
     if (!selectedFiles?.length) return
     hideLocalDetail()
+    setFindingVisible(false)
     setImporting(true)
     setImportError(null)
     try {
