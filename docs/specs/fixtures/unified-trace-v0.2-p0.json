@@ -1,0 +1,332 @@
+{
+  "fixtureVersion": "unified-trace-v0.2-p0-candidate-1",
+  "authority": "HARNESS_FIXTURE_ONLY_NOT_PRODUCER_WIRE_SCHEMA",
+  "purpose": "Machine-readable semantic input and expected results; no actual conformance runner or approved type registry yet.",
+  "resultContract": {
+    "gateStatus": [
+      "PASS",
+      "FAIL",
+      "NOT_RUN",
+      "N_A",
+      "UNRESOLVED"
+    ],
+    "coverage": [
+      "COMPLETE",
+      "PARTIAL",
+      "UNKNOWN",
+      "N_A"
+    ],
+    "productStatus": [
+      "PASS",
+      "TARGET_GAP",
+      "NOT_RUN",
+      "N_A"
+    ],
+    "issueCodes": [
+      "REQUIRED_CAPABILITY_MISSING",
+      "UNSUPPORTED_SCOPE_PASS",
+      "MATERIAL_ROLE_MISMATCH",
+      "INVALID_PREDICATE_VERDICT"
+    ],
+    "note": "PARTIAL is a coverage status, not a gate result; TARGET_GAP is only a product-profile aggregation result."
+  },
+  "vectors": [
+    {
+      "id": "P0-1-positive",
+      "p0": "P0-1",
+      "inputKind": "publishedProductProfile+sourceSet+productClaim",
+      "gate": "PRODUCT_AGGREGATION+C02+C06",
+      "input": {
+        "profile": {
+          "recordRef": "profile-owner/p1",
+          "profileVersion": "1",
+          "product": "demo-product",
+          "publishedAt": "2026-11-01T00:00:00Z",
+          "scope": "execution:e1",
+          "requiredCapabilities": [
+            "AGENT_L0"
+          ],
+          "participants": [
+            "agent:producer",
+            "tester:assessor"
+          ],
+          "assessor": "tester",
+          "testConfigVersion": "t1"
+        },
+        "evidence": {
+          "sourceRangeComplete": true,
+          "modelInteractions": [
+            {
+              "id": "m1",
+              "requestRecoverable": true,
+              "responseOrErrorRecoverable": true,
+              "effectiveMaterialsVerifiable": true
+            }
+          ]
+        },
+        "claimedProductStatus": "PASS"
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "COMPLETE",
+        "productStatus": "PASS",
+        "issueCodes": []
+      }
+    },
+    {
+      "id": "P0-1-negative",
+      "p0": "P0-1",
+      "inputKind": "publishedProductProfile+sourceSet+productClaim",
+      "gate": "PRODUCT_AGGREGATION+C02+C06",
+      "input": {
+        "profile": {
+          "recordRef": "profile-owner/p1",
+          "profileVersion": "1",
+          "product": "demo-product",
+          "publishedAt": "2026-11-01T00:00:00Z",
+          "scope": "execution:e1",
+          "requiredCapabilities": [
+            "AGENT_L0"
+          ],
+          "participants": [
+            "agent:producer",
+            "tester:assessor"
+          ],
+          "assessor": "tester",
+          "testConfigVersion": "t1"
+        },
+        "evidence": {
+          "sourceRangeComplete": true,
+          "producerSelfDeclared": [
+            "CORE"
+          ],
+          "modelInteractions": [
+            {
+              "id": "m1",
+              "requestRecoverable": false,
+              "responseOrErrorRecoverable": false,
+              "effectiveMaterialsVerifiable": false
+            }
+          ]
+        },
+        "claimedProductStatus": "PASS"
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "COMPLETE",
+        "productStatus": "TARGET_GAP",
+        "issueCodes": [
+          "REQUIRED_CAPABILITY_MISSING"
+        ]
+      }
+    },
+    {
+      "id": "P0-2-positive",
+      "p0": "P0-2",
+      "inputKind": "sourceCoverageProof+interactionRecords+scopeClaim",
+      "gate": "C02+C06",
+      "input": {
+        "scope": "execution:e2",
+        "sourceCoverage": {
+          "verified": true,
+          "expectedModelInteractionIds": [
+            "m1",
+            "m2",
+            "m3"
+          ],
+          "closed": true
+        },
+        "capturedModelInteractionIds": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "allEffectiveRequestsRecoverable": true,
+        "allResponsesOrErrorsRecoverable": true,
+        "claimedScopeL0": "PASS"
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "COMPLETE",
+        "productStatus": "N_A",
+        "issueCodes": []
+      }
+    },
+    {
+      "id": "P0-2-negative",
+      "p0": "P0-2",
+      "inputKind": "sourceCoverageProof+interactionRecords+scopeClaim",
+      "gate": "C02+C06",
+      "input": {
+        "scope": "execution:e2",
+        "sourceCoverage": {
+          "verified": true,
+          "expectedModelInteractionIds": [
+            "m1",
+            "m2",
+            "m3"
+          ],
+          "closed": true
+        },
+        "capturedModelInteractionIds": [
+          "m3"
+        ],
+        "allEffectiveRequestsRecoverable": true,
+        "allResponsesOrErrorsRecoverable": true,
+        "claimedScopeL0": "PASS"
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "PARTIAL",
+        "productStatus": "N_A",
+        "issueCodes": [
+          "UNSUPPORTED_SCOPE_PASS"
+        ]
+      }
+    },
+    {
+      "id": "P0-3-positive",
+      "p0": "P0-3",
+      "inputKind": "compositeInteraction+materialLocators+outboundModelRequest",
+      "gate": "C02+C06",
+      "input": {
+        "interaction": {
+          "recordRef": "tool-owner/int1",
+          "type": "tool.interaction",
+          "typeVersion": "1",
+          "stages": [
+            {
+              "stage": "request",
+              "locator": "int1#request"
+            },
+            {
+              "stage": "result",
+              "locator": "int1#result",
+              "materialRef": "raw/r1"
+            },
+            {
+              "stage": "delivery",
+              "locator": "int1#delivery",
+              "materialRef": "redacted/r2",
+              "recipient": "agent-host"
+            }
+          ]
+        },
+        "outboundModelRequest": {
+          "actualConsumes": [
+            "redacted/r2"
+          ],
+          "declaredConsumes": [
+            "redacted/r2"
+          ],
+          "requestMaterialVerified": true
+        }
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": []
+      }
+    },
+    {
+      "id": "P0-3-negative",
+      "p0": "P0-3",
+      "inputKind": "compositeInteraction+materialLocators+outboundModelRequest",
+      "gate": "C02+C06",
+      "input": {
+        "interaction": {
+          "recordRef": "tool-owner/int1",
+          "type": "tool.interaction",
+          "typeVersion": "1",
+          "stages": [
+            {
+              "stage": "request",
+              "locator": "int1#request"
+            },
+            {
+              "stage": "result",
+              "locator": "int1#result",
+              "materialRef": "raw/r1"
+            },
+            {
+              "stage": "delivery",
+              "locator": "int1#delivery",
+              "materialRef": "redacted/r2",
+              "recipient": "agent-host"
+            }
+          ]
+        },
+        "outboundModelRequest": {
+          "actualConsumes": [
+            "redacted/r2"
+          ],
+          "declaredConsumes": [
+            "tool-owner/int1",
+            "raw/r1"
+          ],
+          "requestMaterialVerified": true
+        }
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": [
+          "MATERIAL_ROLE_MISMATCH"
+        ]
+      }
+    },
+    {
+      "id": "P0-4-positive",
+      "p0": "P0-4",
+      "inputKind": "typedPredicateFact+observationAvailability",
+      "gate": "C01",
+      "input": {
+        "fact": {
+          "recordRef": "evaluator/p1",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "subject": "rule:eligibility",
+          "evaluationRuleVersion": "r1",
+          "observedStatus": "UNAVAILABLE",
+          "unavailableReason": "observation source unreachable",
+          "verdict": "UNKNOWN"
+        }
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": []
+      }
+    },
+    {
+      "id": "P0-4-negative",
+      "p0": "P0-4",
+      "inputKind": "typedPredicateFact+observationAvailability",
+      "gate": "C01",
+      "input": {
+        "fact": {
+          "recordRef": "evaluator/p2",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "subject": "rule:eligibility",
+          "evaluationRuleVersion": "r1",
+          "observedStatus": "UNAVAILABLE",
+          "unavailableReason": "observation source unreachable",
+          "observedValue": false,
+          "verdict": "FAIL"
+        }
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": [
+          "INVALID_PREDICATE_VERDICT"
+        ]
+      }
+    }
+  ]
+}
