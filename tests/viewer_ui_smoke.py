@@ -57,6 +57,74 @@ def main():
             page.get_by_role("button", name="All owners", exact=True).click()
             assert page.locator(".timeline .turn-card").count() >= 2
             checks.append("Deterministic Run does not fabricate a Model interaction")
+
+            # Synthetic-only local diagnostic V1: no private Owner data enters this test.
+            examples = [
+                {
+                    "kind": "PREDICATE_EVALUATED",
+                    "data": {
+                        "predicate_identity": "ran_response_received",
+                        "verdict": "UNKNOWN",
+                        "reason": "Await selector did not match",
+                        "evidence_refs": ["synthetic-private-ref"],
+                        "subscriber": "imsi-synthetic-private",
+                    },
+                    "material": {"output": {"token": "synthetic-hidden-material"}},
+                    "summary": "synthetic-hidden-summary",
+                    "diag": "synthetic-hidden-diagnostic",
+                },
+                {
+                    "kind": "CALL_RESULT",
+                    "data": {
+                        "operation": "smf.create_context",
+                        "reported_outcome": "COMMITTED",
+                        "outcome": "COMMITTED",
+                        "bindings": {"token": "synthetic-hidden-binding"},
+                    },
+                    "material": None,
+                    "summary": "synthetic-hidden-call-summary",
+                    "diag": "synthetic-hidden-call-diagnostic",
+                },
+                {
+                    "kind": "VERIFY_RESULT",
+                    "data": {"scope": "ROOT", "verdict": "FAIL", "reason": None},
+                    "material": None,
+                    "summary": "synthetic-hidden-verify-summary",
+                    "diag": "synthetic-hidden-verify-diagnostic",
+                },
+            ]
+            payload = (chr(10).join(json.dumps(x) for x in examples) + chr(10)).encode("utf-8")
+            page.locator("#review-jsonl").set_input_files({
+                "name": "synthetic-v1-diagnostic.jsonl",
+                "mimeType": "application/x-ndjson",
+                "buffer": payload,
+            })
+            page.get_by_text("ARCHIVED DIAGNOSTIC · NOT OWNER NATIVE", exact=True).wait_for()
+            assert page.locator(".inspector-title").inner_text() == "PREDICATE_EVALUATED"
+            assert page.locator(".inspector .status.uncertain").inner_text() == "UNKNOWN"
+            page.get_by_role("button", name="Show allowed local fields").click()
+            detail = page.locator(".local-detail")
+            assert "Await selector did not match" in detail.inner_text()
+            for secret in ("imsi-synthetic-private", "synthetic-hidden-material",
+                           "synthetic-hidden-summary", "synthetic-private-ref"):
+                assert secret not in page.locator(".app-shell").inner_text()
+            checks.append("Explicit local detail reveals only allowed fields, no raw materials")
+
+            page.get_by_role("button", name="Focus unknown").click()
+            assert page.locator(".local-detail-fields").count() == 0
+            assert page.locator(".inspector .status.uncertain").inner_text() == "UNKNOWN"
+            checks.append("Focus unknown finds Predicate without treating it as terminal failure")
+
+            page.get_by_role("button", name="All", exact=True).click()
+            page.locator(".timeline .trace-event").filter(has_text="CALL_RESULT").first.click()
+            assert page.locator(".local-detail-fields").count() == 0
+            page.get_by_role("button", name="Show allowed local fields").click()
+            assert "smf.create_context" in page.locator(".local-detail").inner_text()
+            assert "synthetic-hidden-binding" not in page.locator(".app-shell").inner_text()
+            page.get_by_role("button", name="Frozen Procedure · without a model call").click()
+            assert page.locator(".local-detail").count() == 0
+            checks.append("Changing selected record or Run clears local diagnostic preview")
+
             page.screenshot(path=str(OUT / "trace-viewer-console-parity.png"), full_page=True)
             assert not errors, f"Browser JavaScript errors: {errors}"
             checks.append("No browser JavaScript exceptions")
