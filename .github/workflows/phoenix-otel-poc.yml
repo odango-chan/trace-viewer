@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/phoenix-otel-poc.yml'
       - 'scripts/phoenix_otel_poc.py'
+      - 'tests/phoenix_ui_smoke.py'
       - 'docs/experiments/phoenix-otel-poc.md'
   workflow_dispatch:
 
@@ -18,6 +19,7 @@ jobs:
     env:
       PHOENIX_WORKING_DIR: /tmp/trace-viewer-phoenix
       PHOENIX_ENABLE_AUTH: 'false'
+      PHOENIX_TELEMETRY_ENABLED: 'false'
       PHOENIX_HOST: 127.0.0.1
       PHOENIX_PORT: '6006'
       PHOENIX_COLLECTOR_ENDPOINT: http://127.0.0.1:6006
@@ -30,8 +32,10 @@ jobs:
           python-version: '3.12'
       - name: Install Phoenix, OpenTelemetry and Phoenix client
         run: |
-          python -m pip install --disable-pip-version-check arize-phoenix arize-phoenix-otel arize-phoenix-client
+          python -m pip install --disable-pip-version-check arize-phoenix arize-phoenix-otel arize-phoenix-client playwright
           python -m pip freeze | grep -Ei 'phoenix|opentelemetry|openinference' | sort
+      - name: Install headless browser
+        run: python -m playwright install --with-deps chromium --only-shell
       - name: Start private local Phoenix
         run: |
           mkdir -p "$PHOENIX_WORKING_DIR"
@@ -54,6 +58,16 @@ jobs:
           exit 1
       - name: Send two synthetic traces and verify Phoenix readback
         run: python scripts/phoenix_otel_poc.py
+      - name: Smoke-test Phoenix browser trace navigation
+        run: python tests/phoenix_ui_smoke.py
+      - name: Upload synthetic UI proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phoenix-synthetic-ui-proof
+          path: /tmp/phoenix-ui-proof/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Print Phoenix server errors on failure
         if: failure()
         run: tail -n 100 /tmp/trace-viewer-phoenix.log || true

@@ -17,6 +17,8 @@ jobs:
           node-version: '24'
       - name: Install
         run: npm install --no-audit --no-fund
+      - name: Native Trace synthetic audit tests
+        run: python3 -m unittest discover -s tests -p 'test_native_trace_audit.py' -v
       - name: Unit tests
         run: npm test
       - name: Type check
