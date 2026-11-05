@@ -69,5 +69,46 @@ export const samples = Object.freeze([
         ],
       },
     ],
+  },,
+  {
+    id: 'synthetic-host-delivery-gap', sourceKind: 'SYNTHETIC', mode: 'AGENT / MODEL',
+    title: 'Delivery failure · Host RESULT_UNKNOWN',
+    subtitle: 'Console anomaly reference: Runtime SUCCEEDED is not Host knowledge',
+    note: 'Synthetic scenario adapted from ca-console trajectory-anomaly-prototype.html. Runtime knows the operation succeeded; the Host did not receive its ToolResult until recovery.',
+    sections: [
+      { id: 'host-turn', title: 'TURN 01 · Model initiates tool', subtitle: 'Model selection is not the effect', kind: 'turn', records: [
+        {ref:'synthetic:host-model-req',sourceAuthority:'synthetic:agent',ownerSequence:1,kind:'MODEL_REQUEST',title:'Model input',summary:'A synthetic tool catalog is visible',status:'OBSERVED',causalRefs:[]},
+        {ref:'synthetic:host-model-resp',sourceAuthority:'synthetic:agent',ownerSequence:2,kind:'MODEL_RESPONSE',title:'Model selects release',summary:'Tool invocation selected; not yet executed',status:'OBSERVED',causalRefs:['synthetic:host-model-req']},
+        {ref:'synthetic:host-call',sourceAuthority:'synthetic:agent',ownerSequence:3,kind:'TOOL_CALL',title:'release_pdu_session',summary:'Original request identity synthetic:request-301',status:'REQUESTED',causalRefs:['synthetic:host-model-resp']},
+      ]},
+      { id: 'host-runtime', title: 'STEP 01 · Runtime completes', subtitle: 'One authoritative Runtime outcome', kind: 'tool', records: [
+        {ref:'synthetic:host-admission',sourceAuthority:'synthetic:runtime',ownerSequence:1,kind:'HARNESS_ADMISSION',title:'Authorization & assurance',summary:'The synthetic operation is admitted',status:'PASS',causalRefs:['synthetic:host-call']},
+        {ref:'synthetic:host-runtime-terminal',sourceAuthority:'synthetic:runtime',ownerSequence:2,kind:'RUNTIME_TERMINAL',title:'Runtime SUCCEEDED',summary:'Effect was committed; this fact does not change if ToolResult delivery fails',status:'SUCCEEDED',causalRefs:['synthetic:host-admission']},
+        {ref:'synthetic:host-delivery-lost',sourceAuthority:'synthetic:agent',ownerSequence:4,kind:'HOST_DELIVERY',title:'Host delivery interrupted',summary:'Host RESULT_UNKNOWN; Runtime result remains authoritative',status:'RESULT_UNKNOWN',causalRefs:['synthetic:host-call','synthetic:host-runtime-terminal']},
+      ]},
+      { id: 'host-recover', title: 'STEP 02 · Resolve original request', subtitle: 'No duplicate mutation', kind: 'tool', records: [
+        {ref:'synthetic:host-resolve',sourceAuthority:'synthetic:agent',ownerSequence:5,kind:'RESOLVE_REQUEST',title:'Resolve existing request/run',summary:'No second release dispatch; reuse original identity',status:'COMMITTED',causalRefs:['synthetic:host-delivery-lost','synthetic:host-runtime-terminal']},
+        {ref:'synthetic:host-result',sourceAuthority:'synthetic:agent',ownerSequence:6,kind:'TOOL_RESULT',title:'Recovered ToolResult delivered',summary:'Explicitly paired to original synthetic:host-call',status:'DELIVERED',causalRefs:['synthetic:host-call','synthetic:host-resolve']},
+      ]},
+    ],
+  },
+  {
+    id: 'synthetic-parallel-tool-results', sourceKind: 'SYNTHETIC', mode: 'AGENT / MODEL',
+    title: 'Parallel reads · out-of-order ToolResults',
+    subtitle: 'Console anomaly reference: match by callId, not arrival order',
+    note: 'Both results are synthetic. Result B arrives before result A; exact causal refs are required for correct folding.',
+    sections: [
+      { id:'parallel-turn', title:'TURN 01 · Two concurrent read calls', subtitle:'Results arrive in opposite order', kind:'turn', records:[
+        {ref:'synthetic:parallel-model-req',sourceAuthority:'synthetic:agent',ownerSequence:1,kind:'MODEL_REQUEST',title:'Model input · two read tools',summary:'Visible tool definitions are synthetic',status:'OBSERVED',causalRefs:[]},
+        {ref:'synthetic:parallel-model-resp',sourceAuthority:'synthetic:agent',ownerSequence:2,kind:'MODEL_RESPONSE',title:'Model selects two read tools',summary:'Read-only requests A and B',status:'OBSERVED',causalRefs:['synthetic:parallel-model-req']},
+        {ref:'synthetic:parallel-call-a',sourceAuthority:'synthetic:agent',ownerSequence:3,kind:'TOOL_CALL',title:'query_session (A)',summary:'Call A requested first',status:'REQUESTED',causalRefs:['synthetic:parallel-model-resp']},
+        {ref:'synthetic:parallel-call-b',sourceAuthority:'synthetic:agent',ownerSequence:4,kind:'TOOL_CALL',title:'query_path (B)',summary:'Call B requested second',status:'REQUESTED',causalRefs:['synthetic:parallel-model-resp']},
+        {ref:'synthetic:parallel-result-b',sourceAuthority:'synthetic:agent',ownerSequence:5,kind:'TOOL_RESULT',title:'Result B first',summary:'Explicit causal edge to call B',status:'DELIVERED',causalRefs:['synthetic:parallel-call-b']},
+        {ref:'synthetic:parallel-result-a',sourceAuthority:'synthetic:agent',ownerSequence:6,kind:'TOOL_RESULT',title:'Result A second',summary:'Explicit causal edge to call A',status:'DELIVERED',causalRefs:['synthetic:parallel-call-a']},
+      ]},
+      { id:'parallel-next', title:'TURN 02 · Model consumes both results', subtitle:'One input, two exact source refs',kind:'turn',records:[
+        {ref:'synthetic:parallel-next-input',sourceAuthority:'synthetic:agent',ownerSequence:7,kind:'MODEL_REQUEST',title:'Next Model Input',summary:'Consumes both A and B by their exact result refs',status:'OBSERVED',causalRefs:['synthetic:parallel-result-a','synthetic:parallel-result-b']},
+      ]},
+    ],
   },
 ])
