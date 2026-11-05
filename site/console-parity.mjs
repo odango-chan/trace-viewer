@@ -42,7 +42,7 @@ export function projectSectionRows(run, section, mode = 'readable') {
   const selected = (mode === 'model')
     ? section.records.filter(item =>
         laneOf(item) === 'agent' && (
-          String(item.sourceAuthority).includes('agent') ||
+          String(item.sourceAuthority) === 'synthetic:agent' ||
           item.kind.startsWith('MODEL_') || item.kind.startsWith('TOOL_')
         ))
     : section.records
