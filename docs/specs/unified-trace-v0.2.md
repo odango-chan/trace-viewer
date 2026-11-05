@@ -1,6 +1,6 @@
 # 统一 Trace 规范 v0.2（精简修订稿）
 
-**状态：DRAFT；已新增 10 个 P0 + 29 个边界合成机器断言，候选验证器执行 39/39 PASS；独立/跨实现一致性测试仍 NOT_RUN，4 项 P0 全部 OPEN；不授权修改 Producer 或 Consumer。**  
+**状态：DRAFT；10 个 P0 + 29 个边界合成机器断言，候选 JS 验证器及独立 Python 判定器各获 39/39 PASS（仅合成夹具语义一致性）；真实 Owner/cross-Producer 黑盒 Conformance 仍 NOT_RUN，4 项 P0 均 OPEN；不授权修改 Producer 或 Consumer。**  
 **日期：2026-11-05。**  
 本文件是当前唯一候选规范；[v0.1 架构审查](../reviews/unified-trace-v0.1-architecture-review.md)及[v0.2 最小化审查](../reviews/unified-trace-v0.2-minimality-review.md)仅作为评审依据。[语义冻结复审](../reviews/unified-trace-v0.2-semantic-freeze-review.md)提出的四项 P0 已有候选判定规则，**还没有通过实际机器验证**。
 
@@ -19,7 +19,7 @@
 
 **独立验收依据约束：** 被测 Producer/产品的 `claimed*`、`verified=true`、`sourceRangeComplete=true` 一类声明**本身不是证据**。合成向量将输入 `input` 与受测试框架控制的 `oracle` 分开；未来真实验收应从可信 Owner 来源范围/封口记录、Material 可读性/摘要复核、Profile 发布与生效证明、实际外发模型请求恢复依据建立 oracle。无依据时必须返回对应的 `UNKNOWN/UNRESOLVED`，若仍宣称范围 `PASS` 则拒绝该声明，**不得由同一 Producer 的布尔值互相证明**。Product Profile 明确不存在时为 `N_A`；声明存在但其事前发布无法核验时为 `UNRESOLVED`，不可偷换 `N_A`。夹具增加了这两类错误断言的边界。
 
-**按类型关闭 P0：** P0-1/P0-2 属验收流程类：产品声明/范围输入、覆盖证明、聚合规则、结构化预期与实际输出已经确定且可独立运行；P0-3/P0-4 属语义规则类：版本化类型、阶段定位与 Predicate 字段/枚举的机器判定规则已确定，含合法/非法成对向量。**每项均须正负例独立一致性执行、断言完全匹配并通过版本审查**，方可分别 CLOSED；不互相等待无关 Schema，也不把文档 lint/工程 CI 视为一致性 PASS。**当前候选验证器对合成向量 39/39 PASS；跨语言/跨 Owner 独立一致性仍 `NOT_RUN`，四项 P0 均 `OPEN`**。
+**按类型关闭 P0：** P0-1/P0-2 属验收流程类：产品声明/范围输入、覆盖证明、聚合规则、结构化预期与实际输出已经确定且可独立运行；P0-3/P0-4 属语义规则类：版本化类型、阶段定位与 Predicate 字段/枚举的机器判定规则已确定，含合法/非法成对向量。**每项均须正负例独立一致性执行、断言完全匹配并通过版本审查**，方可分别 CLOSED；不互相等待无关 Schema，也不把文档 lint/工程 CI 视为一致性 PASS。**当前候选 JS 与独立 Python 判定器对同一 39 个合成向量均 39/39 PASS；独立实现已在候选语义夹具范围内交叉核对，真实 Owner/cross-Producer conformance 仍 `NOT_RUN`，四项 P0 均 `OPEN`**。
 
 **其他冻结项**（机器 Schema、编码、权限政策、投影映射和黑盒测试）是上述语义定型后的**工程/互操作交付**，不是第五至第九项语义 P0。不得因表格出现 OPEN 而擅自启动各仓改造。
 
@@ -195,7 +195,7 @@ OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方�
 | **C09** | **L0：只读重建**，不得触发真实 Tool/5GC；**L2（未来另验）：隔离控制流重演**，须禁用真实副作用。**不能以 C09 要求 L0 实现 L2 Engine** |
 | **C10** | LEARNING_CANDIDATE：独立评估/Oracle、授权、完整来源和数据集隔离；普通 Producer N/A |
 
-**机器向量本地运行方式（合成夹具，非对真实 Owner 的认证）：** 从仓库根目录执行 `node docs/specs/fixtures/verify-p0.mjs` 与 `node docs/specs/fixtures/verify-boundaries.mjs`。两个验证器只从各自 JSON 夹具的 `input`（被测声明）和 `oracle`（受测试框架控制的独立合成事实）计算输出，再逐字段对比 `expected`；不访问外网、不启动业务代码、不读真实敏感材料。2026-11-05 已将 GitHub 分支上的同一判定逻辑在隔离 V8 执行，10/10 + 29/29 PASS；**Node 命令、独立双实现比较、真实 Owner 来源和跨语言一致性测试仍 NOT_RUN**。这个 PASS 只能说明候选条款在上述合成子集内有自洽的可执行解释，不代表 v0.2 已通过 Conformance。
+**机器向量本地运行方式（合成夹具，非真实 Owner 认证）：** 从仓库根目录执行 `node docs/specs/fixtures/verify-p0.mjs`、`node docs/specs/fixtures/verify-boundaries.mjs`，以及独立实现 `python3 docs/specs/fixtures/verify-independent.py`。两个 JS 候选判定器及独立 Python 判定器均分别从 `input`（被测声明）与测试框架控制的合成 `oracle`（可信前提）计算结果，再比较 `expected`，不访问网络、业务代码或敏感材料。2026-11-05 已在隔离 V8 执行原 JS 10/10 + 29/29，另以独立 JS 判定路径复核 39/39 与 7/7 变形检查；**将 GitHub 提交的 Python 源码与全部 39 个向量逐字/规范化校验后，在本地 Python 3.13 实跑 39/39 + 4/4 变形检查 PASS**。JS `node` 原生命令、Node 24、CI、真实 Owner 数据、跨 Producer 黑盒验证仍 `NOT_RUN`。这些 PASS 仅证明合成语义判定的跨语言一致性，不代表 v0.2 已获正式 Conformance 或类型 Registry 批准。
 
 **适用范围详见文首**；本节 Gate 仅针对对应产品声明、组件角色及已发生行为执行，不能对存量实现追溯授权。
 
