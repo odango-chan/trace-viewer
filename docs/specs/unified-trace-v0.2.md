@@ -84,7 +84,15 @@
 | Tool / Operation request / outcome / delivery | 精确请求/操作身份、实际 attempt、工具/操作种类、输出/异常、Owner 断言、交付接收者与结果认知（发生时） | 请求已发 ≠ 副作用已确认；结果产生 ≠ Host 收到；UNKNOWN 不升级成功 |
 | Activity / Capture | 实际活动范围及可信时间/状态；只有声明范围封口时才有来源覆盖和损失依据 | 没有结束记录 ≠ FAILED；只读到文件末尾 ≠ 源端 COMPLETE |
 
-**语义族 × 能力最小适用矩阵：** “基础”表示只要产出该记录就必须符合 CORE；“条件”表示该行为确实存在、或宣称相应能力时才验收；“—”表示不由此族单独要求。不是生产五类事件的配额。
+**核心类型最小负向判定式**（针对相关类型发生的记录，而非强制所有组件生产该类型）：
+
+- **评价 C01**：`observed=NOT_AVAILABLE` 或实际不可读取，却声称已观察到明确的 FALSE 并给出 `verdict=FAIL` → FAIL；明确 `verdict=UNKNOWN`、记录缺失原因 → 可通过。真实业务规则可将“无法观察”判为流程失败，但那属于**独立规则/步骤的失败事实**，不能伪称原 Predicate 实际观察为假。
+- **模型 C02**：声称模型请求已外发，却缺少本次有效请求材料或可核对的来源，仍将**该交互**标为 `AGENT_L0 PASS` → FAIL；仅调用模型 API 成功不等于模型内部处理已被证明。
+- **Tool / Operation C07**：声称 `effect=CONFIRMED` 却无任何可辨认的**有权限 Owner 的确认断言或来源证据**（可以是同一 Fact 的有类型证据，不强制额外记录）→ FAIL；只有请求发出/HTTP 接收不能证明业务副作用已提交。
+- **交付 C02/C07**：声称 `delivery=DELIVERED` 却无法确认接收者及其交付来源 → FAIL；Host 结果未知时必须保留 UNKNOWN，不伪造交付。
+- **Activity / Capture C05/C08b**：仅因缺失结束记录就断言 FAILED，或没有源范围/封口依据却声明 `COMPLETE` → FAIL。
+
+**语义族 × 能力最小适用矩阵：** “基础”**仅**表示产出该类型记录时须遵守 **§2 的公共最小契约 + C04 稳定身份 + C05 去重/冲突**；不额外要求此族全部专业字段、其他能力或专用服务。“条件”表示该行为确实存在、或宣称相应能力时才验收；“—”表示不由此族单独要求。不是生产五类事件的配额。
 
 | 语义族 | CORE | DIAGNOSTIC | AGENT_L0 | DISTRIBUTED | ARCHIVE | LEARNING_CANDIDATE |
 |---|---|---|---|---|---|---|
@@ -132,7 +140,7 @@ Material 可内嵌在受控文件，也可通过受控引用读取；**不要求
 
 **在线遥测**可以采样、裁剪或丢失，但保留的事实不能改变身份与语义，且须如实披露已知的覆盖限制；它不能仅凭可浏览就声称完整归档或 Replay。
 
-**有损投影的最低不变量（C08）：** 凡声称“这是源记录 R 的投影”，已保留的 `recordRef`、类型/版本、Owner/来源、源时间及其未知标记、已保留关系的目标引用、材料摘要均不得改写或用新语义冒充源数据。允许不展示非必需字段，但要显式标为 `LOSSY` 并公开**已知的**采样/裁剪/字段缺失范围；无法知道漏了多少，标为覆盖未知，**不得为了满足格式凭空生成每条不可观测丢失的缺失 Fact**。对原记录的忠实保留与对整段执行的完整覆盖是两个不同断言。
+**有损投影的最低不变量（C08a）：** 凡声称“这是源记录 R 的投影”，已保留的 `recordRef`、类型/版本、Owner/来源、源时间及其未知标记、已保留关系的目标引用、**原始材料摘要描述符（算法、输入字节/规范编码范围、摘要值）**均不得改写或用新语义冒充源数据。投影可为派生/转码内容**追加新摘要**，但必须另给算法、计算范围、转换来源和派生内容标识，不能替换源摘要；若原摘要因安全规则不能向当前读者披露，则显式标记受限/省略，不能声称该字段无损保留。允许不展示非必需字段，但要显式标为 `LOSSY` 并公开**已知的**采样/裁剪/字段缺失范围；无法知道漏了多少，标为覆盖未知，**不得为了满足格式凭空生成每条不可观测丢失的缺失 Fact**。对原记录的忠实保留与对整段执行的完整覆盖是两个不同断言。
 
 **旧资料导入**：如果缺少 Owner 原生 Record ID，可使用稳定的导入合成标识 `importRef`，须带原始来源 locator、合成标记及导入 Profile/映射版本；不可将它标记为原生 `recordRef`。同一来源再次导入时应依明确的原始 locator/版本与导入规则重复生成同一投影身份，不以浏览顺序派生。旧 OTLP 的 TraceId/SpanId 仅用于遥测相关性，**不能直接反推 Execution ID**；若有可信关联，由单独且带证据的链接 Fact 表达，保留旧记录原文。
 
@@ -140,18 +148,18 @@ Material 可内嵌在受控文件，也可通过受控引用读取；**不要求
 
 OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方案**。一套语义可以有在线有损投影与离线完整归档两种编码，不代表两套机器事实标准。
 
-## 7. 四个最小反例（文本推演，并非已运行测试）
+## 7. 最小合规场景与负向反例（文本推演，未运行机器测试）
 
 | 场景 | 最小合规表示 | 不需要 | 负例：会违反什么 |
 |---|---|---|---|
-| 单进程 Predicate | 一条含 verdict、expected/observed、原因与证据的 Fact | Attempt、Activity、Tool、Manifest | 只写 PASS 不留评价依据违反 DIAGNOSTIC；**额外真实 Attempt 不违规**，伪造重试才违规 |
-| 单轮模型调用、无 Tool | 请求/响应两条关联事实，或一条完整交互 Activity；保留实际请求、响应及材料校验 | ToolResult、Skill、跨 Owner 关联、额外重试 | 只保存 SHA、没有可读取原文却宣称 AGENT_L0 PASS 违规 |
-| Runtime 成功、Host 未知 | 同一 Operation 引用下的 Runtime outcome 和 Host knowledge；有调和时另记事实 | 每跳一条事件或全局 Manifest | 把 Host UNKNOWN 覆盖为 SUCCESS，或无授权裁决就只显示一方结果违规 |
-| 旧 JSONL/OTLP 部分导入 | 原来源 locator、显式合成的导入 ID、未知与截断声明 | 原生 Sequence、时间或完整性若原文没有则不要求 | 用 JSONL 行号冒充 Owner sequence、把采样 Trace 声称为完整归档违规 |
+| 单进程 Predicate | 一条含 verdict、expected/observed、原因与证据的 Fact | Attempt、Activity、Tool、Manifest | 只写 PASS 不留评价依据违反 **C01**；**额外真实 Attempt 不违规**，伪造重试才违反 **C04** |
+| 单轮模型调用、无 Tool | 请求/响应两条关联事实，或一条完整交互 Activity；保留实际请求、响应及材料校验 | ToolResult、Skill、跨 Owner 关联、额外重试 | 只保存 SHA、没有可读取原文却宣称 AGENT_L0 PASS 违反 **C02/C06** |
+| Runtime 成功、Host 未知 | 同一 Operation 引用下的 Runtime outcome 和 Host knowledge；有调和时另记事实 | 每跳一条事件或全局 Manifest | 把 Host UNKNOWN 覆盖为 SUCCESS，或无授权裁决就只显示一方结果违反 **C07** |
+| 旧 JSONL/OTLP 部分导入 | 原来源 locator、显式合成的导入 ID、未知与截断声明 | 原生 Sequence、时间或完整性若原文没有则不要求 | 用 JSONL 行号冒充 Owner sequence 违反 **C04/C08a**；把采样 Trace 声称完整归档违反 **C08b** |
 
-**额外负例 M1（覆盖范围）**：3 次 Model 调用只留第 3 次。可以宣称“交互 3：L0 PASS”，但“整个 Execution：L0 PASS”违规，必须报告前两次缺口/范围未知。
+**额外负例 M1（C02/C08b，覆盖范围）**：3 次 Model 调用只留第 3 次。可以宣称“交互 3：L0 PASS”，但“整个 Execution：L0 PASS”违规，必须报告前两次缺口/范围未知。
 
-**额外负例 M2（交互阶段）**：同一个 Tool Interaction 保存原始敏感结果和脱敏结果，而下一次模型请求只包含脱敏版。若 `consumes` 只指向整条 Activity，进而声称原始敏感结果被模型看见，违反 §3 的材料阶段定位及 AGENT_L0。
+**额外负例 M2（C02/C06，交互阶段）**：同一个 Tool Interaction 保存原始敏感结果和脱敏结果，而下一次模型请求只包含脱敏版。若 `consumes` 只指向整条 Activity，进而声称原始敏感结果被模型看见，违反 §3 的材料阶段定位及 AGENT_L0。
 
 ## 8. 一致性要求与冻结条件
 
@@ -166,7 +174,8 @@ OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方�
 | **C05** | CORE：同 Record ID 去重/冲突；若记录包含终态，不得将“未收到结束事实”冒充失败，不要求所有 CORE Producer 建立 State 系统 |
 | **C06** | AGENT_L0 / ARCHIVE：所要求材料的编码、摘要、原文可取回性、权限与缺失分别检验；无关记录 N/A |
 | **C07** | DIAGNOSTIC / DISTRIBUTED：存在不同 Owner Outcome/Host Knowledge 时并存并按授权裁决，禁止合并 SUCCESS |
-| **C08** | ARCHIVE：声明无损的有限范围导出/读回保真；在线有损投影只测不变量和覆盖声明，不要求 ARCHIVE |
+| **C08a（投影）** | 所有声称源记录投影的组件：保留未受限的原始身份/来源/时间/关系与摘要描述符；转换须另标派生关系，声明已知损失/覆盖未知，不要求 ARCHIVE |
+| **C08b（归档）** | ARCHIVE：宣称无损的有限范围导出、重开、读回，逐项对比原始身份、类型、材料摘要及可信封口/覆盖；只做在线投影者 N/A |
 | **C09** | **L0：只读重建**，不得触发真实 Tool/5GC；**L2（未来另验）：隔离控制流重演**，须禁用真实副作用。**不能以 C09 要求 L0 实现 L2 Engine** |
 | **C10** | LEARNING_CANDIDATE：独立评估/Oracle、授权、完整来源和数据集隔离；普通 Producer N/A |
 
