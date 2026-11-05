@@ -5,6 +5,7 @@ import { allRecords, defaultOpenSections, getSourceLinks, inspectorEvidenceStatu
 import { findPrimaryUnknown, projectLanes, projectSectionRows } from './console-parity.mjs'
 import { importTraceStoreFiles } from './native-import.mjs'
 import { importReviewDiagnosticFile } from './review-diagnostic.mjs'
+import { readLocalReviewDetail, reviewDetailAvailable } from './review-detail.mjs'
 
 type TraceRecord = {
   ref: string
@@ -34,6 +35,15 @@ type PresentationRow = {
   label: string
   lane: string
   isFolded: boolean
+}
+type LocalReviewDetail = {
+  runId: string
+  recordRef: string
+  fields: {label: string; value: string}[]
+  materialReported: boolean
+  evidenceRefCount: number | null
+  sourceLine: number
+  kind: string
 }
 type ViewMode = 'readable' | 'model' | 'owners' | 'raw'
 type InspectorTab = 'summary' | 'source' | 'links'
@@ -70,15 +80,28 @@ function App() {
   const [importError, setImportError] = useState<string | null>(null)
   const [importing, setImporting] = useState(false)
   const directoryRef = useRef<HTMLInputElement | null>(null)
+  const reviewFileRef = useRef<{file: File; runId: string} | null>(null)
+  const detailRequest = useRef(0)
+  const [localDetail, setLocalDetail] = useState<LocalReviewDetail | null>(null)
+  const [detailBusy, setDetailBusy] = useState(false)
+  const [detailError, setDetailError] = useState<string | null>(null)
+  function hideLocalDetail() {
+    detailRequest.current += 1
+    setLocalDetail(null)
+    setDetailBusy(false)
+    setDetailError(null)
+  }
   const runs = [reviewRun, nativeRun, ...syntheticRuns].filter(Boolean) as ExampleRun[]
   async function importReview(event: React.ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget
     const file = input.files?.[0]
     if (!file) return
+    hideLocalDetail()
     setImporting(true)
     setImportError(null)
     try {
       const imported = await importReviewDiagnosticFile(file) as ExampleRun
+      reviewFileRef.current = {file, runId: imported.id}
       setReviewRun(imported)
       setRunId(imported.id)
       setExpanded(new Set(imported.sections.map(s => s.id)))
@@ -104,6 +127,7 @@ function App() {
     const input = event.currentTarget
     const selectedFiles = input.files
     if (!selectedFiles?.length) return
+    hideLocalDetail()
     setImporting(true)
     setImportError(null)
     try {
@@ -129,6 +153,28 @@ function App() {
   const records = allRecords(run) as TraceRecord[]
   const activeRecord = records.find(record => record.ref === selectedRef) ?? null
   const evidenceStatus = inspectorEvidenceStatus(run, activeRecord)
+  const shownDetail = localDetail?.runId === run.id && localDetail?.recordRef === activeRecord?.ref ? localDetail : null
+  const canRevealLocalDetail = run.sourceKind === 'REVIEW_DIAGNOSTIC' &&
+    !!activeRecord && Number.isSafeInteger(activeRecord.sourceLine) &&
+    reviewDetailAvailable(activeRecord.kind) && reviewFileRef.current?.runId === run.id
+  async function revealLocalDetail() {
+    if (!canRevealLocalDetail || !activeRecord || !activeRecord.sourceLine) return
+    const held = reviewFileRef.current
+    if (!held || held.runId !== run.id) return
+    hideLocalDetail()
+    const request = detailRequest.current
+    setDetailBusy(true)
+    try {
+      const safe = await readLocalReviewDetail(held.file, activeRecord.sourceLine, activeRecord.kind)
+      if (request !== detailRequest.current) return
+      setLocalDetail({...safe, runId: run.id, recordRef: activeRecord.ref})
+    } catch {
+      if (request !== detailRequest.current) return
+      setDetailError('This local source line could not be inspected safely.')
+    } finally {
+      if (request === detailRequest.current) setDetailBusy(false)
+    }
+  }
   const summary = runSummary(run)
   const causalLinks = activeRecord ? getSourceLinks(run, activeRecord) : []
   const activePresentationRow = run.sections.flatMap(section =>
@@ -142,11 +188,13 @@ function App() {
     setViewMode('readable')
     const containing = run.sections.find(section => section.records.some(item => item.ref === record.ref))
     if (containing) setExpanded(previous => new Set(previous).add(containing.id))
+    hideLocalDetail()
     setSelectedRef(record.ref)
     setInspectorTab('summary')
   }
 
   function selectRecord(ref: string) {
+    hideLocalDetail()
     setSelectedRef(ref)
     setInspectorTab('summary')
   }
@@ -179,6 +227,7 @@ function App() {
   }
 
   function selectRun(next: ExampleRun) {
+    hideLocalDetail()
     setRunId(next.id)
     setExpanded(new Set(defaultOpenSections(next)))
     setFilter('all')
@@ -244,7 +293,7 @@ function App() {
           <div className="sidebar-caption">THIS RUN</div>
           <div className="section-index">
             {run.sections.map((section, i) => (
-              <button key={section.id} type="button" onClick={() => { setExpanded(previous => new Set(previous).add(section.id)); setSelectedRef(section.records[0]?.ref ?? '') }}>
+              <button key={section.id} type="button" onClick={() => { hideLocalDetail(); setExpanded(previous => new Set(previous).add(section.id)); setSelectedRef(section.records[0]?.ref ?? '') }}>
                 <span className="section-index-num">{String(i + 1).padStart(2, '0')}</span>
                 <span>{section.title.replace(/^TURN \d+ · |^STEP \d+ · |^ENTRY · |^EXECUTION · |^EXTERNAL · /, '')}</span>
               </button>
@@ -389,7 +438,7 @@ function App() {
                       <div className="paired-sources">
                         <p>Read-time pairing based on explicit owner refs, never timing.</p>
                         {activePresentationRow.members.map(member => (
-                          <button type="button" key={member.ref} onClick={() => { setSelectedRef(member.ref); setInspectorTab('source') }}>
+                          <button type="button" key={member.ref} onClick={() => { hideLocalDetail(); setSelectedRef(member.ref); setInspectorTab('source') }}>
                             <strong>{member.kind}</strong>
                             <span>{recordPosition(member)} · {member.status}</span>
                           </button>
@@ -399,6 +448,31 @@ function App() {
                   )}
                   <div className="inspector-label">EVIDENCE / MATERIAL</div>
                   <div className="raw-placeholder" role="status"><strong>{evidenceStatus.label}</strong><span>{evidenceStatus.detail}</span></div>
+                  {canRevealLocalDetail && (
+                    <section className="local-detail" aria-label="Local diagnostic detail">
+                      <div className="inspector-label">LOCAL DIAGNOSTIC PREVIEW</div>
+                      <p>Optional source-line inspection. Only selected scalar fields; never raw diagnostic text, bindings, output, credentials or materials. No upload or persistence.</p>
+                      {shownDetail ? (
+                        <>
+                          <dl className="properties local-detail-fields">
+                            {shownDetail.fields.length ? shownDetail.fields.map(field => (
+                              <React.Fragment key={field.label}>
+                                <dt>{field.label}</dt><dd>{field.value}</dd>
+                              </React.Fragment>
+                            )) : <><dt>Allowed fields</dt><dd>None available for this record</dd></>}
+                            <dt>Evidence refs</dt><dd>{shownDetail.evidenceRefCount ?? 'NOT VERIFIED / NOT PROVIDED'}</dd>
+                            <dt>Material</dt><dd>{shownDetail.materialReported ? 'Reported in JSONL · not verified' : 'No material object reported'}</dd>
+                          </dl>
+                          <button type="button" className="detail-toggle" onClick={hideLocalDetail}>Hide local details</button>
+                        </>
+                      ) : (
+                        <button type="button" className="detail-toggle" onClick={revealLocalDetail} disabled={detailBusy}>
+                          {detailBusy ? 'Reading selected line…' : 'Show allowed local fields'}
+                        </button>
+                      )}
+                      {detailError && <p role="alert" className="detail-error">{detailError}</p>}
+                    </section>
+                  )}
                 </>
               )}
               {inspectorTab === 'source' && (
@@ -425,7 +499,7 @@ function App() {
                   {causalLinks.length ? (
                     <div className="ref-list">{causalLinks.map((link: { ref: string; target: TraceRecord | null }) => (
                       <button type="button" key={link.ref} className="ref-item"
-                        onClick={() => { if (link.target) { setFilter('all'); setViewMode('owners'); const section = run.sections.find(item => item.records.some(record => record.ref === link.ref)); if (section) setExpanded(previous => new Set(previous).add(section.id)); setSelectedRef(link.ref) } }}
+                        onClick={() => { if (link.target) { setFilter('all'); setViewMode('owners'); const section = run.sections.find(item => item.records.some(record => record.ref === link.ref)); if (section) setExpanded(previous => new Set(previous).add(section.id)); hideLocalDetail(); setSelectedRef(link.ref) } }}
                         disabled={!link.target}>
                         <span>↳</span><span className="mono">{link.ref}</span>
                         <small>{link.target ? 'VIEW SOURCE' : 'UNAVAILABLE'}</small>
