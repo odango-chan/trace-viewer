@@ -4,7 +4,7 @@ import { samples } from '../site/fixtures.mjs'
 import { validateSyntheticRun, allRecords, getSourceLinks, runSummary, defaultOpenSections } from '../site/projection.mjs'
 
 test('synthetic cases are explicitly labeled; DSH and deterministic modes remain separate', () => {
-  assert.equal(samples.length, 2)
+  assert.equal(samples.length, 4)
   for (const sample of samples) validateSyntheticRun(sample)
   assert.equal(samples[0].mode, 'AGENT / MODEL')
   assert.equal(samples[1].mode, 'DETERMINISTIC')
