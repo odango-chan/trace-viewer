@@ -65,3 +65,16 @@
 .detail-toggle{border:1px solid #c9d9ef;background:#eef5ff;border-radius:7px;color:#325f9a;padding:9px 11px;font-size:11px;font-weight:700}
 .detail-toggle:disabled{opacity:.65;cursor:wait}
 .detail-error{color:#a64137;margin:10px 0 0}
+
+/* Standalone review reports are independent source assertions, never timeline nodes. */
+.finding-open-control,.finding-hide{border:1px solid #cfdaeb;background:#fff;border-radius:7px;color:#345c8e;padding:8px 10px;font-size:11px;font-weight:650}
+.finding-open-control{text-align:left}
+.finding-report{margin-top:20px;border:1px solid #dfd8cd;border-radius:10px;background:#fffdf9;padding:18px 20px}
+.finding-topline{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.finding-topline h2{font-size:16px;color:#2d3d53;margin:7px 0 10px}
+.finding-caveat{font-size:11px;line-height:1.7;color:#775f43;margin:0 0 18px}
+.finding-fields{display:grid;grid-template-columns:minmax(120px,175px) minmax(0,1fr);gap:11px 15px;margin:0;font-size:11px}
+.finding-fields dt{color:#8290a4;font-weight:650}
+.finding-fields dd{margin:0;color:#35475f;font-family:ui-monospace,Consolas,monospace;line-height:1.6;overflow-wrap:anywhere;user-select:text}
+.finding-source{border-top:1px solid #ece5da;padding-top:12px;margin-top:18px;color:#9b8d7b;font-size:10px}
+@media(max-width:750px){.finding-fields{grid-template-columns:1fr;gap:4px}.finding-fields dd{margin-bottom:8px}}
