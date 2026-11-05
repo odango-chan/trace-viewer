@@ -12,6 +12,8 @@ export const LANES = Object.freeze([
 ])
 
 export function laneOf(record) {
+  if (record.stage === 'RUNTIME') return 'runtime'
+  if (record.stage === 'LINKER' || record.stage === 'ADMISSION') return 'runtime'
   const authority = String(record.sourceAuthority || '').toLowerCase()
   if (authority.includes('agent') || authority.includes('host')) return 'agent'
   if (authority.includes('runtime')) return 'runtime'
@@ -51,6 +53,7 @@ export function projectSectionRows(run, section, mode = 'readable') {
     const localRefs = new Set(section.records.map(item => item.ref))
     for (const candidate of selected) {
       const targetKind = candidate.kind === 'MODEL_REQUEST' ? 'MODEL_RESPONSE'
+                       : candidate.kind.endsWith('_MODEL_REQUEST') ? candidate.kind.replace(/_MODEL_REQUEST$/, '_MODEL_RESPONSE')
                        : candidate.kind === 'TOOL_CALL' ? 'TOOL_RESULT'
                        : null
       if (!targetKind) continue
@@ -64,13 +67,14 @@ export function projectSectionRows(run, section, mode = 'readable') {
     let label = record.kind.replaceAll('_', ' ')
     if (fold) {
       const resultKind = record.kind === 'MODEL_REQUEST' ? 'MODEL_RESPONSE'
+                       : record.kind.endsWith('_MODEL_REQUEST') ? record.kind.replace(/_MODEL_REQUEST$/, '_MODEL_RESPONSE')
                        : record.kind === 'TOOL_CALL' ? 'TOOL_RESULT' : null
       if (resultKind) {
         const result = pairByExactRef(records, record, resultKind, new Set())
         if (result) {
           members = [record, result]
-          label = record.kind === 'MODEL_REQUEST' ? 'Model Interaction' : 'Tool Interaction'
-        } else if (record.kind === 'MODEL_REQUEST') label = 'Model Request · response unavailable'
+          label = record.kind.endsWith('_MODEL_REQUEST') || record.kind === 'MODEL_REQUEST' ? 'Model Interaction' : 'Tool Interaction'
+        } else if (record.kind === 'MODEL_REQUEST' || record.kind.endsWith('_MODEL_REQUEST')) label = 'Model Request · response unavailable'
         else label = 'Tool Call · result unavailable'
       }
     }
