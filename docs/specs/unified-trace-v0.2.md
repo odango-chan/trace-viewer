@@ -67,11 +67,39 @@
 
 具体名称可采用版本化类型，例如 `model.request.dispatched`、`runtime.predicate.evaluated`，但不以 CreatedSession、Fabric、DSH 等业务或内部名称作为公共类型。没有 Model 的 Runtime 不需要任何 Model 事件。
 
+**少量基础类型语义（候选，名称/枚举的机器拼写尚未冻结）：**
+
+| 类型/阶段 | 发生时的必需语义 | 明确不可混淆的情况 |
+|---|---|---|
+| Predicate / Verification evaluated | 评价对象、该次评价、判断规则或版本、`verdict`、expected/observed 或可验证的缺失原因、依据 | **FALSE / FAIL** 是获得有效观察后的否定；**UNKNOWN / UNAVAILABLE** 是无法有效判断，不能代填 FAIL |
+| Model request / response / failure | 交互与实际 attempt 身份、实际有效外发请求/Provider 配置、响应或失败阶段、对应材料和请求结果关联 | Dispatch ≠ Provider 内部已处理；无响应 ≠ 模型返回空字符串 |
+| Tool / Operation request / outcome / delivery | 精确请求/操作身份、实际 attempt、工具/操作种类、输出/异常、Owner 断言、交付接收者与结果认知（发生时） | 请求已发 ≠ 副作用已确认；结果产生 ≠ Host 收到；UNKNOWN 不升级成功 |
+| Activity / Capture | 实际活动范围及可信时间/状态；只有声明范围封口时才有来源覆盖和损失依据 | 没有结束记录 ≠ FAILED；只读到文件末尾 ≠ 源端 COMPLETE |
+
+**语义族 × 能力最小适用矩阵：** “基础”表示只要产出该记录就必须符合 CORE；“条件”表示该行为确实存在、或宣称相应能力时才验收；“—”表示不由此族单独要求。不是生产五类事件的配额。
+
+| 语义族 | CORE | DIAGNOSTIC | AGENT_L0 | DISTRIBUTED | ARCHIVE | LEARNING_CANDIDATE |
+|---|---|---|---|---|---|---|
+| Activity / 生命周期 | 基础 | 条件（异常/时段诊断） | 条件（模型/工具交互阶段） | 条件（跨 Owner） | 条件（纳入归档范围） | — |
+| Decision / Evaluation | 基础 | 条件（评价实际发生） | 条件（模型有效请求） | 条件（跨 Owner 评价关联） | 条件（纳入范围） | 条件（独立评价来源） |
+| Interaction | 基础 | 条件（请求排障） | 条件（实际模型调用、ToolResult） | 条件（跨组件请求） | 条件（纳入范围） | 条件（候选样本） |
+| State / Outcome | 基础 | 条件（Owner 状态/分歧） | 条件（进入模型输入的观察） | 条件（跨 Owner） | 条件（纳入范围） | — |
+| Capture / Provenance | 基础（存在时） | 条件（缺失诊断） | 条件（L0 证据） | 条件（关联） | 条件（声明 COMPLETE） | 条件（权利/来源审查） |
+
 ## 5. Material 与能力声明
 
 Material 可内嵌在受控文件，也可通过受控引用读取；**不要求独立材料服务**。凡声称内容可重建，必须说明内容原始字节或无损编码、版本、摘要及其计算范围、Owner、访问/保留限制。脱敏内容必须有自己的来源和摘要，不能冒充原文。
 
 有需要时分别报告**采集状态**（已采/未采/丢失/未知）、**完整性校验**（通过/不匹配/未验）和**访问状态**（可读/无权限/脱敏/过期）。没有材料需求的 Fact 不必生成空 Material 状态。
+
+**Material 最小义务表：** 仅要求真实发生的内容；没有 Tool/Reference 不应生成空假材料。内容可内嵌于记录的有类型位置，但必须能够独立准确定位。
+
+| 声明能力 | 需要可恢复或明确声明缺失的材料 |
+|---|---|
+| DIAGNOSTIC | 实际评价依据：expected、observed、reason、证据来源；不采集或权限受限必须区分 |
+| AGENT_L0 | **当次外发有效模型请求完整内容**（消息顺序、工具定义/Schema、实际注入的 Skill/Reference、有效配置与 attempt），真实响应/错误；发生 ToolResult 时记录原始/交付版本及下一次请求是否确实包含它 |
+| ARCHIVE | **所声明来源范围内**的记录、所要求的材料描述符/正文或缺失状态、范围与损失/封口证明 |
+| LEARNING_CANDIDATE | 精确来源与摘要、独立质量/Oracle 评判依据、使用许可和脱敏/留存信息；不能只凭 Producer 的 SUCCESS |
 
 以下能力**独立声明、按需验收**，不构成从低到高的单一等级：
 
@@ -83,6 +111,10 @@ Material 可内嵌在受控文件，也可通过受控引用读取；**不要求
 | DISTRIBUTED | 发生跨 Owner 行为时，能证明关联、区分重试/迟到/异步与 UNKNOWN |
 | ARCHIVE | 对**有限且已声明的来源范围**证明记录与材料覆盖、丢失/截断及读回保真 |
 | LEARNING_CANDIDATE | 独立的质量判定、许可、来源/版本、敏感筛查、训练/评测集隔离 |
+
+**目标产品责任不是 Producer 自由选择：** 新 Producer 只要产出记录就须满足 CORE；有 Predicate/Verification 等实际判断的 Owner 须满足该记录的 DIAGNOSTIC；真正调用模型的 Agent/Adapter 须对**当次交互**提供 AGENT_L0；跨 Owner 请求边界须满足适用的 DISTRIBUTED；产品声称某一有限执行范围能完整离线复核时，须满足该范围的 ARCHIVE；独立的数据评测/准备环节负责 LEARNING_CANDIDATE，普通 Recorder 不替样本打正标签。组件可如实声明缺失，但**目标产品必须报告 TARGET_GAP，不能通过全部自选 CORE 来宣称已达成诊断和复现目标**。
+
+**能力 PASS 必须带判定单位与覆盖依据**：至少区分单记录、单次交互、Run、Execution、有限来源段。内容完整性与来源捕获覆盖是两项独立判断。一个 Model Interaction 的 L0 PASS **不推导**整个 Run/Execution L0 PASS；一个 Predicate 可诊断 **不证明**整个 Run 没漏事件。范围覆盖未知则范围级 `UNKNOWN/PARTIAL`，不能因现存记录都通过就判完整；不适用为 N/A，未执行测试为 NOT_RUN，应发生却没采集为缺口而非 N/A。
 
 **AGENT_L0 仅保证历史模型外发输入可重建**，不保证模型服务端未公开的内部变换、模型重跑逐字一致。Tool Catalog 可能位于请求正文，不一定在顶层工具字段；当次未注入的 Skill/Reference 属于不适用而非缺失。L1 模型重跑、L2 隔离控制流重演属于后续独立实验，不允许重发真实 5GC/Tool 副作用。成功的 Runtime 结果不会自动使样本成为训练正例。
 
