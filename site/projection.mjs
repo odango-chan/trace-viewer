@@ -2,7 +2,7 @@
  * D0 synthetic-only presentation utilities.
  * No producer contract, owner truth, or implicit cross-owner join lives here.
  */
-export const EXCEPTION_STATUSES = Object.freeze(new Set(['FAILED', 'UNRESOLVED', 'OUTCOME_UNKNOWN', 'RESULT_UNKNOWN', 'BLOCKED', 'DENIED', 'SAFE_STOPPED']))
+export const EXCEPTION_STATUSES = Object.freeze(new Set(['FAIL', 'UNKNOWN', 'FAILED', 'UNRESOLVED', 'OUTCOME_UNKNOWN', 'RESULT_UNKNOWN', 'BLOCKED', 'DENIED', 'SAFE_STOPPED']))
 
 export function validateSyntheticRun(run) {
   if (!run || run.sourceKind !== 'SYNTHETIC') {
