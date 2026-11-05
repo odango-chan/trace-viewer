@@ -69,7 +69,7 @@ export const samples = Object.freeze([
         ],
       },
     ],
-  },,
+  },
   {
     id: 'synthetic-host-delivery-gap', sourceKind: 'SYNTHETIC', mode: 'AGENT / MODEL',
     title: 'Delivery failure · Host RESULT_UNKNOWN',
