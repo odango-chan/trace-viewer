@@ -92,7 +92,7 @@
 - **模型 C02**：声称模型请求已外发，却缺少本次有效请求材料或可核对的来源，仍将**该交互**标为 `AGENT_L0 PASS` → FAIL；仅调用模型 API 成功不等于模型内部处理已被证明。
 - **Tool / Operation C07**（副作用声明证据；若同时宣称模型可复现，还需 C02/C06）：声称 `effect=CONFIRMED` 却无任何可辨认的**有权限 Owner 的确认断言或来源证据**（可以是同一 Fact 的有类型证据，不强制额外记录）→ FAIL；只有请求发出/HTTP 接收不能证明业务副作用已提交。
 - **交付 C02/C07**：声称 `delivery=DELIVERED` 却无法确认接收者及其交付来源 → FAIL；Host 结果未知时必须保留 UNKNOWN，不伪造交付。
-- **Activity / Capture C05/C08b**：仅因缺失结束记录就断言 FAILED，或没有源范围/封口依据却声明 `COMPLETE` → FAIL。
+- **Activity C05b / Capture C08b**：仅因缺失结束记录就断言 FAILED 违反 C05b；没有源范围/封口依据却声明 `COMPLETE` 违反 C08b。两者是独立断言。
 
 **语义族 × 能力最小适用矩阵：** “基础”**仅**表示产出该类型记录时须遵守 **§2 的公共最小契约 + C04a 稳定身份 + C05a 记录级去重/冲突**；不额外要求此族全部专业字段、其他能力或专用服务。“条件”表示该行为确实存在、或宣称相应能力时才验收；“—”表示不由此族单独要求。不是生产五类事件的配额。
 
@@ -164,7 +164,7 @@ OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方�
 
 | 场景 | 最小合规表示 | 不需要 | 负例：会违反什么 |
 |---|---|---|---|
-| 单进程 Predicate | 一条含 verdict、expected/observed、原因与证据的 Fact | Attempt、Activity、Tool、Manifest | 只写 PASS 不留评价依据违反 **C01**；**额外真实 Attempt 不违规**，伪造重试才违反 **C04** |
+| 单进程 Predicate | 一条含 verdict、expected/observed、原因与证据的 Fact | Attempt、Activity、Tool、Manifest | 只写 PASS 不留评价依据违反 **C01**；**额外真实 Attempt 不违规**，伪造重试违反 **§2 的事实真实性**（发生跨 Owner retry 时还触发 **C04b**） |
 | 单轮模型调用、无 Tool | 请求/响应两条关联事实，或一条完整交互 Activity；保留实际请求、响应及材料校验 | ToolResult、Skill、跨 Owner 关联、额外重试 | 只保存 SHA、没有可读取原文却宣称 AGENT_L0 PASS 违反 **C02/C06** |
 | Runtime 成功、Host 未知 | 同一 Operation 引用下的 Runtime outcome 和 Host knowledge；有调和时另记事实 | 每跳一条事件或全局 Manifest | 把 Host UNKNOWN 覆盖为 SUCCESS，或无授权裁决就只显示一方结果违反 **C07** |
 | 旧 JSONL/OTLP 部分导入 | 原来源 locator、显式合成的导入 ID、未知与截断声明 | 原生 Sequence、时间或完整性若原文没有则不要求 | 用 JSONL 行号冒充 Owner sequence 违反 **C08a**（若同时冒充稳定原生记录身份才违反 **C04a**）；把采样 Trace 声称完整归档违反 **C08b** |
@@ -187,7 +187,7 @@ OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方�
 | **C05a** | CORE；**单身份记录集断言**：所有新源记录的幂等重发、`IDENTITY_CONFLICT`、不可核对判定均适用 |
 | **C05b** | 含 terminal 语义的记录；**终态断言**：未收到结束事实不得冒充 FAILED，且终态与副作用/Host knowledge 不折叠；仅输出普通 Decision 的 CORE Producer 不需实现 State 系统 |
 | **C06** | AGENT_L0 / ARCHIVE：所要求材料的编码、摘要、原文可取回性、权限与缺失分别检验；无关记录 N/A |
-| **C07** | DIAGNOSTIC / DISTRIBUTED；**单条 effect 声明及跨 Owner 裁决断言**：`effect=CONFIRMED` 要有授权 Owner 的确认依据；Owner Outcome/Host Knowledge 分歧必须并存，规则引用与事先授权可验证才可优选，不得合并 SUCCESS |
+| **C07** | 有 `effect=CONFIRMED` 的记录或 DIAGNOSTIC / DISTRIBUTED 裁决行为；**单条 effect 声明及跨 Owner 裁决断言**：`effect=CONFIRMED` 要有授权 Owner 的确认依据；Owner Outcome/Host Knowledge 分歧必须并存，规则引用与事先授权可验证才可优选，不得合并 SUCCESS |
 | **C08a（投影）** | 所有声称源记录投影的组件；**逐投影断言级检查**（非 CORE/ARCHIVE 能力）：真实身份/来源/时间/关系不得改写，摘要处置三态须如实标记，缺失须 `LOSSY`，不能伪造完整性 |
 | **C08b（归档）** | ARCHIVE；**有限来源范围级能力 Gate**：宣称无损导出、重开、读回，逐项对比原始身份、类型、材料摘要及可信封口/覆盖；只做在线投影者 N/A |
 | **C09** | **L0：只读重建**，不得触发真实 Tool/5GC；**L2（未来另验）：隔离控制流重演**，须禁用真实副作用。**不能以 C09 要求 L0 实现 L2 Engine** |
@@ -203,7 +203,7 @@ OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方�
 | Fact / recordRef | Owner 命名空间内唯一的已发布源身份、最小实质差异集和不可静默覆盖；更正新建记录 | 更正授权的跨信任域证明 | 类型 Registry、逐类型规范化/冲突比较、投影版本字段 |
 | Activity / activityRef | 时段活动可一条记录或多条事实表示；活动 ID 不等于记录 ID | 特殊暂停/恢复边界 | Span/Log 对应、阶段引用编码 |
 | Request / Operation | 请求、尝试、结果与副作用的准确关联 | 跨系统接收确认与超时边界 | 交互阶段定位、跨域身份绑定 |
-| Owner / Host knowledge | 事实权威来源 / Host 当时对结果的真实认知；裁决必须引用事前发布的可寻址规则 Fact | 具体业务授权者的优先序和信任证明 | `ruleRef` 编码、权限证明与类型枚举 |
+| Owner / Host knowledge | 事实权威来源 / Host 当时对结果的真实认知；裁决必须引用事前发布的可寻址规则 Fact | 具体业务授权者的优先序和信任证明 | 规则 Fact 的 `recordRef` 引用编码（如字段 `ruleRef`）、权限证明与类型枚举 |
 | terminal / effect / Reconcile | 终态、副作用确定性、后续调和分维度；C05b/C07 按实际语义触发 | 具体业务 outcome 转换与相冲突规则的优先序 | 版本化类型和值编码 |
 | Material | 有来源的实际请求、响应或诊断证据，受权限控制 | 具体分类、保留、原文/脱敏后用途政策 | 字节域、摘要算法、编码及材料引用 |
 | ORPHAN / importRef | 当时无可信关联的不可变断言 / 导入器合成身份 | 跨域关联可信证据要求 | 原始 locator、导入映射版本 |
