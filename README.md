@@ -7,11 +7,11 @@
 ## 统一 Trace 规范设计（当前主线）
 
 **当前优先工作是规范设计，不是 DSH / Agent Demo / Runtime 的实现验收。**
-已形成 [**Unified Trace Specification v0.2（DRAFT，当前唯一候选）**](docs/specs/unified-trace-v0.2.md)，针对 [v0.1 评审指出的六项 P0](docs/reviews/unified-trace-v0.1-architecture-review.md) 完成了语义层修订；[**v0.2 独立反例评审**](docs/reviews/unified-trace-v0.2-minimality-review.md) 又识别出六项必须减重的问题，以**可诊断、可复现、可学习**为目标，覆盖执行身份、Activity/Fact、因果关系、诊断与模型可见材料、完整性和一致性门禁。现有多个 Viewer Adapter、DSH Session 测试与 Phoenix PoC 是**历史现状/选型证据**，不是规范标准；在 v0.2 评审定型前**暂停继续修改各 Producer**。v0.1 仅保留为[历史草案](docs/specs/unified-trace-v0.1.md)。
+已形成 [**Unified Trace Specification v0.2（DRAFT，当前唯一候选）**](docs/specs/unified-trace-v0.2.md)，针对 [v0.1 评审指出的六项 P0](docs/reviews/unified-trace-v0.1-architecture-review.md) 完成了语义层修订；[**v0.2 独立反例评审**](docs/reviews/unified-trace-v0.2-minimality-review.md) 指出的六项减重问题已经按正文修订（仍待复审），以**可诊断、可复现、可学习**为目标，覆盖执行身份、Activity/Fact、因果关系、诊断与模型可见材料、完整性和一致性门禁。现有多个 Viewer Adapter、DSH Session 测试与 Phoenix PoC 是**历史现状/选型证据**，不是规范标准；在 v0.2 评审定型前**暂停继续修改各 Producer**。v0.1 仅保留为[历史草案](docs/specs/unified-trace-v0.1.md)。
 
 ## 统一 Trace 目标（规范先行）
 
-目标是**一套对外 Trace 契约**，覆盖 Agent、Harness、Runtime 诊断、确定性/LLM/混合执行；当前多格式仅服务存量兼容。**第一版同时验收可诊断与 Agent 可复现**：既能定位步骤、解释原因、核验证据，也能在授权范围内离线重建模型当时实际可见的输入/ToolResult，并做最小隔离重演；训练或自学习先保留合格数据与评测来源，不自动训练。优先阅读 [诊断审计 Q1–Q6/S1–S3](docs/design/trace-debuggability-audit.md) 与 [Agent Replay/可学习审计 Q7–Q9/S4](docs/design/trace-reproducibility-learning-audit.md) 和 [真实 Model→Tool→Model 的摘要/ToolCatalog/Observation Stub 复核](docs/experiments/agent-replay-archive-audit.md)，再看 [需求库存 R01–R16](docs/design/trace-requirements-audit.md) 和 [候选 OTel/OTLP 评估](docs/design/trace-unification-assessment.md)。**OTLP 尚未冻结为最终方案，Producer 未改。**
+目标是**一套对外 Trace 契约**，覆盖 Agent、Harness、Runtime 诊断、确定性/LLM/混合执行；当前多格式仅服务存量兼容。**第一版同时验收可诊断与 Agent 可复现**：既能定位步骤、解释原因、核验证据，也能让宣称 AGENT_L0 的 Agent 在授权范围内重建当时实际外发模型请求及 ToolResult；隔离重演为后续独立能力，训练/自学习只要求合格数据来源，不自动训练。优先阅读 [诊断审计 Q1–Q6/S1–S3](docs/design/trace-debuggability-audit.md) 与 [Agent Replay/可学习审计 Q7–Q9/S4](docs/design/trace-reproducibility-learning-audit.md) 和 [真实 Model→Tool→Model 的摘要/ToolCatalog/Observation Stub 复核](docs/experiments/agent-replay-archive-audit.md)，再看 [需求库存 R01–R16](docs/design/trace-requirements-audit.md) 和 [候选 OTel/OTLP 评估](docs/design/trace-unification-assessment.md)。**OTLP 尚未冻结为最终方案，Producer 未改。**
 
 ## 定位
 

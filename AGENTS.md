@@ -8,7 +8,7 @@
 
 ## 开发前阅读顺序
 
-1. `README.md`、`docs/specs/unified-trace-v0.2.md`（**当前唯一候选规范**，先设计后实现；v0.1 为历史草案）、`docs/reviews/unified-trace-v0.2-minimality-review.md`（六项减重阻塞）、`docs/README.md`
+1. `README.md`、`docs/specs/unified-trace-v0.2.md`（**当前唯一候选规范**，先设计后实现；v0.1 为历史草案）、`docs/reviews/unified-trace-v0.2-minimality-review.md`（六项历史减重意见；中文正文已整改，复审待做）、`docs/README.md`
 2. `docs/WORK.md`（当前状态）、`docs/TRACEABILITY.md`（实现→测试→证据）
 3. `docs/architecture/ownership.md`
 4. `docs/contracts/trace-inputs.md`（D1/D2 输入格式与验证前置要求）

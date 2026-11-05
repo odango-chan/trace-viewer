@@ -4,7 +4,7 @@
 
 **本轮纠偏（当前生效）**：Stage A 当前唯一候选为 [**Unified Trace v0.2 草案**](specs/unified-trace-v0.2.md)。v0.1 [架构审查](reviews/unified-trace-v0.1-architecture-review.md) 的六项 P0 已在 **v0.2 文本语义**处理：Execution 传递与孤儿关联、不可变记录/活动生命周期、精确关系、核心类型 Registry、Material/Owner Stream Closure、单一语义与在线/离线编码解耦。**下一步只做独立反例审查→规范批准→机器 Schema/黑盒向量；不得提前修改 Producer。**
 
-**v0.2 独立评审更新**：[极简与反例评审](reviews/unified-trace-v0.2-minimality-review.md) 发现六项新的轻量化问题（身份必填、Activity Summary、Registry 范围、Material 等级、Model 可见边界、Online/Durable lossless 表述）。**接下来的规范工作只做减重：公共最小字段 + 条件能力 + 各等级验收**；v0.2 暂不可冻结，机器 Schema 暂缓。
+**v0.2 修订进展**：[极简与反例评审](reviews/unified-trace-v0.2-minimality-review.md) 的六项减重意见已落实到[中文精简正文](specs/unified-trace-v0.2.md)：最小公共记录、身份与 Activity 按需、五类语义、按能力验收、L0 材料闭包、在线/归档边界。**下一步是复审修订后的文本和反例，而不是继续改 Producer**；机器 Schema、OTLP 和测试向量尚未冻结。
 
 **Stage B — Demo 重新实现：PAUSED / NOT_AUTHORIZED。** 规范批准之后再决定各 Producer/Consumer 一次性迁移顺序与旧 Adapter 清理。**下列 D0–D5 和 DSH 验收是历史工作/候选清单，不是当前要继续执行的步骤**；不要因阅读旧交接自动启动 DSH/Runtime/Agent Demo 代码开发。
 

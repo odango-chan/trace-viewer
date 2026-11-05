@@ -1,12 +1,12 @@
 # Trace Viewer 当前状态
 
 **Updated: 2026-11-05**
-**Current planning baseline: [Unified Trace Specification v0.2](specs/unified-trace-v0.2.md) DRAFT, six prior P0 addressed in text but not independently approved or machine-validated. Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
+**当前规范基线：[统一 Trace v0.2 中文精简修订稿](specs/unified-trace-v0.2.md)，DRAFT。两轮评审指出的问题已按文本修改，但修订后的独立复审和机器一致性测试未完成。 Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
 **Scope: 当前切回统一 Trace 规范设计；暂停 Producer/DSH/Runtime 代码工作，既有实现及验收记录不撤销。2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
-| **Unified Trace v0.2（当前主线）** | **DRAFT / 轻量化冻结阻塞**：[唯一候选规范](specs/unified-trace-v0.2.md)；[v0.2 四场景独立评审](reviews/unified-trace-v0.2-minimality-review.md) | **DOCS_ONLY**：保留 Execution/Activity/Fact/Material 语义；发现默认 MUST、Activity summary、类型数量、Capture/Online 过度要求；未修改 Producer | S-A～S-D **文本反例评审完成**；按能力条件化规范修订 **PENDING**；机器 Schema、Conformance C01–C10 **NOT_RUN**；OTLP 决策 **PENDING**，冻结 **BLOCKED** |
+| **统一 Trace v0.2（当前主线）** | **DRAFT / 中文精简正文已改，待复审**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[轻量化评审依据](reviews/unified-trace-v0.2-minimality-review.md) | **仅文档**：公共最小契约、按需身份/材料、五类语义、六项可独立声明能力、按能力 C01–C10；Producer 未改 | 四个场景已写入正文并作文本一致性检查；**修订后的独立复审 NOT_RUN**；机器 Schema、黑盒测试、OTLP 选型均 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
 | D0 文档治理 / 责任边界 | ACCEPTED | IMPLEMENTED | main 已核验；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 浅色 Web 壳 / 合成 DSH 轨迹 | ACCEPTED (D0) | IMPLEMENTED | [CI 单测/类型检查/静态构建 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)；Browser NOT_RUN |
 | D0 Synthetic 异常、确定性对照样本 | ACCEPTED (D0) | IMPLEMENTED | 5 unit tests PASS（[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)） |
