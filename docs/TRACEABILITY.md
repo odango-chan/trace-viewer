@@ -1,6 +1,6 @@
 # Trace Viewer 实施追溯
 
-**Date: 2026-11-05 · D0/D0.7 synthetic-only engineering checks**
+**Date: 2026-11-05 · D1.1 real archived diagnostic acceptance, original Owner source retained private**
 
 | Scope | Canonical design | Code / artifact | Test | Evidence |
 |---|---|---|---|---|
@@ -14,6 +14,7 @@
 | D0.7 TraceStore structural / no-fabricated-timing gate | [Native ↔ OTel loss audit](experiments/native-otel-gap.md) | `scripts/native_trace_audit.py` + `tests/test_native_trace_audit.py` | 8 schema-shaped synthetic tests, refusal of unsafe input; output metadata only | [CI 8/8 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41948042263); owner-generated fixture NOT_RUN |
 | D0.8 Console-inspired UI parity | [Console matrix](design/console-prototype-parity.md) | `site/console-parity.mjs`, `site/app.tsx`, `site/light.css`, `site/fixtures.mjs` | 5 tests `tests/console-parity.test.mjs` + `tests/viewer_ui_smoke.py` Chromium | [Engineering CI 10 Node + 8 Python PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41956588953); [Chromium 8 checks PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41956396421) · [Screenshot proof](https://github.com/odango-chan/trace-viewer/actions/runs/41956396421/artifacts/13383166824); full Console parity/native source still NOT_RUN |
 | D1 native Agent Demo folder import | [Owner Golden interoperability](experiments/native-d1-import.md) / [native source contract](contracts/trace-inputs.md) | `site/native-import.mjs`, `site/app.tsx`, `scripts/generate_owner_golden.py`, `tests/native-golden.test.mjs`, `tests/native_viewer_ui.py`; isolated private Owner workflow | 2 genuine TraceStore.persist/load_run synthetic runs; JS 7/7 negative/interop groups; Chromium directory UI | [private CI PASS](https://github.com/odango-chan/ca-agent-demo/actions/runs/41959276561); arbitrary owner Loader parity / real run NOT_RUN |
+| D1.1 real P8-D4 diagnostic report | [Real report import](experiments/real-p8d4-review-import.md) | `site/review-diagnostic.mjs`, `site/app.tsx`, `site/projection.mjs`, `tests/review-diagnostic.test.mjs`, `tests/review_real_ui.py` | Source 106 rows / 21 spans / 85 events, no invented owner sequence, raw summaries/material hidden, private Chromium checks | [Private real-record CI PASS](https://github.com/odango-chan/ca-agent-demo/actions/runs/41961642639); not TraceStore v2, no owner closure |
 | D2 Console/Runtime adapter | [source-adapters](design/source-adapters.md) | NOT_STARTED | NOT_RUN | NOT_RUN |
 
 **约束：** `IMPLEMENTED`、`PASS`、`LIVE_PASS` 不得互换；没有 owner source refs 的样本只允许示意，不能作为跨仓真实证据。

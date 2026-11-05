@@ -1,6 +1,6 @@
 # Source Adapters / View Projection
 
-**Status: D1 strict local TraceStore v2 folder reader implemented and golden-verified; D2 proposed · 2026-11-05**
+**Status: D1 strict native v2 folder reader (synthetic owner Golden PASS) + D1.1 real report reader (real P8-D4 browser PASS); D2 proposed · 2026-11-05**
 
 D1 current implementation and non-coverage: [Owner-generated golden report](../experiments/native-d1-import.md).
 
@@ -26,6 +26,10 @@ source file / owner API
 - 不读取当前 Skill 文件来重构历史执行事实；使用历史 trace 里 frozen identity、artifact digest、source node/frozen node、attempt/occurrence。
 - Runtime Trace 和 Fabric HELD disposition 是不同 truth owner；不因一个 terminal 替代另一个。
 - Run 与材料可能包含敏感信息：导入应拒绝超限或危险内容、只做本地处理、默认折叠/raw 脱敏，不用第三方外链发送材料。
+
+## D1.1: Real archived Runtime diagnostic report (not a new canonical contract)
+
+[Evidence and limitations](../experiments/real-p8d4-review-import.md). The private P8-D4 archive is an unversioned 106-line report (21 spans, 85 events); it has no TraceStore v2 metadata/digest closure or per-event owner sequence. The separate `review-diagnostic.mjs` reader imports it locally, drops raw diagnostic/material fields and labels every row by **file line**, not native sequence. [Private CI PASS](https://github.com/odango-chan/ca-agent-demo/actions/runs/41961642639). **Do not use the report adapter to infer Procedure causality or replace native source.**
 
 ## D2: Console / Runtime
 

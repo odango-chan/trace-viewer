@@ -1,10 +1,11 @@
 # D1.1 — Existing P8-D4 REAL diagnostic archive (read-only, no re-execution)
 
-**Status: REAL_CAPTURE_FOUND / STRUCTURE_INSPECTED; private browser acceptance PENDING**
+**Status: PRIVATE_REAL_REPORT_READBACK_PASS + CHROMIUM_UI_PASS; not TraceStore v2**
 **Date: 2026-11-05**
 **Source repository: private \`odango-chan/ca-agent-demo\`**
 **Source file: \`artifacts/reviews/20261104-createdsession-p8d4-final-live-e2e/evidence/runtime-trace-attempt2.jsonl\`**
-**Proof workflow: [private owner interop](https://github.com/odango-chan/ca-agent-demo/actions/workflows/trace-viewer-native-golden.yml)**
+**Proof: [Private owner run 41961642639](https://github.com/odango-chan/ca-agent-demo/actions/runs/41961642639)**
+**Viewer pinned for private proof: `eeee4659342f424f6bcfcc0f2281f4bb82dc44d9`**
 
 ## 1. What we actually found
 
@@ -44,7 +45,13 @@ An original live workspace such as \`/tmp/opencode/p8d4/run2\` is mentioned by t
 
 Unit tests: \`tests/review-diagnostic.test.mjs\` exercise synthetic shape/metadata, no sensitive body leakage, and negative cases. The same file has an optional real-capture test gated on \`REAL_DIAGNOSTIC_PATH\`; public CI skips it. A separate \`tests/review_real_ui.py\` opens the actual file in a headless browser **inside the private owner workspace** without screenshots, DOM export or raw traces in logs.
 
-## 3. Next true-native gate
+## 3. Executed private verification
+
+Private CI passed (1) existing **2/2** synthetic Owner Writer/Loader Golden runs, (2) native v2 importer **7/7** negative/interoperability test groups, (3) diagnostic reader **4/4** test groups including the actual private P8-D4 archived file, (4) native Golden Chromium, and (5) real archived diagnostic Chromium. The real test asserts **106** source file lines, **21** diagnostic spans, **85** diagnostic events, **null native owner sequence for all records**, local display of source references, and no external browser requests. No screenshot, DOM dump, complete diagnostics, evidence body or real file copy is uploaded to public or private artifacts; only synthetic Writer proof metadata is uploaded.
+
+[Private acceptance run](https://github.com/odango-chan/ca-agent-demo/actions/runs/41961642639). This is an acceptance of **viewing the archived real report**. It is not a new 5GC execution, a replay, an auditable RunEvent material closure, or a full native v2 real Run.
+
+## 4. Next true-native gate
 
 To test an **actual** TraceStore v2 full native real-world Run rather than a runtime report:
 1. Acquire a complete source directory from a deliberately preserved Owner Run, **in its authorized private environment**, not from a diagnostic dump.

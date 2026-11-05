@@ -10,6 +10,7 @@
 | D0.7 Native source loss audit | TraceStore.v2 结构/序号/material digest / no-fabricated-event-time 8 synthetic tests | 不宣称真实 owner golden fixture、完整 Procedure/Model lineage 或 OTLP round-trip |
 | D0.8 Console parity in Viewer | 基于两个 Console Prototype 的四阅读模式、Inspector、明确 ref folding、Host/Runtime 异常语义，使用新合成 fixture 与 Chromium UI 8 checks PASS（仅 synthetic） | 不复制私有源码/假定 Demo 是生产证据 |
 | D1 Offline Agent Demo | **第一条纵切 PASS（Owner-generated synthetic golden）**：原生目录浏览器导入、格式/digest/基础 lineage 及负向验证；继续补 Owner 全部语义校验和真实授权数据 | 不变更 Agent Demo Producer，不声称真实 Run 或 OTLP Roundtrip |
+| D1.1 Real archived diagnostic review | **PASS for real report UI**：独立 JSONL 适配，读取 106 行、21 spans/85 事件，源行号明确不等于 owner sequence，私有浏览器无外部请求 | 不重建完整 TraceStore v2，不声明 Evidence closure，不上传私有原文 |
 | D2 Console / Runtime | 按 `runId`/owner 序号读取 typed records；correlation 只依据确切 refs；保留四泳道 | 不产生 `UnifiedTrajectoryEvent` 真源 |
 | D3 Forensics | Model Input/Output、Tool Call/Result、Harness gates、Evidence、异常优先展开、UNKNOWN/reconcile、历史事件截断 | 不用 renderer 判定业务成功 |
 | D4 Flow & comparison | 动态的 Procedure 节点路径 / retries、Run Diff、Source identity 深链到 Skill Studio | 不在 Viewer 编辑 Skill 或重执行 |

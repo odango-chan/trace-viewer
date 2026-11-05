@@ -2,7 +2,7 @@
 
 **只读的 Agent / Harness / Runtime 执行轨迹可视化 Demo。** 本仓沿用 [Skill Studio](https://github.com/odango-chan/ca-skill-studio-demo) 的轻量 Web 与文档治理方式，继承 [CA Console 的 DSH-inspired Trajectory 阅读模型](https://github.com/odango-chan/ca-console/blob/main/docs/design/tasks-and-runs.md)，不把轨迹简化为一张确定性 Procedure 图。
 
-> 当前状态：**D1 首条 Owner Writer/Loader → Viewer 本地目录导入纵切 PASS（仅合成 Golden）；Console-inspired 四模式与 Phoenix PoC 继续保留；真实业务 Run 仍未验收**。示例是明确标注的合成数据，不代表真实 Agent、Runtime 或 5GC 验收。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
+> 当前状态：**D1 原生 TraceStore v2 合成 Golden PASS；D1.1 真实 P8-D4 诊断 JSONL 的独立只读导入与私有 Chromium PASS；完整真实业务 TraceStore v2 仍未验收**。默认示例均为合成数据；额外可手动导入经验证的本地真实诊断文件，但不能把诊断导出当作原生全量执行证据。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
 
 ## 定位
 
@@ -22,10 +22,10 @@ npm run build
 npm run dev
 ```
 
-开发界面默认使用 **synthetic / illustration only** 样本。已可从左侧选择 **Import TraceStore v2 folder**，在浏览器本地读取 `ca-agent-demo` 的 `run.json`、`trace.jsonl`、`materials/<digest>.json` 只读目录；结构与 SHA 检查通过后显示为 **LOCAL NATIVE · NOT OWNER VERIFIED**。该严格子集已有 Owner Writer/Loader 生成的合成 Golden 跨仓证明，但浏览器不会执行上游完整 Loader，真实业务 Run / ca-console owner-native Adapter 仍待验收。不得把伪造数据包装成真实 Trace。
+开发界面默认使用 **synthetic / illustration only** 样本。已可从左侧选择 **Import TraceStore v2 folder**，在浏览器本地读取 `ca-agent-demo` 的 `run.json`、`trace.jsonl`、`materials/<digest>.json` 只读目录；结构与 SHA 检查通过后显示为 **LOCAL NATIVE · NOT OWNER VERIFIED**。该严格子集已有 Owner Writer/Loader 生成的合成 Golden 跨仓证明，但浏览器不会执行上游完整 Loader，真实业务 Run / ca-console owner-native Adapter 仍待验收。另可选择 **Import archived diagnostic JSONL**，在浏览器里只读查看真实执行归档的报告行与显式状态；原始材料、诊断正文不会自动呈现，文件行号不是 Owner Sequence。跨仓私有验收见 [D1.1 真实归档](docs/experiments/real-p8d4-review-import.md)。不得把诊断报告当作可验证的完整 TraceStore v2。
 
 ## 文档
 
-[AGENTS.md](AGENTS.md) · [文档地图](docs/README.md) · [当前状态](docs/WORK.md) · [实现追溯](docs/TRACEABILITY.md) · [架构边界](docs/architecture/ownership.md) · [UX 基线](docs/design/trajectory-viewer.md) · [Console Demo 对照](docs/design/console-prototype-parity.md) · [输入格式要求](docs/contracts/trace-inputs.md) · [OTel GenAI 字段映射](docs/design/otel-genai-mapping.md) · [Phoenix PoC/Chromium UI 实测](docs/experiments/phoenix-otel-poc.md) · [Native ↔ OTel 缺口](docs/experiments/native-otel-gap.md) · [D1 Owner Golden 互操作](docs/experiments/native-d1-import.md) · [Adapter 方案](docs/design/source-adapters.md) · [里程碑](docs/ROADMAP.md)
+[AGENTS.md](AGENTS.md) · [文档地图](docs/README.md) · [当前状态](docs/WORK.md) · [实现追溯](docs/TRACEABILITY.md) · [架构边界](docs/architecture/ownership.md) · [UX 基线](docs/design/trajectory-viewer.md) · [Console Demo 对照](docs/design/console-prototype-parity.md) · [输入格式要求](docs/contracts/trace-inputs.md) · [OTel GenAI 字段映射](docs/design/otel-genai-mapping.md) · [Phoenix PoC/Chromium UI 实测](docs/experiments/phoenix-otel-poc.md) · [Native ↔ OTel 缺口](docs/experiments/native-otel-gap.md) · [D1 Owner Golden 互操作](docs/experiments/native-d1-import.md) · [D1.1 真实 P8-D4 诊断导入](docs/experiments/real-p8d4-review-import.md) · [Adapter 方案](docs/design/source-adapters.md) · [里程碑](docs/ROADMAP.md)
 
 本仓不直接修改其他仓的业务行为、Schema、Source/Runtime 规则。Pages 发布和真实浏览器验收只有在工作流实际通过后才标记为 PASS。
