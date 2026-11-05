@@ -1,6 +1,6 @@
 # Trace Viewer 文档地图
 
-**Status: D0.8 Console synthetic Viewer slice / Chromium gate PASS · 2026-11-05**
+**Status: D1 first Owner Writer/Loader synthetic golden interop PASS · 2026-11-05**
 
 请按以下顺序阅读：
 
@@ -14,10 +14,11 @@
 8. [Source Adapters](design/source-adapters.md) — 多来源只读适配
 8. [OTel GenAI 映射与缺口](design/otel-genai-mapping.md) — D0.6 字段级映射；不是跨仓正式机器契约
 10. [Phoenix × OTLP PoC](experiments/phoenix-otel-poc.md) — 合成 E2E 实测与 CI 证据
-11. [Native TraceStore ↔ OTel 结构缺口与审计](experiments/native-otel-gap.md) — D0.7 8 个合成用例、不可伪造事件时间
-12. [ROADMAP](ROADMAP.md) — 后续里程碑
-13. [ADR-0001](decisions/0001-owner-native-viewer.md) — Owner-native、无第二真源
-14. [DOCUMENTATION](DOCUMENTATION.md) — 文档规范
+11. [D1 Owner-generated Golden 互操作与浏览器导入](experiments/native-d1-import.md) — 上游 Writer/Loader 与 Viewer 双重验收
+12. [Native TraceStore ↔ OTel 结构缺口与审计](experiments/native-otel-gap.md) — D0.7 8 个合成用例、不可伪造事件时间
+13. [ROADMAP](ROADMAP.md) — 后续里程碑
+14. [ADR-0001](decisions/0001-owner-native-viewer.md) — Owner-native、无第二真源
+15. [DOCUMENTATION](DOCUMENTATION.md) — 文档规范
 
 外部 canonical 阅读材料： [CA Console 设计](https://github.com/odango-chan/ca-console/blob/main/docs/design/tasks-and-runs.md)、[Console 完整轨迹原型](https://github.com/odango-chan/ca-console/blob/main/docs/examples/trajectory-prototype.html)、[异常场景](https://github.com/odango-chan/ca-console/blob/main/docs/examples/trajectory-anomaly-prototype.html)、[Agent Demo Trace](https://github.com/odango-chan/ca-agent-demo/blob/main/docs/design/run-trace.md)。
 

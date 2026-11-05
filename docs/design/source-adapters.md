@@ -1,6 +1,8 @@
 # Source Adapters / View Projection
 
-**Status: Proposed D1/D2, with D0 synthetic adapter · 2026-11-04**
+**Status: D1 strict local TraceStore v2 folder reader implemented and golden-verified; D2 proposed · 2026-11-05**
+
+D1 current implementation and non-coverage: [Owner-generated golden report](../experiments/native-d1-import.md).
 
 **D0.5 输入格式与验收前置门禁见 [Trace 输入格式要求](../contracts/trace-inputs.md)。** 本文只讲 Adapter/Projection 架构，不复制 owner-native 字段表。
 

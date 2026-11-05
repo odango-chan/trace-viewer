@@ -9,13 +9,13 @@
 | D0.6 Phoenix / OpenTelemetry selection spike | 2 个合成根 Trace；OTLP→Phoenix→API readback；Owner-native ↔ GenAI 字段映射与缺失报告 | 不将合成 PoC 称为真实 Owner/Evidence 验收，UI parity 需另测 |
 | D0.7 Native source loss audit | TraceStore.v2 结构/序号/material digest / no-fabricated-event-time 8 synthetic tests | 不宣称真实 owner golden fixture、完整 Procedure/Model lineage 或 OTLP round-trip |
 | D0.8 Console parity in Viewer | 基于两个 Console Prototype 的四阅读模式、Inspector、明确 ref folding、Host/Runtime 异常语义，使用新合成 fixture 与 Chromium UI 8 checks PASS（仅 synthetic） | 不复制私有源码/假定 Demo 是生产证据 |
-| D1 Offline Agent Demo | 原生 `run.json` + `trace.jsonl` + `materials/` 浏览器导入、版本与 digest/lineage 校验、不可用提示 | 不变更 Agent Demo TraceStore |
+| D1 Offline Agent Demo | **第一条纵切 PASS（Owner-generated synthetic golden）**：原生目录浏览器导入、格式/digest/基础 lineage 及负向验证；继续补 Owner 全部语义校验和真实授权数据 | 不变更 Agent Demo Producer，不声称真实 Run 或 OTLP Roundtrip |
 | D2 Console / Runtime | 按 `runId`/owner 序号读取 typed records；correlation 只依据确切 refs；保留四泳道 | 不产生 `UnifiedTrajectoryEvent` 真源 |
 | D3 Forensics | Model Input/Output、Tool Call/Result、Harness gates、Evidence、异常优先展开、UNKNOWN/reconcile、历史事件截断 | 不用 renderer 判定业务成功 |
 | D4 Flow & comparison | 动态的 Procedure 节点路径 / retries、Run Diff、Source identity 深链到 Skill Studio | 不在 Viewer 编辑 Skill 或重执行 |
 | D5 Integration | 可选只读 remote adapter / SSE、Console deep link、Pages 合规部署 | 不获得 runtime mutation authority |
 
-前置要求：[D0.5 Trace 输入格式清单](contracts/trace-inputs.md)；只有取得上游 Python 生成的真实结构、可公开脱敏 golden fixture 并通过格式/安全负向测试，才能宣布 D1 adapter 验收。
+前置要求：[D0.5 Trace 输入格式清单](contracts/trace-inputs.md)；已获得上游 Python Writer/Loader 真正生成的**合成 Golden**，通过私有 Owner 隔离 CI。D1 第一条纵切已验收；但完整 D1 Owner parity 与真实业务 Run 依然待验证。
 
 **第一条独立纵切：** 真实 `ca-agent-demo` 一次确定性执行的持久化 Trace 可重开，展现 exactly matched Runtime node/predicate/evidence refs，再开展 Web D1 验收。
 
