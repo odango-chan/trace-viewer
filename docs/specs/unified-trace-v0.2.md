@@ -1,8 +1,8 @@
 # 统一 Trace 规范 v0.2（精简修订稿）
 
-**状态：草案，未冻结；仅供规范评审，不授权修改 Producer 或 Consumer。**  
+**状态：草案，独立复审已完成，4 项语义冻结问题待处理；不授权修改 Producer 或 Consumer。**  
 **日期：2026-11-05。**  
-本文件是当前唯一候选规范；[v0.1 架构审查](../reviews/unified-trace-v0.1-architecture-review.md)及[v0.2 最小化审查](../reviews/unified-trace-v0.2-minimality-review.md)仅作为评审依据。
+本文件是当前唯一候选规范；[v0.1 架构审查](../reviews/unified-trace-v0.1-architecture-review.md)及[v0.2 最小化审查](../reviews/unified-trace-v0.2-minimality-review.md)仅作为评审依据。**最新复审：[中文精简稿语义冻结评审](../reviews/unified-trace-v0.2-semantic-freeze-review.md)——架构/减重基本通过，4 项 P0 待补。**
 
 ## 1. 目标与原则
 
