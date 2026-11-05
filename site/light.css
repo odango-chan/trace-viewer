@@ -48,3 +48,12 @@
 @media(max-width:1450px){.owner-lanes{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.view-mode{padding:8px 10px}}
 @media(max-width:750px){.owner-lanes{grid-template-columns:minmax(0,1fr)}.view-selector{width:100%}.view-mode{flex:1}}
+
+
+/* Browser-only native TraceStore v2 folder loader */
+.import-block{margin:0 5px 17px;padding:12px;border:1px solid #dce6f1;background:#f9fbfe;border-radius:9px;display:grid;gap:9px}
+.import-block label{color:#42658f;font-size:11px;font-weight:800}
+.import-block input{font-size:10px;color:#6a7e9b;max-width:100%;min-width:0}
+.import-block input::file-selector-button{border:1px solid #d5e1ef;border-radius:6px;padding:5px;background:white;color:#4a6391;font-size:10px;cursor:pointer;margin-right:6px}
+.import-block small{font-size:9px;line-height:1.5;color:#8998ab}
+.import-error{margin:0;color:#a64137;background:#fff2ee;border-radius:5px;border:1px solid #f1d2cb;font-size:10px;overflow-wrap:anywhere;padding:7px}
