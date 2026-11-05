@@ -8,7 +8,7 @@
 
 ## 开发前阅读顺序
 
-1. `README.md`、`docs/specs/unified-trace-v0.2.md`（**当前唯一候选规范**，先设计后实现；v0.1 为历史草案）、`docs/reviews/unified-trace-v0.2-semantic-freeze-review.md`（**最新复审与整改依据，4 项 P0 文本已补，未冻结**）、`docs/reviews/unified-trace-v0.2-minimality-review.md`（六项已完成文字整改的历史减重意见）、`docs/README.md`
+1. **Viewer 主线先读**：`README.md`、`docs/WORK.md`、`docs/design/trace-debuggability-audit.md`（Q1–Q6/S1–S3）与 `docs/design/trajectory-viewer.md`；然后读现有 `site/` 和 `tests/`。统一规范 v0.2 仍是候选参考，不是 Viewer 交付的前置冻结门禁。
 2. `docs/WORK.md`（当前状态）、`docs/TRACEABILITY.md`（实现→测试→证据）
 3. `docs/architecture/ownership.md`
 4. `docs/contracts/trace-inputs.md`（D1/D2 输入格式与验证前置要求）
@@ -25,8 +25,8 @@
 
 ## 本阶段工作边界（2026-11-05）
 
-- **先评审统一规范，再实现**。当前只编辑 `docs/specs/unified-trace-v0.2.md` 及索引/决策说明；不得因为规范讨论自动推进 DSH、Agent Demo、Runtime、Console Producer、Replay Engine 或新的多格式 Adapter。
-- 旧 D1/D2 计划和 ADR-0001 适用于**已实现 Viewer**；它们不是未来统一 Trace 机器格式的既定约束。现有业务事实的真实性、安全性不得因重设计而牺牲。
+- **Viewer-first（2026-11-05 用户重新定位）**：先做好真实轨迹的只读阅读、异常定位、材料/证据可用性和 Inspector。允许修改本仓 `site/`、`tests/` 与相关文档；先用现有 Owner-native 输入，遵守来源限制。统一 Trace v0.2 的机器 Schema/跨语言夹具保留为 Draft（[PR #1](https://github.com/odango-chan/trace-viewer/pull/1)），不阻塞 Viewer MVP；不因规范讨论自动推进 DSH、Agent Demo、Runtime、Console Producer 或 Replay Engine。
+- D1 原生 TraceStore v2、D1.1 真实诊断 JSONL 的浏览器本地只读导入作为现成基础；下一纵切优先完成 S1 的来源可核验、材料可用状态、异常定位和最小受控 Inspector，不把 Viewer 卡在新统一 Schema 上。旧 D1/D2 计划和 ADR-0001 不是未来统一 Trace 机器格式的既定约束。
 - 未经明确评审，不冻结 OTLP / Phoenix、存储文件格式、机器 Schema、跨 Owner 的唯一权威数据模型。
 
 ## 不可违背
