@@ -1,12 +1,12 @@
 # Trace Viewer 当前状态
 
 **Updated: 2026-11-05**
-**当前规范基线：[统一 Trace v0.2 中文精简修订稿](specs/unified-trace-v0.2.md)，DRAFT。[独立复审已完成](reviews/unified-trace-v0.2-semantic-freeze-review.md)：架构/轻量化通过，4 项 P0 已对应 [10 个候选向量](specs/fixtures/unified-trace-v0.2-p0.json)，另有 [29 个边界向量](specs/fixtures/unified-trace-v0.2-boundaries.json)；候选 JS 验证器 V8 执行 39/39 PASS，独立跨实现一致性 NOT_RUN，P0 均 OPEN。 Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
+**当前规范基线：[统一 Trace v0.2 中文精简修订稿](specs/unified-trace-v0.2.md)，DRAFT。[独立复审已完成](reviews/unified-trace-v0.2-semantic-freeze-review.md)：架构/轻量化通过，4 项 P0 已对应 [10 个候选向量](specs/fixtures/unified-trace-v0.2-p0.json)，另有 [29 个边界向量](specs/fixtures/unified-trace-v0.2-boundaries.json)；候选 JS V8 执行 39/39 PASS，独立 Python 3.13 运行提交脚本 39/39 + 4/4 变形检查 PASS；仅合成语义向量跨语言一致，真实 Owner/跨 Producer conformance NOT_RUN，P0 均 OPEN. Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
 **Scope: 当前切回统一 Trace 规范设计；暂停 Producer/DSH/Runtime 代码工作，既有实现及验收记录不撤销。2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
-| **统一 Trace v0.2（当前主线）** | **DRAFT / 复审整改已写入正文、尚未冻结**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **仅文档**：公共最小契约、条件能力、真实来源/材料、分离 Owner 结果；Producer 未改 | 四个最小场景通过文本复核；**4 项 P0 已有 Gate+结构化预期及 10 个 P0、29 个边界候选向量；V8 合成验证 39/39 PASS，仍 OPEN**：产品责任、能力范围/覆盖、复合交互阶段、基本类型。用户新增的身份/N/A、裁决、L0/L2、材料/投影、负例等要求亦已写入；正式机器 Schema/独立黑盒一致性、Node 原生命令与 OTLP 选型 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
+| **统一 Trace v0.2（当前主线）** | **DRAFT / 复审整改已写入正文、尚未冻结**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **仅文档**：公共最小契约、条件能力、真实来源/材料、分离 Owner 结果；Producer 未改 | 四个最小场景通过文本复核；**4 项 P0 已有 Gate+结构化预期及 10 个 P0、29 个边界候选向量；V8 与独立 Python 合成验证均 39/39 PASS（Python 变形 4/4），仍 OPEN**：产品责任、能力范围/覆盖、复合交互阶段、基本类型。用户新增的身份/N/A、裁决、L0/L2、材料/投影、负例等要求亦已写入；正式机器 Schema/真实 Owner 黑盒一致性、Node 24 原生命令与 OTLP 选型 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
 | D0 文档治理 / 责任边界 | ACCEPTED | IMPLEMENTED | main 已核验；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 浅色 Web 壳 / 合成 DSH 轨迹 | ACCEPTED (D0) | IMPLEMENTED | [CI 单测/类型检查/静态构建 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)；Browser NOT_RUN |
 | D0 Synthetic 异常、确定性对照样本 | ACCEPTED (D0) | IMPLEMENTED | 5 unit tests PASS（[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)） |
