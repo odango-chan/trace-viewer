@@ -4,6 +4,8 @@
 
 **当前主线已调整：** 第一版必须同时验证 [真实执行可排障](design/trace-debuggability-audit.md) 的 **Q1–Q6/S1–S3** 与 [Agent 可复现/可学习准备](design/trace-reproducibility-learning-audit.md) 的 **Q7–Q9/S4**。下表 D2–D5 是之前的功能候选，**不是需要按顺序全部建设的既定工作包**；OTLP/Profile/多 Producer 改造等待上述排障实证。
 
+**Agent 纵切进展：** 已核验两份真实 Owner Model→Tool→Model 归档的 ToolResult body/ref 精确交接，[私有 CI PASS](https://github.com/odango-chan/ca-console/actions/runs/41978359553)。**L0 仍 PARTIAL**：先补/查 Tool Catalog 的实际内容、Skill/Reference 注入、Owner digest 校验，再做 L2 Tool stub 无副作用重演。详见 [归档审计](experiments/agent-replay-archive-audit.md)。
+
 **两个最小实证纵切：** (A) 在授权私有环境，取 P8-D4 一个 Predicate、一个 CALL_RESULT 和一个异常转移，做受控诊断 Inspector，按 Q1–Q6 验收；(B) 取一轮真实生成的 Agent Model/Tool 输入输出，核验 exact model-visible snapshot / ToolResult delivery，完成 L0 离线重建与至少一个 L1/L2 隔离实验，按 Q7–Q9 验收。两条共享来源/材料原则，**不建设独立 Replay 平台或 Training Trace 合同**。**不得**以 106 行能加载替代诊断回答能力。
 
 | 里程碑 | 目标 | 明确不做 |
