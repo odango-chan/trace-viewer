@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { samples } from '../site/fixtures.mjs'
-import { validateSyntheticRun, allRecords, getSourceLinks, runSummary, defaultOpenSections } from '../site/projection.mjs'
+import { validateSyntheticRun, allRecords, getSourceLinks, runSummary, defaultOpenSections, inspectorEvidenceStatus, sourceOverviewLabel } from '../site/projection.mjs'
 
 test('synthetic cases are explicitly labeled; DSH and deterministic modes remain separate', () => {
   assert.equal(samples.length, 4)
@@ -45,4 +45,25 @@ test('reject duplicate refs and local sequence collisions; distinct owners may r
 test('native owner trace is not silently accepted as synthetic projection', () => {
   assert.throws(() => validateSyntheticRun({sourceKind:'REAL',sections:[]}), /synthetic/)
   assert.ok(runSummary(samples[0]).ownerStreams >= 2)
+})
+
+test('Inspector evidence claims stay scoped to the actual imported source', () => {
+  const record = {ref:'owner:1', materialRef:'a'.repeat(64)}
+  const native = {sourceKind:'NATIVE_LOCAL', mode:'NATIVE / AGENT DEMO'}
+  const review = {sourceKind:'REVIEW_DIAGNOSTIC', mode:'DIAGNOSTIC / REVIEW EXPORT'}
+  assert.equal(inspectorEvidenceStatus(samples[0], record).label, 'ILLUSTRATION ONLY')
+  assert.equal(inspectorEvidenceStatus(native, record).label, 'DIGEST CHECKED · BODY HIDDEN')
+  assert.match(inspectorEvidenceStatus(native, record).detail, /Owner Loader validation/)
+  assert.equal(inspectorEvidenceStatus(native, {...record,materialRef:null}).label, 'NO MATERIAL REF ON RECORD')
+  assert.equal(inspectorEvidenceStatus(review, record).label, 'WITHHELD BY REVIEW READER')
+  assert.match(inspectorEvidenceStatus(review, record).detail, /not proof they were absent/)
+  assert.equal(sourceOverviewLabel(native), 'Local TraceStore v2')
+  assert.equal(sourceOverviewLabel(review), 'Diagnostic review export')
+  assert.equal(sourceOverviewLabel(samples[1]), 'Deterministic')
+})
+
+test('Missing record selection never implies an execution outcome', () => {
+  const status = inspectorEvidenceStatus({sourceKind:'NATIVE_LOCAL'}, null)
+  assert.equal(status.label, 'NO SOURCE SELECTED')
+  assert.doesNotMatch(status.detail, /FAILED|SUCCEEDED/)
 })
