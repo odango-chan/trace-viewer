@@ -92,7 +92,7 @@ test('Reject missing, changed, or malicious materials', {skip: !root}, async () 
   const files=filesFor('synthetic-owner-det-v2')
   await assert.rejects(importTraceStoreFiles(files.filter(x=>!x.webkitRelativePath.includes('/materials/'))),
     /INCOMPLETE_BUNDLE/)
-  const bad=mutate(files,x=>x.webkitRelativePath.includes('/materials/'),()=>'{\"synthetic\":true,\"unicode\":\"篡改\",\"facts\":[\"only-test\"]}\n')
+  const bad=mutate(files,x=>x.webkitRelativePath.includes('/materials/'),()=>'{\"facts\":[\"only-test\"],\"synthetic\":true,\"unicode\":\"篡改\"}\n')
   await assert.rejects(importTraceStoreFiles(bad),/DIGEST_MISMATCH/)
   const unsafe=mutate(files,x=>x.webkitRelativePath.includes('/materials/'),()=>'{\"api_key\":\"do-not-share\"}\n')
   await assert.rejects(importTraceStoreFiles(unsafe),/UNSAFE_CONTENT/)
