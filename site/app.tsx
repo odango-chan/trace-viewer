@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { samples } from './fixtures.mjs'
 import { allRecords, defaultOpenSections, getSourceLinks, isException, runSummary } from './projection.mjs'
+import { findPrimaryUnknown, projectLanes, projectSectionRows } from './console-parity.mjs'
 
 type TraceRecord = {
   ref: string
@@ -20,6 +21,16 @@ type Section = {
   kind: string
   records: TraceRecord[]
 }
+type PresentationRow = {
+  key: string
+  source: TraceRecord
+  members: TraceRecord[]
+  label: string
+  lane: string
+  isFolded: boolean
+}
+type ViewMode = 'readable' | 'model' | 'owners' | 'raw'
+type InspectorTab = 'summary' | 'source' | 'links'
 type ExampleRun = {
   id: string
   sourceKind: 'SYNTHETIC'
@@ -32,7 +43,7 @@ type ExampleRun = {
 const runs = samples as unknown as ExampleRun[]
 
 function statusClass(status: string): string {
-  if (['FAILED', 'BLOCKED', 'OUTCOME_UNKNOWN', 'UNRESOLVED'].includes(status)) return 'status danger'
+  if (['FAILED', 'BLOCKED', 'OUTCOME_UNKNOWN', 'RESULT_UNKNOWN', 'UNRESOLVED', 'DENIED', 'SAFE_STOPPED'].includes(status)) return 'status danger'
   if (['PASS', 'SUCCEEDED', 'COMMITTED', 'COMPLETED', 'DELIVERED'].includes(status)) return 'status good'
   if (['ATTEMPTED', 'RUNNING', 'REQUESTED'].includes(status)) return 'status pending'
   return 'status neutral'
@@ -52,16 +63,63 @@ function App() {
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(runs[0])))
   const [selectedRef, setSelectedRef] = useState<string>(runs[0].sections[1].records[2].ref)
   const [filter, setFilter] = useState<'all' | 'exceptions'>('all')
+  const [viewMode, setViewMode] = useState<ViewMode>('readable')
+  const [inspectorTab, setInspectorTab] = useState<InspectorTab>('summary')
   const run = runs.find(item => item.id === runId) ?? runs[0]
   const records = allRecords(run) as TraceRecord[]
   const activeRecord = records.find(record => record.ref === selectedRef) ?? null
   const summary = runSummary(run)
   const causalLinks = activeRecord ? getSourceLinks(run, activeRecord) : []
+  const activePresentationRow = run.sections.flatMap(section =>
+    projectSectionRows(run, section, viewMode) as PresentationRow[]
+  ).find(row => row.members.some(member => member.ref === selectedRef)) ?? null
+
+  function focusUnknown() {
+    const record = findPrimaryUnknown(run) as TraceRecord | null
+    if (!record) return
+    setFilter('exceptions')
+    setViewMode('readable')
+    const containing = run.sections.find(section => section.records.some(item => item.ref === record.ref))
+    if (containing) setExpanded(previous => new Set(previous).add(containing.id))
+    setSelectedRef(record.ref)
+    setInspectorTab('summary')
+  }
+
+  function selectRecord(ref: string) {
+    setSelectedRef(ref)
+    setInspectorTab('summary')
+  }
+
+  function renderRecordRow(row: PresentationRow) {
+    const active = row.members.some(member => member.ref === selectedRef)
+    const source = row.source
+    const terminal = row.members[row.members.length - 1]
+    const warning = row.members.some(isException)
+    return (
+      <button key={row.key} type="button"
+        className={'trace-event ' + (active ? 'selected' : '')}
+        onClick={() => selectRecord(source.ref)} aria-pressed={active}>
+        <span className={'event-glyph ' + (warning ? 'glyph-warning' : '')}>{kindSymbol(source.kind)}</span>
+        <span className="event-detail">
+          <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}</span>
+          <strong>{viewMode === 'raw' ? source.kind : source.title}</strong>
+          <small>{viewMode === 'raw' ? source.ref : source.summary}</small>
+          {row.isFolded && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · seq ' + member.ownerSequence).join('  →  ')}</span>}
+        </span>
+        <span className="event-side">
+          <span className={statusClass(terminal.status)}>{terminal.status}</span>
+          <small>{row.isFolded ? row.members.length + ' exact sources' : 'seq ' + source.ownerSequence}</small>
+        </span>
+      </button>
+    )
+  }
 
   function selectRun(next: ExampleRun) {
     setRunId(next.id)
     setExpanded(new Set(defaultOpenSections(next)))
     setFilter('all')
+    setViewMode('readable')
+    setInspectorTab('summary')
     const recordsForRun = allRecords(next) as TraceRecord[]
     setSelectedRef((recordsForRun.find(isException) ?? recordsForRun[0])?.ref ?? '')
   }
@@ -99,8 +157,8 @@ function App() {
               <button key={item.id} type="button" className={'run-option ' + (item.id === run.id ? 'active' : '')} onClick={() => selectRun(item)} aria-pressed={item.id === run.id}>
                 <span className="run-option-icon">{item.mode === 'DETERMINISTIC' ? '◇' : '◆'}</span>
                 <span className="run-option-copy">
-                  <strong>{item.mode === 'DETERMINISTIC' ? 'Frozen Procedure' : 'Agent & Harness'}</strong>
-                  <small>{item.mode === 'DETERMINISTIC' ? 'No model calls' : 'Uncertainty / Reconcile'}</small>
+                  <strong>{item.title}</strong>
+                  <small>{item.mode === 'DETERMINISTIC' ? 'Deterministic · No Model' : 'Agent / Model · Synthetic'}</small>
                 </span>
               </button>
             ))}
@@ -146,22 +204,40 @@ function App() {
           <div className="trace-heading">
             <div>
               <h2>Execution trajectory</h2>
-              <p>Owner-native references · DSH-inspired folding · explicit causal links only</p>
+              <p>Console-inspired reading modes · exact source refs · read-only</p>
             </div>
-            <div className="toolbar">
+            <div className="toolbar" aria-label="Trajectory presentation controls">
               <button type="button" className={filter === 'all' ? 'tool active' : 'tool'} onClick={() => setFilter('all')}>All</button>
               <button type="button" className={filter === 'exceptions' ? 'tool active' : 'tool'} onClick={() => setFilter('exceptions')}>Exceptions</button>
-              <button type="button" className="tool border-left" onClick={() => setExpanded(new Set(run.sections.map(item => item.id)))}>Expand</button>
-              <button type="button" className="tool" onClick={() => setExpanded(new Set())}>Collapse</button>
+              <button type="button" className="tool border-left" onClick={focusUnknown}>Focus unknown</button>
+              <button type="button" className="tool" onClick={() => setExpanded(new Set(run.sections.map(item => item.id)))}>Expand all</button>
+              <button type="button" className="tool" onClick={() => setExpanded(new Set())}>Collapse normal</button>
             </div>
+          </div>
+          <div className="view-selector" role="group" aria-label="Console-inspired trace reading mode">
+            {([
+              ['readable', 'Readable'], ['model', 'Model only'],
+              ['owners', 'All owners'], ['raw', 'Raw records'],
+            ] as [ViewMode, string][]).map(([mode, label]) => (
+              <button type="button" key={mode} className={'view-mode ' + (viewMode === mode ? 'active' : '')}
+                aria-pressed={viewMode === mode} onClick={() => { setViewMode(mode); setFilter('all') }}>{label}</button>
+            ))}
+          </div>
+          <div className="view-hint">
+            {viewMode === 'readable' && 'Paired Model/Tool interactions are presentation-only; Runtime and external facts remain separate.'}
+            {viewMode === 'model' && 'Agent/Model owner records only. Runtime omission here is a filter, not missing execution.'}
+            {viewMode === 'owners' && 'Unfolded owner-native records in separate lanes. No global cross-owner sequence.'}
+            {viewMode === 'raw' && 'Source refs, kinds and owner-local sequences. Raw materials are not included in these synthetic fixtures.'}
           </div>
 
           <div className="timeline" aria-label="Read-only execution trajectory">
             {run.sections.map((section, sectionIndex) => {
-              const shown = filter === 'exceptions' ? section.records.filter(isException) : section.records
-              if (filter === 'exceptions' && shown.length === 0) return null
+              const rows = projectSectionRows(run, section, viewMode) as PresentationRow[]
+              const shown = filter === 'exceptions' ? rows.filter(row => row.members.some(isException)) : rows
+              if (!shown.length) return null
               const isOpen = expanded.has(section.id)
               const containsWarning = section.records.some(isException)
+              const useLanes = viewMode === 'readable' || viewMode === 'owners'
               return (
                 <section className={'turn-card ' + (containsWarning ? 'has-warning' : '')} key={section.id}>
                   <button type="button" className="turn-header" onClick={() => toggleSection(section.id)} aria-expanded={isOpen}>
@@ -170,31 +246,31 @@ function App() {
                       <strong>{section.title}</strong>
                       <small>{section.subtitle}</small>
                     </span>
-                    <span className={'turn-count ' + (containsWarning ? 'turn-count-warning' : '')}>{section.records.length} records</span>
+                    <span className={'turn-count ' + (containsWarning ? 'turn-count-warning' : '')}>{section.records.length} owner records</span>
                     <span className="chevron">{isOpen ? '⌄' : '›'}</span>
                   </button>
                   {isOpen && (
-                    <div className="turn-body">
-                      {shown.map((record, recordIndex) => (
-                        <button key={record.ref} type="button" className={'trace-event ' + (activeRecord?.ref === record.ref ? 'selected' : '')} onClick={() => setSelectedRef(record.ref)} aria-pressed={activeRecord?.ref === record.ref}>
-                          <span className={'event-glyph ' + (isException(record) ? 'glyph-warning' : '')}>{kindSymbol(record.kind)}</span>
-                          <span className="event-detail">
-                            <span className="event-meta">{record.kind.replaceAll('_', ' ')} <span>·</span> {record.sourceAuthority}</span>
-                            <strong>{record.title}</strong>
-                            <small>{record.summary}</small>
-                          </span>
-                          <span className="event-side">
-                            <span className={statusClass(record.status)}>{record.status}</span>
-                            <small>seq {record.ownerSequence}</small>
-                          </span>
-                        </button>
-                      ))}
+                    <div className={'turn-body ' + (useLanes ? 'laned' : '')}>
+                      {useLanes ? (
+                        <div className="owner-lanes">
+                          {projectLanes(shown).map(lane => (
+                            <div className={'owner-lane lane-' + lane.id} key={lane.id}>
+                              <div className="lane-heading">{lane.label} <span>{lane.rows.length}</span></div>
+                              {lane.rows.length ? lane.rows.map(row => renderRecordRow(row)) :
+                                <div className="lane-empty">NOT REPORTED IN THIS STEP</div>}
+                            </div>
+                          ))}
+                        </div>
+                      ) : shown.map(row => renderRecordRow(row))}
                     </div>
                   )}
                 </section>
               )
             })}
-            {filter === 'exceptions' && !run.sections.some(section => section.records.some(isException)) && <div className="empty-state">No exception flags in this synthetic example.</div>}
+            {!run.sections.some(section => {
+              const rows = projectSectionRows(run, section, viewMode) as PresentationRow[]
+              return (filter === 'exceptions' ? rows.filter(row => row.members.some(isException)) : rows).length > 0
+            }) && <div className="empty-state">No matching source records in this view. This is a filter result, not an execution conclusion.</div>}
           </div>
           <div className="canvas-footer">D1 will add native TraceRun import. No live owner APIs are connected in D0.</div>
         </main>
@@ -209,24 +285,69 @@ function App() {
               <div className="inspector-title">{activeRecord.title}</div>
               <span className={statusClass(activeRecord.status)}>{activeRecord.status}</span>
               <p className="inspector-description">{activeRecord.summary}</p>
-              <div className="inspector-label">SOURCE RECORD</div>
-              <dl className="properties">
-                <dt>Authority</dt><dd>{activeRecord.sourceAuthority}</dd>
-                <dt>Record kind</dt><dd>{activeRecord.kind}</dd>
-                <dt>Local sequence</dt><dd>{activeRecord.ownerSequence}</dd>
-                <dt>Source ref</dt><dd className="mono">{activeRecord.ref}</dd>
-              </dl>
-              <div className="inspector-label">EXPLICIT CAUSAL REFS</div>
-              {causalLinks.length ? (
-                <div className="ref-list">{causalLinks.map((link: { ref: string; target: TraceRecord | null }) => (
-                  <button type="button" key={link.ref} className="ref-item" onClick={() => { if (link.target) { setFilter('all'); const section = run.sections.find(item => item.records.some(record => record.ref === link.ref)); if (section) setExpanded(previous => new Set(previous).add(section.id)); setSelectedRef(link.ref) } }} disabled={!link.target}>
-                    <span>↳</span><span className="mono">{link.ref}</span>
-                    <small>{link.target ? 'VIEW' : 'UNAVAILABLE'}</small>
-                  </button>
-                ))}</div>
-              ) : <p className="unavailable">No causal refs were declared for this record.</p>}
-              <div className="inspector-label">RAW MATERIAL</div>
-              <div className="raw-placeholder"><strong>Not available in D0</strong><span>Real evidence and material digests require an owner adapter. Nothing is inferred from these synthetic cards.</span></div>
+              <div className="inspector-tabs" role="group" aria-label="Inspector detail">
+                {([
+                  ['summary', 'Summary'], ['source', 'Source'], ['links', 'Lineage'],
+                ] as [InspectorTab, string][]).map(([tab, label]) => (
+                  <button key={tab} type="button" aria-pressed={inspectorTab === tab}
+                    className={inspectorTab === tab ? 'inspector-tab active' : 'inspector-tab'}
+                    onClick={() => setInspectorTab(tab)}>{label}</button>
+                ))}
+              </div>
+              {inspectorTab === 'summary' && (
+                <>
+                  <div className="inspector-label">SELECTED SOURCE</div>
+                  <dl className="properties">
+                    <dt>Authority</dt><dd>{activeRecord.sourceAuthority}</dd>
+                    <dt>Record kind</dt><dd>{activeRecord.kind}</dd>
+                    <dt>Local sequence</dt><dd>{activeRecord.ownerSequence}</dd>
+                  </dl>
+                  {activePresentationRow?.isFolded && (
+                    <>
+                      <div className="inspector-label">FOLDED INTERACTION</div>
+                      <div className="paired-sources">
+                        <p>Read-time pairing based on explicit owner refs, never timing.</p>
+                        {activePresentationRow.members.map(member => (
+                          <button type="button" key={member.ref} onClick={() => { setSelectedRef(member.ref); setInspectorTab('source') }}>
+                            <strong>{member.kind}</strong>
+                            <span>seq {member.ownerSequence} · {member.status}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  <div className="inspector-label">EVIDENCE / MATERIAL</div>
+                  <div className="raw-placeholder"><strong>UNAVAILABLE — synthetic fixture</strong><span>No real source material, model snapshot or evidence closure was loaded.</span></div>
+                </>
+              )}
+              {inspectorTab === 'source' && (
+                <>
+                  <div className="inspector-label">SOURCE IDENTITY</div>
+                  <pre className="source-preview">{JSON.stringify({
+                    sourceKind: 'SYNTHETIC', ref: activeRecord.ref,
+                    sourceAuthority: activeRecord.sourceAuthority,
+                    ownerSequence: activeRecord.ownerSequence,
+                    kind: activeRecord.kind, status: activeRecord.status,
+                    causalRefs: activeRecord.causalRefs,
+                  }, null, 2)}</pre>
+                  <div className="raw-placeholder"><strong>Presentation-only snapshot</strong><span>This is a safe subset of the authored fixture, not raw owner-native bytes.</span></div>
+                </>
+              )}
+              {inspectorTab === 'links' && (
+                <>
+                  <div className="inspector-label">EXPLICIT CAUSAL REFS</div>
+                  {causalLinks.length ? (
+                    <div className="ref-list">{causalLinks.map((link: { ref: string; target: TraceRecord | null }) => (
+                      <button type="button" key={link.ref} className="ref-item"
+                        onClick={() => { if (link.target) { setFilter('all'); setViewMode('owners'); const section = run.sections.find(item => item.records.some(record => record.ref === link.ref)); if (section) setExpanded(previous => new Set(previous).add(section.id)); setSelectedRef(link.ref) } }}
+                        disabled={!link.target}>
+                        <span>↳</span><span className="mono">{link.ref}</span>
+                        <small>{link.target ? 'VIEW SOURCE' : 'UNAVAILABLE'}</small>
+                      </button>
+                    ))}</div>
+                  ) : <p className="unavailable">No explicit causal refs declared. No relationship is inferred.</p>}
+                </>
+              )}
             </>
           ) : <p className="unavailable">Select a record for provenance.</p>}
           <div className="inspector-bottom">SOURCE-FIRST · NO EXECUTION CONTROLS</div>
