@@ -127,6 +127,47 @@ def main():
             assert page.locator(".local-detail").count() == 0
             checks.append("Changing selected record or Run clears local diagnostic preview")
 
+            # Separate local finding is not a Run or synthetic timeline event.
+            standalone = {
+                "owner": "local-demo",
+                "outcome": "UNRESOLVED",
+                "firstFailureStage": "RAN Adoption",
+                "firstFailureNode": "await-result",
+                "predicate": "observation.received",
+                "ownerResult": {
+                    "reason": "WAIT_BUDGET_EXHAUSTED",
+                    "observationsUsed": 3,
+                },
+                "networkEffect": "NONE: network accepted; no mutation replayed",
+                "fix": {
+                    "waitScope": "Require exact attempt selector",
+                    "procedureBindings": "Bind an explicit attempt context",
+                },
+                "bindingsSupplied": {"purpose": "local", "operationContextRef": "fake-private"},
+                "rootCause": "Sensitive source note imsi-synthetic-secret",
+            }
+            before_runs = page.locator(".run-list .run-option").count()
+            page.locator("#review-finding-json").set_input_files({
+                "name": "synthetic-finding.json",
+                "mimeType": "application/json",
+                "buffer": json.dumps(standalone).encode("utf-8"),
+            })
+            report = page.get_by_role("region", name="Standalone diagnosis report")
+            report.wait_for(timeout=10000)
+            assert "WAIT_BUDGET_EXHAUSTED" in report.inner_text()
+            assert "RAN Adoption" in report.inner_text()
+            assert "NOT linked to the selected Run" in report.inner_text()
+            assert "imsi-synthetic-secret" not in page.locator(".app-shell").inner_text()
+            assert page.locator(".run-list .run-option").count() == before_runs
+            checks.append("Independent local finding is readable without fabricating owner events or Run linkage")
+
+            page.get_by_role("button", name="Delivery failure · Host RESULT_UNKNOWN").click()
+            assert report.count() == 0
+            page.get_by_role("button", name="View standalone finding").click()
+            report.wait_for(timeout=10000)
+            assert "NOT linked to the selected Run" in report.inner_text()
+            checks.append("Switching Run hides unrelated report; explicit re-open keeps source warning")
+
             page.screenshot(path=str(OUT / "trace-viewer-console-parity.png"), full_page=True)
             assert not errors, f"Browser JavaScript errors: {errors}"
             checks.append("No browser JavaScript exceptions")
