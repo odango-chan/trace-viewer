@@ -6,7 +6,7 @@
 
 > **实证更新（2026-11-05）**：私有 03/04 两份真实 ProductTask Owner 归档已核验 **Request/Response Snapshot JSON SHA、实际模型 user 消息中的完整 Tool Catalog 与 Owner SurfaceDigest、ToolResult/Next Model ref+body、无副作用 Observation Stub 均 PASS**。[审计证据](../experiments/agent-replay-archive-audit.md)。这条 ProductTask 路线的 Skill/Reference 为 **N/A**；另需测试需要 Skill Context 的 DSH/Planner 路线。完整 L0 执行环境 PARTIAL、L1/L2 全程 NOT_RUN、训练资格 NOT_QUALIFIED。
 
-> **DSH Skill/Reference 纵切更新**：`ca-dsh` 真正的 ModelInput/Output Snapshot Builder 已通过 source-only synthetic owner-event Golden，验证 Skill/Reference 真实 Surface 可见性、Source refs、内容摘要及错误关联/不可见拒绝。[验收范围](../experiments/dsh-skill-replay-golden.md)。完整 DSH Agent Loop 与 Session 持久化重开 **NOT_RUN**；完整 L0/L2 和训练资格仍未达标。
+> **DSH Skill/Reference 纵切更新**：`ca-dsh` 真正的 ModelInput/Output Snapshot Builder 已通过 source-only synthetic owner-event Golden，验证 Skill/Reference 真实 Surface 可见性、Source refs、内容摘要及错误关联/不可见拒绝。[验收范围](../experiments/dsh-skill-replay-golden.md)。genuine DSH Session + 官方 JSONL 后端 `flush → close → fresh Context read` 和 ModelInput/Output 一致性 **PASS（synthetic）**，[证据](../experiments/dsh-skill-replay-golden.md)。完整 DSH Agent Loop 的真实 Skill/Reference material closure **NOT_RUN**；完整 L0/L2 和训练资格仍未达标。
 
 ## 0. 产品目标更新
 
