@@ -73,3 +73,17 @@ test('private archived P8-D4 export retains only safe, aggregate source metadata
   // Never print or upload source values; only these count-level checks.
   console.log('REDACTED_REAL_DIAGNOSTIC_PASS: 106 rows, 21 spans, 85 events, zero fabricated owner sequences')
 })
+
+test('Predicate UNKNOWN and Verify FAIL stay distinct from Runtime terminal status',async()=>{
+  const source=[
+    {kind:'PREDICATE_EVALUATED',summary:'hidden',diag:'hidden',data:{verdict:'UNKNOWN'},material:null},
+    {kind:'VERIFY_RESULT',summary:'hidden',diag:'hidden',data:{verdict:'FAIL'},material:null},
+    {kind:'CALL_RESULT',summary:'hidden',diag:'hidden',data:{outcome:'COMMITTED'},material:null},
+    {kind:'GRAPH_TRANSITION',summary:'hidden',diag:'hidden',data:{verdict:'UNKNOWN'},material:null},
+    {kind:'PREDICATE_EVALUATED',summary:'hidden',diag:'hidden',data:{verdict:null},material:null},
+  ]
+  const run=await importReviewDiagnosticFile(mockFile(source))
+  assert.deepEqual(allRecords(run).map(r=>r.status),
+    ['UNKNOWN','FAIL','COMMITTED','RECORDED','RECORDED'])
+  assert.ok(allRecords(run).every(r=>r.ownerSequence===null))
+})
