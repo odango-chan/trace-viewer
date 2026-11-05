@@ -1,0 +1,1768 @@
+{
+  "fixtureVersion": "unified-trace-v0.2-boundary-candidate-1",
+  "authority": "SYNTHETIC_HARNESS_ORACLE_NOT_PRODUCER_WIRE_SCHEMA",
+  "note": "oracle is a synthetic independently controlled trusted input for these tests; producer claims cannot substitute for verified source, publication, registry and retention evidence. For adjudication, trustedDecisionPublicationOrders is from independent ordering evidence in a single authority scope (never owner-local sequence or claimant-supplied timestamp).",
+  "resultContract": {
+    "gateStatus": [
+      "PASS",
+      "FAIL",
+      "UNRESOLVED"
+    ],
+    "dispositionByKind": {
+      "IDENTITY": [
+        "SAME_FACT",
+        "DISTINCT_FACTS",
+        "IDENTITY_CONFLICT",
+        "IDENTITY_UNVERIFIABLE"
+      ],
+      "ADJUDICATION": [
+        "RESOLVED",
+        "DISPUTED",
+        "MISADJUDICATED"
+      ],
+      "PROJECTION": [
+        "PRESERVED",
+        "REDACTED_VERIFIED",
+        "REDACTED_UNVERIFIED",
+        "LOSSY_DECLARED",
+        "LOSS_UNDECLARED",
+        "SOURCE_DIGEST_CHANGED",
+        "SOURCE_IDENTITY_CHANGED",
+        "FALSE_REDACTION_CLAIM"
+      ]
+    }
+  },
+  "vectors": [
+    {
+      "id": "I01-idempotent",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "disposition": "SAME_FACT",
+        "issueCodes": [],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I02-metadata-only",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "renamed.jsonl:70"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "disposition": "SAME_FACT",
+        "issueCodes": [],
+        "warnings": [
+          "METADATA_DRIFT"
+        ],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I03-version-conflict",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "2",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "IDENTITY_CONFLICT",
+        "issueCodes": [
+          "TYPE_VERSION_CHANGED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I04-source-time-precision",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "microsecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "IDENTITY_CONFLICT",
+        "issueCodes": [
+          "SOURCE_TIME_CHANGED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I05-digest-domain",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "JSON-CANONICAL-V1",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "IDENTITY_CONFLICT",
+        "issueCodes": [
+          "SOURCE_DIGEST_DESCRIPTOR_CHANGED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I06-same-local-id-different-owner",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-B",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "disposition": "DISTINCT_FACTS",
+        "issueCodes": [],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I07-canonicalizer-unknown",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": false,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "IDENTITY_UNVERIFIABLE",
+        "issueCodes": [
+          "CANONICALIZER_MISSING"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I08-required-field-conflict",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "FAIL",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "IDENTITY_CONFLICT",
+        "issueCodes": [
+          "REQUIRED_CONTENT_CHANGED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I09-source-digest-unverified",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": true,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": false
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "IDENTITY_UNVERIFIABLE",
+        "issueCodes": [
+          "SOURCE_DIGEST_UNVERIFIED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "I10-owner-namespace-unauthenticated",
+      "gate": "C04a+C05a",
+      "kind": "IDENTITY",
+      "input": {
+        "left": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        },
+        "right": {
+          "owner": "owner-A",
+          "recordRef": "local-42",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "requiredContent": {
+            "subject": "test",
+            "verdict": "UNKNOWN",
+            "unavailableReason": "no-observation"
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "metadata": {
+            "locator": "a.jsonl:10"
+          }
+        }
+      },
+      "oracle": {
+        "ownerNamespacesVerified": false,
+        "canonicalizerRegistered": true,
+        "sourceDigestVerified": true
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "IDENTITY_UNVERIFIABLE",
+        "issueCodes": [
+          "OWNER_NAMESPACE_UNVERIFIED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A01-preregistered-authorized",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "disposition": "RESOLVED",
+        "issueCodes": [],
+        "warnings": [],
+        "winnerRef": "owner-A/decision-1"
+      }
+    },
+    {
+      "id": "A02-missing-rule-reference",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_REFERENCE_MISSING"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A03-backdated-rule",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 15,
+            "effectiveFromOrder": 1,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_NOT_PREPUBLISHED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A04-equal-priority",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 1
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "PRIORITY_TIE"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A05-rule-out-of-scope",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:another",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_SCOPE_MISMATCH"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A06-wrong-winner-claim",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-B/decision-2"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "MISADJUDICATED",
+        "issueCodes": [
+          "UNSUPPORTED_WINNER"
+        ],
+        "warnings": [],
+        "winnerRef": "owner-A/decision-1"
+      }
+    },
+    {
+      "id": "A07-disjoint-rule-refs",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r2",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_SELECTION_AMBIGUOUS"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A08-rule-publisher-not-authorized",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": false,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_PUBLISHER_UNVERIFIED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R01-preserved-exact",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "PRESERVED",
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "lossy": false
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": null
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "disposition": "PRESERVED",
+        "issueCodes": [],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R02-redacted-with-proof",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "REDACTED_BY_POLICY",
+          "lossy": false,
+          "redactionPolicyRef": "policy/secret1"
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": {
+          "verified": true,
+          "sourceRef": "owner-A/source-7",
+          "digestMatches": true,
+          "policyRef": "policy/secret1",
+          "viewerDenied": true
+        }
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "disposition": "REDACTED_VERIFIED",
+        "issueCodes": [],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R03-redacted-no-proof",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "REDACTED_BY_POLICY",
+          "lossy": false,
+          "redactionPolicyRef": "policy/secret1"
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": null
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "REDACTED_UNVERIFIED",
+        "issueCodes": [
+          "RETENTION_PROOF_MISSING"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R04-omitted-loss-declared",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "OMITTED",
+          "lossy": true,
+          "knownLosses": [
+            "sourceDigest"
+          ]
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": null
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "disposition": "LOSSY_DECLARED",
+        "issueCodes": [],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R05-omitted-not-declared",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "OMITTED",
+          "lossy": false
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": null
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "LOSS_UNDECLARED",
+        "issueCodes": [
+          "OMITTED_WITHOUT_LOSS_DECLARATION"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R06-preserved-but-changed",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "PRESERVED",
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "tampered"
+          },
+          "lossy": false
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": null
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "SOURCE_DIGEST_CHANGED",
+        "issueCodes": [
+          "SOURCE_DIGEST_DESCRIPTOR_CHANGED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R07-forged-source-ref",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-8",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "PRESERVED",
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          },
+          "lossy": false
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": null
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "SOURCE_IDENTITY_CHANGED",
+        "issueCodes": [
+          "SOURCE_IDENTITY_CHANGED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "R08-redaction-evidence-mismatch",
+      "gate": "C08a",
+      "kind": "PROJECTION",
+      "input": {
+        "projection": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigestState": "REDACTED_BY_POLICY",
+          "lossy": false,
+          "redactionPolicyRef": "policy/secret1"
+        }
+      },
+      "oracle": {
+        "trustedSourceSnapshot": {
+          "recordRef": "owner-A/source-7",
+          "owner": "owner-A",
+          "type": "tool.result",
+          "typeVersion": "1",
+          "sourceTime": {
+            "value": "2026-11-05T09:00:00.123Z",
+            "precision": "millisecond",
+            "unknownReason": null
+          },
+          "sourceDigest": {
+            "algorithm": "SHA-256",
+            "byteDomain": "UTF8-EXACT",
+            "digestValue": "synthetic-digest-a"
+          }
+        },
+        "retentionProof": {
+          "verified": true,
+          "sourceRef": "owner-A/source-7",
+          "digestMatches": false,
+          "policyRef": "policy/secret1",
+          "viewerDenied": true
+        }
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "disposition": "FALSE_REDACTION_CLAIM",
+        "issueCodes": [
+          "SOURCE_NOT_PRESERVED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A09-decision-order-not-verified",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "DECISION_ORDER_UNVERIFIED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A10-rule-version-mismatch",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "2"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_VERSION_MISMATCH"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A11-rule-expired-before-second-decision",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 11,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_NOT_EFFECTIVE"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    }
+  ]
+}

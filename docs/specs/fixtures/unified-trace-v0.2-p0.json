@@ -1,0 +1,541 @@
+{
+  "fixtureVersion": "unified-trace-v0.2-p0-candidate-2",
+  "authority": "HARNESS_FIXTURE_ONLY_NOT_PRODUCER_WIRE_SCHEMA",
+  "purpose": "Synthetic semantic inputs, candidate assessor outputs, and independently controlled harness oracles; not approved wire fields nor proven Owner-native evidence.",
+  "resultContract": {
+    "gateStatus": [
+      "PASS",
+      "FAIL",
+      "NOT_RUN",
+      "N_A",
+      "UNRESOLVED"
+    ],
+    "coverage": [
+      "COMPLETE",
+      "PARTIAL",
+      "UNKNOWN",
+      "N_A"
+    ],
+    "productStatus": [
+      "PASS",
+      "TARGET_GAP",
+      "NOT_RUN",
+      "N_A",
+      "UNRESOLVED"
+    ],
+    "issueCodes": [
+      "REQUIRED_CAPABILITY_MISSING",
+      "UNSUPPORTED_SCOPE_PASS",
+      "MATERIAL_ROLE_MISMATCH",
+      "INVALID_PREDICATE_VERDICT",
+      "PROFILE_PUBLICATION_UNVERIFIED"
+    ],
+    "note": "Input claims are untrusted. Each vector oracle is independent synthetic harness evidence. UNRESOLVED is used for asserted-but-unverified profile scope, not N_A."
+  },
+  "vectors": [
+    {
+      "id": "P0-1-positive",
+      "p0": "P0-1",
+      "inputKind": "publishedProductProfile+sourceSet+productClaim",
+      "gate": "PRODUCT_AGGREGATION+C02+C06",
+      "input": {
+        "profile": {
+          "recordRef": "profile-owner/p1",
+          "profileVersion": "1",
+          "product": "demo-product",
+          "publishedAt": "2026-11-01T00:00:00Z",
+          "scope": "execution:e1",
+          "requiredCapabilities": [
+            "AGENT_L0"
+          ],
+          "participants": [
+            "agent:producer",
+            "tester:assessor"
+          ],
+          "assessor": "tester",
+          "testConfigVersion": "t1"
+        },
+        "evidence": {
+          "modelInteractions": [
+            {
+              "id": "m1"
+            }
+          ]
+        },
+        "claimedProductStatus": "PASS"
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "COMPLETE",
+        "productStatus": "PASS",
+        "issueCodes": []
+      },
+      "oracle": {
+        "trustedProfilePublication": {
+          "ref": "profile-owner/p1",
+          "profileVersion": "1",
+          "verifiedPreEvaluation": true,
+          "scopeMatched": true
+        },
+        "trustedSourceScope": {
+          "scope": "execution:e1",
+          "coverage": "COMPLETE",
+          "interactionIds": [
+            "m1"
+          ]
+        },
+        "trustedMaterialsByInteraction": {
+          "m1": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          }
+        }
+      }
+    },
+    {
+      "id": "P0-1-negative",
+      "p0": "P0-1",
+      "inputKind": "publishedProductProfile+sourceSet+productClaim",
+      "gate": "PRODUCT_AGGREGATION+C02+C06",
+      "input": {
+        "profile": {
+          "recordRef": "profile-owner/p1",
+          "profileVersion": "1",
+          "product": "demo-product",
+          "publishedAt": "2026-11-01T00:00:00Z",
+          "scope": "execution:e1",
+          "requiredCapabilities": [
+            "AGENT_L0"
+          ],
+          "participants": [
+            "agent:producer",
+            "tester:assessor"
+          ],
+          "assessor": "tester",
+          "testConfigVersion": "t1"
+        },
+        "evidence": {
+          "producerSelfDeclared": [
+            "CORE"
+          ],
+          "modelInteractions": [
+            {
+              "id": "m1"
+            }
+          ]
+        },
+        "claimedProductStatus": "PASS"
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "COMPLETE",
+        "productStatus": "TARGET_GAP",
+        "issueCodes": [
+          "REQUIRED_CAPABILITY_MISSING"
+        ]
+      },
+      "oracle": {
+        "trustedProfilePublication": {
+          "ref": "profile-owner/p1",
+          "profileVersion": "1",
+          "verifiedPreEvaluation": true,
+          "scopeMatched": true
+        },
+        "trustedSourceScope": {
+          "scope": "execution:e1",
+          "coverage": "COMPLETE",
+          "interactionIds": [
+            "m1"
+          ]
+        },
+        "trustedMaterialsByInteraction": {
+          "m1": {
+            "request": "MISSING",
+            "responseOrError": "MISSING",
+            "effectiveMaterials": "MISSING"
+          }
+        }
+      }
+    },
+    {
+      "id": "P0-2-positive",
+      "p0": "P0-2",
+      "inputKind": "sourceCoverageProof+interactionRecords+scopeClaim",
+      "gate": "C02+C06",
+      "input": {
+        "scope": "execution:e2",
+        "capturedModelInteractionIds": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "claimedScopeL0": "PASS"
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "COMPLETE",
+        "productStatus": "N_A",
+        "issueCodes": []
+      },
+      "oracle": {
+        "trustedSourceScope": {
+          "scope": "execution:e2",
+          "coverage": "COMPLETE",
+          "interactionIds": [
+            "m1",
+            "m2",
+            "m3"
+          ]
+        },
+        "trustedMaterialsByInteraction": {
+          "m1": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          },
+          "m2": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          },
+          "m3": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          }
+        }
+      }
+    },
+    {
+      "id": "P0-2-negative",
+      "p0": "P0-2",
+      "inputKind": "sourceCoverageProof+interactionRecords+scopeClaim",
+      "gate": "C02+C06",
+      "input": {
+        "scope": "execution:e2",
+        "capturedModelInteractionIds": [
+          "m3"
+        ],
+        "claimedScopeL0": "PASS"
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "PARTIAL",
+        "productStatus": "N_A",
+        "issueCodes": [
+          "UNSUPPORTED_SCOPE_PASS"
+        ]
+      },
+      "oracle": {
+        "trustedSourceScope": {
+          "scope": "execution:e2",
+          "coverage": "COMPLETE",
+          "interactionIds": [
+            "m1",
+            "m2",
+            "m3"
+          ]
+        },
+        "trustedMaterialsByInteraction": {
+          "m1": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          },
+          "m2": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          },
+          "m3": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          }
+        }
+      }
+    },
+    {
+      "id": "P0-3-positive",
+      "p0": "P0-3",
+      "inputKind": "compositeInteraction+materialLocators+outboundModelRequest",
+      "gate": "C02+C06",
+      "input": {
+        "interaction": {
+          "recordRef": "tool-owner/int1",
+          "type": "tool.interaction",
+          "typeVersion": "1",
+          "stages": [
+            {
+              "stage": "request",
+              "locator": "int1#request"
+            },
+            {
+              "stage": "result",
+              "locator": "int1#result",
+              "materialRef": "raw/r1"
+            },
+            {
+              "stage": "delivery",
+              "locator": "int1#delivery",
+              "materialRef": "redacted/r2",
+              "recipient": "agent-host"
+            }
+          ]
+        },
+        "outboundModelRequest": {
+          "declaredConsumes": [
+            "redacted/r2"
+          ]
+        }
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": []
+      },
+      "oracle": {
+        "trustedModelDispatch": {
+          "verifiedEffectiveRequest": true,
+          "consumedMaterialRefs": [
+            "redacted/r2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "P0-3-negative",
+      "p0": "P0-3",
+      "inputKind": "compositeInteraction+materialLocators+outboundModelRequest",
+      "gate": "C02+C06",
+      "input": {
+        "interaction": {
+          "recordRef": "tool-owner/int1",
+          "type": "tool.interaction",
+          "typeVersion": "1",
+          "stages": [
+            {
+              "stage": "request",
+              "locator": "int1#request"
+            },
+            {
+              "stage": "result",
+              "locator": "int1#result",
+              "materialRef": "raw/r1"
+            },
+            {
+              "stage": "delivery",
+              "locator": "int1#delivery",
+              "materialRef": "redacted/r2",
+              "recipient": "agent-host"
+            }
+          ]
+        },
+        "outboundModelRequest": {
+          "declaredConsumes": [
+            "tool-owner/int1",
+            "raw/r1"
+          ]
+        }
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": [
+          "MATERIAL_ROLE_MISMATCH"
+        ]
+      },
+      "oracle": {
+        "trustedModelDispatch": {
+          "verifiedEffectiveRequest": true,
+          "consumedMaterialRefs": [
+            "redacted/r2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "P0-4-positive",
+      "p0": "P0-4",
+      "inputKind": "typedPredicateFact+observationAvailability",
+      "gate": "C01",
+      "input": {
+        "fact": {
+          "recordRef": "evaluator/p1",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "subject": "rule:eligibility",
+          "evaluationRuleVersion": "r1",
+          "observedStatus": "UNAVAILABLE",
+          "unavailableReason": "observation source unreachable",
+          "verdict": "UNKNOWN"
+        }
+      },
+      "expected": {
+        "gateStatus": "PASS",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": []
+      },
+      "oracle": {
+        "trustedObservation": {
+          "status": "UNAVAILABLE",
+          "sourceVerified": true
+        },
+        "allowedTypes": [
+          "predicate.evaluated@1"
+        ]
+      }
+    },
+    {
+      "id": "P0-4-negative",
+      "p0": "P0-4",
+      "inputKind": "typedPredicateFact+observationAvailability",
+      "gate": "C01",
+      "input": {
+        "fact": {
+          "recordRef": "evaluator/p2",
+          "type": "predicate.evaluated",
+          "typeVersion": "1",
+          "subject": "rule:eligibility",
+          "evaluationRuleVersion": "r1",
+          "observedStatus": "UNAVAILABLE",
+          "unavailableReason": "observation source unreachable",
+          "observedValue": false,
+          "verdict": "FAIL"
+        }
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "N_A",
+        "productStatus": "N_A",
+        "issueCodes": [
+          "INVALID_PREDICATE_VERDICT"
+        ]
+      },
+      "oracle": {
+        "trustedObservation": {
+          "status": "UNAVAILABLE",
+          "sourceVerified": true
+        },
+        "allowedTypes": [
+          "predicate.evaluated@1"
+        ]
+      }
+    },
+    {
+      "id": "P0-1-unverified-profile",
+      "p0": "P0-1",
+      "inputKind": "publishedProductProfile+sourceSet+productClaim",
+      "gate": "PRODUCT_AGGREGATION+C02+C06",
+      "input": {
+        "profile": {
+          "recordRef": "profile-owner/p1",
+          "profileVersion": "1",
+          "product": "demo-product",
+          "publishedAt": "2026-11-01T00:00:00Z",
+          "scope": "execution:e1",
+          "requiredCapabilities": [
+            "AGENT_L0"
+          ],
+          "participants": [
+            "agent:producer",
+            "tester:assessor"
+          ],
+          "assessor": "tester",
+          "testConfigVersion": "t1"
+        },
+        "evidence": {
+          "modelInteractions": [
+            {
+              "id": "m1"
+            }
+          ]
+        },
+        "claimedProductStatus": "PASS"
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "coverage": "COMPLETE",
+        "productStatus": "UNRESOLVED",
+        "issueCodes": [
+          "PROFILE_PUBLICATION_UNVERIFIED"
+        ]
+      },
+      "oracle": {
+        "trustedProfilePublication": {
+          "ref": "profile-owner/p1",
+          "profileVersion": "1",
+          "verifiedPreEvaluation": false,
+          "scopeMatched": true
+        },
+        "trustedSourceScope": {
+          "scope": "execution:e1",
+          "coverage": "COMPLETE",
+          "interactionIds": [
+            "m1"
+          ]
+        },
+        "trustedMaterialsByInteraction": {
+          "m1": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          }
+        }
+      }
+    },
+    {
+      "id": "P0-2-unknown-scope",
+      "p0": "P0-2",
+      "inputKind": "sourceCoverageProof+interactionRecords+scopeClaim",
+      "gate": "C02+C06",
+      "input": {
+        "scope": "execution:e2",
+        "capturedModelInteractionIds": [
+          "m3"
+        ],
+        "claimedScopeL0": "PASS"
+      },
+      "expected": {
+        "gateStatus": "FAIL",
+        "coverage": "UNKNOWN",
+        "productStatus": "N_A",
+        "issueCodes": [
+          "UNSUPPORTED_SCOPE_PASS"
+        ]
+      },
+      "oracle": {
+        "trustedSourceScope": {
+          "scope": "execution:e2",
+          "coverage": "UNKNOWN",
+          "interactionIds": [
+            "m1",
+            "m2",
+            "m3"
+          ]
+        },
+        "trustedMaterialsByInteraction": {
+          "m1": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          },
+          "m2": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          },
+          "m3": {
+            "request": "VERIFIED",
+            "responseOrError": "VERIFIED",
+            "effectiveMaterials": "VERIFIED"
+          }
+        }
+      }
+    }
+  ]
+}
