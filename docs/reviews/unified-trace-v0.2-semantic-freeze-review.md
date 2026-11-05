@@ -1,0 +1,138 @@
+# 统一 Trace v0.2 中文精简版：语义冻结复审
+
+**复审日期：2026-11-05**  
+**对象：** [当前统一 Trace v0.2 中文规范](../specs/unified-trace-v0.2.md)  
+**结果：方向通过；轻量化通过；语义冻结暂缓（4 项 P0）**  
+**工作边界：仅评审归档，不修改规范正文、不修改任何 Producer/Consumer、不冻结技术实现。**
+
+## 一、复审标准与判定
+
+本次不以 DSH、TraceStore、OTLP 或 Phoenix 的历史格式为准，而从未来**由不同弱模型独立实现多个 Demo**的角度审查：
+
+1. 单进程/单次执行是否能够轻量落地；
+2. 同一类事件的含义是否跨 Producer 一致；
+3. 是否真的能回答诊断问题，并重建 Agent 当时提交的有效模型输入；
+4. 数据丢失、权限不足、不同 Owner 的冲突与结果未知是否被如实表示；
+5. Producer、导入器、Exporter、聚合 Trace 产品各自承担哪些合规义务。
+
+结论：**v0.2 已基本解决原有“所有组件都太重”的问题，但缺少端到端产品验收边界、能力范围与缺失完整性的证明，以及合并交互记录时的身份/阶段规则。** 不建议用这些空白交给不同弱模型自行决定。
+
+## 二、已通过的设计部分
+
+| 项目 | 复审结果 | 说明 |
+|---|---|---|
+| 可诊断/可复现/可学习共享源事实与材料 | **通过** | 未引入额外 ReplayEvent/TrainingTrace 真源 |
+| 公共最小记录与条件化身份 | **通过** | Run/Attempt/Activity/Operation/Stream 仅在必要时出现 |
+| Activity 单记录或多事实表达 | **方向通过** | 不需要机械产生多条事件，但仍要明确合并表示的可寻址语义（P0-3） |
+| 五类语义族与能力集合 | **方向通过** | 分类是帮助设计，不是五个强制服务或通用基类 |
+| Owner 结果与知识分维度 | **通过** | Runtime outcome、Host knowledge、Reconcile 不被合成 SUCCESS |
+| 在线有损与持久化无损分层 | **通过** | 不强制在线 OTLP 声称源数据完全保留 |
+| 受控 Material 与敏感内容边界 | **通过，细化留待机器规范** | 不要求额外 Material Store；材料摘要不可替代可恢复的内容 |
+
+## 三、四项必须在语义冻结前关闭的 P0
+
+### P0-1：每个组件可以选能力，但目标产品必须规定“谁负责什么”
+
+**源条款：** v0.2 §1、§5、§8 的“按能力宣称/不适用”。
+
+**反例：** Agent Producer 只做 CORE，Runtime Producer 只做 CORE，Viewer 导入全部已有日志，也标记“各模块满足已声明能力”。整套系统却没有模型实际请求材料、ToolResult 交接或 Predicate 的原因。它满足形式上的能力声明，却违背统一 Trace 的**诊断+复现**产品目标。
+
+**最小修订：** 不增新服务或新事件，只加一张**目标系统责任矩阵**：
+
+| 角色/行为 | 必需能力（对目标产品） | 不适用 |
+|---|---|---|
+| 每个参与记录的 Producer | CORE | 无 |
+| 产生 Predicate/Verification 或诊断断言的 Owner | DIAGNOSTIC（该断言） | 无该类判断的 Owner |
+| 执行 Model 请求的 Agent/Adapter | AGENT_L0（**该次模型交互**） | 纯确定性 Producer |
+| 存在跨 Owner 请求/异步交付的边界 | DISTRIBUTED（该边界/关联） | 纯本地流程 |
+| 产品声称“某段执行可离线完整复核” | ARCHIVE（该段有限范围） | 仅提供有损在线展示 |
+| 从 Trace 提取训练/评测候选的流程 | LEARNING_CANDIDATE（派生侧） | 普通 Recorder，不负责给数据打训练质量标签 |
+
+Producer 可以声明自己**不提供某能力**，但整套目标产品不能因此把缺失的必需能力算成“通过”；应标记 **TARGET_GAP / 未满足产品验收**。产品选型可以有诊断版、Replay 版，但每个版本的目标能力要事先确定，不能事后避开不利验收。
+
+### P0-2：能力 PASS 的**适用对象与覆盖范围**尚不明确
+
+**源条款：** v0.2 §5 “AGENT_L0/ARCHIVE/DIAGNOSTIC 通过条件”以及 §6 的完整归档。
+
+**反例 A：** 某 Agent 记录了第 3 次模型调用的完整请求和结果，于是声明整次 Execution 为 AGENT_L0 PASS；其实前两次输入已经丢失。
+
+**反例 B：** Runtime 每一条已保存的 Predicate 都有 reason，但采集器漏了失败的 Predicate；逐条检查 PASS，诊断整次 Run 时仍无法定位实际失败点。
+
+**最小修订：** 每项能力声明必须指出 **对象、范围和来源依据**：
+
+- 能力适用对象：单记录 / 单次交互 / 一个 Run / 一个 Execution / 一段来源范围；
+- **内容保真**与**采集覆盖**是两项独立判断；交互级 L0 PASS 不会自动升级成 Run/Execution L0 PASS；
+- DIAGNOSTIC 允许对**一条断言** PASS，但声称**整次 Run** 可诊断时，必须有该范围内应捕获的重要判断/事件的覆盖依据；
+- ARCHIVE 的 COMPLETE 仍仅在有可信有限范围与封口依据时成立；普通 Demo 只声明 UNKNOWN，不需要 Manifest；
+- 未运行测试是 NOT_RUN；已知缺失是 PARTIAL/FAIL；不适用才是 N/A；**不允许用 N/A 掩盖应采集却未采集的数据**。
+
+不必增加一类新的 Capture 服务；这些只是**能力声明附带的范围与判定规则**。
+
+### P0-3：允许单条 Interaction 合并请求/结果，却没有定义“引用到哪一部分”
+
+**源条款：** v0.2 §2、§3、§7 的“一条完整 Activity/Interaction 可无损表达请求与结果”。
+
+**反例：** 同一个 Activity 记录中既有 Tool args、Tool output，又有“Host 已收到”。下一条 Model Request 的 `consumes` 只引用这个 Activity：它到底消耗的是请求参数、真实返回、Host 摘要还是重新格式化的结果？不同实现会做出不同假设，无法核对 L0。
+
+**最小修订：**
+
+- 无论是一条复合记录还是多条 Facts，都必须有**稳定的交互/请求身份**、明确的**请求、结果、交付阶段**及分别的材料角色；
+- 关系指向精确的请求/结果身份或**复合记录中的有类型目标位置**，而不能只引用一个含糊的整条 Activity；
+- `consumes` 对模型必须用**dispatch-time 有效请求材料**证明实际包含相应内容；只指向 Tool Call 的 Ref 或结果摘要不够；
+- 单条同步 Interaction 仍然**合法**，无需强制拆成三个事件。复杂异步交付/未知结果需要相互独立的事实时才拆。
+
+这项是**轻量化与可复现之间的关键不变量**，不是要求重新增加 Activity 层级。
+
+### P0-4：五个语义族仍不足以定义“同一种具体事件”
+
+**源条款：** v0.2 §4：“模型决策、Predicate、Verification 的身份/verdict/expected/observed/reason”等说明，以及“具体名称可采用版本化类型”。
+
+**反例：** 两个实现都输出 `runtime.predicate.evaluated`，一个把未取得 Observation 记录为 `FAIL`，另一个记录为 `UNKNOWN`，两者的 expected/observed 可用性与 verdict 定义互不相同。字段都存在，业务诊断却不一致。
+
+**最小修订：** 在语义冻结阶段补一张**很小的规范性事件类型表**（不是扩展全套业务 Schema）：
+
+- **Predicate / Verification 评价**：评价对象/作用域、结果值的合法集合及 UNKNOWN/缺 Observation 的区别、expected/observed、依据或缺失原因。
+- **Model 交互**：请求身份、模型有效请求/配置、尝试、响应或失败、材料角色、请求与响应的关系。
+- **Tool/Operation 交互与交付**：请求/attempt、结果、交付接收者、Host knowledge、UNKNOWN 与已确认 outcome 的含义。
+- **Activity / Capture**：边界、Owner/来源身份、何时允许声称完成/封口及其依据。
+
+这可以是一页表，避免为 CreatedSession、Fabric、DSH 或各业务 Procedure 创建专用 Trace 基础类型。机器 Schema 和更多类型枚举仍留到下一阶段。
+
+## 四、P1：进入机器 Schema 前处理，但不需要重新发明架构
+
+1. **执行根与孤儿关联**：`ORPHAN` 是缺乏可信上游关联，不代表它一定属于某个已知 Execution；真正独立的 Root 和未关联的外部资料应明确区分。ID 格式与跨信任边界映射后定。
+2. **Material 编码与敏感信息**：明确 raw bytes、无损 JSON 与脱敏副本的 Digest 域；默认私有、按权限读取、可过期。L0 评估时权限受限与未采集不得合并。
+3. **导入器的合规身份**：合成 importRef 仅对投影/浏览有效，不产生新 Owner 真源；同一个源再次导入的去重条件应定义。
+4. **训练资格归属**：LEARNING_CANDIDATE 应是派生 Evaluation/数据准备流程的能力，而非强制 Agent Producer 提交质量正例。否则会诱导模型自评作为标签。
+
+以上应以简短约束进入 v0.2，不能成为单独的 Replay/Training 契约。
+
+## 五、四个基本场景再次复核
+
+| 场景 | 精简后表达能力 | 是否可正式验收 |
+|---|---|---|
+| 单进程 Predicate | **通过**：一条有依据的 Fact 足够 | 单条 DIAGNOSTIC 可以 PASS；整个 Run 的捕获范围需单独判断 |
+| 无 Tool 的单轮 LLM | **通过**：一条有类型复合 Interaction 或两条关联 Fact | 该模型交互 L0 可 PASS；不能因此宣称整次 Agent Execution 可复现 |
+| Runtime 成功而 Host 未知 | **通过**：分 Owner Outcome/Knowledge，独立关联 Operation | 要确保请求/结果/交付阶段目标可寻址，P0-3 |
+| 旧 JSONL/OTLP 部分导入 | **通过**：明确合成引用、原始 locator 与未知 | 仅投影级合规，不得认证 Owner 原生完整性 |
+
+**追加两个针对产品目标的反例：**
+
+- **M1 — 丢了中间的一个 Model Turn**：两个已保存 Turn 的 L0 PASS 不能推出 Execution L0 PASS。否则所谓训练轨迹会包含历史因果断层。
+- **M2 — 复合 Tool Interaction 返回多份材料**：后续模型只消费脱敏后的 ToolResult；若仅引用复合 Activity，容易把原始敏感结果误判为模型可见内容，甚至泄露。必须有材料角色/精确目标和有效请求中的证据。
+
+## 六、结论与最短闭环
+
+| 事项 | 复审结论 |
+|---|---|
+| 三个产品目标、四项逻辑职责、公共最小记录 | **通过** |
+| 六项轻量化整改 | **实质通过**；无须恢复原来的重型 MUST |
+| 按能力独立合规 | **可保留，但必须加产品级目标责任矩阵（P0-1）** |
+| 能力 PASS 的判定单位与覆盖 | **冻结阻塞（P0-2）** |
+| 复合 Interaction 的可寻址阶段与材料引用 | **冻结阻塞（P0-3）** |
+| 基础事件语义表 | **冻结阻塞（P0-4）** |
+| v0.2 完整语义冻结 | **BLOCKED（4 P0）** |
+| 机器 Schema / Conformance Fixtures / OTel 映射 | **NOT_STARTED / NOT_RUN** |
+| 各 Demo Producer/Consumer 代码修改 | **仍不授权** |
+
+**建议下一步只在 v0.2 正文追加四段短条款，解决上述 P0，然后做一次“是否存在自相矛盾”的文本检查。无需重写第三版规范，也无需新增 Capture/Replay 服务。** 规范语义通过后，再输出一个小型机器 Schema 和最少的正反向测试向量，交给弱模型统一实现。
