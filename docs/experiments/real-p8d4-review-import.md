@@ -60,3 +60,13 @@ To test an **actual** TraceStore v2 full native real-world Run rather than a run
 4. Never publicly upload real 5GC, model prompts, identifiers, N1/N2, material bodies or redacted raw file copies.
 
 This archive provides useful **REAL RECORD UI coverage** independently of the synthetic Golden v2 compatibility proofs. It must not be labeled `NATIVE_TRACE_STORE_V2_PASS`.
+
+## 5. Viewer V1 local Inspector readback (Draft PR #2, 2026-11-05)
+
+[Viewer PR #2](https://github.com/odango-chan/trace-viewer/pull/2) adds an explicit on-demand, local-only review preview. The original diagnostic importer continues to discard all `data`, `diag`, `material` and raw `summary` from its presentation model. Only after the user selects a supported source line and presses **Show allowed local fields** does the reader re-open the same local File object and project bounded, allowlisted scalar metadata. The preview resets when the selection or Run changes.
+
+**Private read-only proof:** The actual archived attempt 2 file was fetched inside the authorized private GitHub context and used only as in-memory input to the branch's importer and preview functions. It yielded 106 lines (21 span + 85 semantic events); **85/85 supported semantic records** were accessible through the allowlisted preview, including all 14 CALL_RESULT, 18 GRAPH_TRANSITION, 21 PREDICATE_EVALUATED, 21 VERIFY_RESULT, 6 PROCEDURE_TERMINAL and 5 SKILL_RESULT. No source body, subscriber identifiers, values, raw diagnostic, material bytes or private artifact copy were emitted or committed.
+
+The 21 Predicate and 21 Verify verdicts in attempt 2 are all PASS. That file cannot validate UNKNOWN/failure navigation; synthetic FAIL/UNKNOWN tests cover that path instead. Some diagnostic fields are deliberately withheld because they are not safe scalars; **19 Predicate `reason` values are null**, displayed as `NOT PROVIDED IN SOURCE`, not as redactions. Evidence-ref counts indicate source presence, **not evidence verification**.
+
+**Verification status:** 23/24 isolated V8 test cases PASS, 1 private file-path-dependent Node test SKIPPED, 0 FAIL. The direct private readback is not a Chromium acceptance run, Node 24 native test run, Owner Loader conformance, material digest verification or Q1–Q6 full diagnostic closure. These remain pending before merging PR #2.
