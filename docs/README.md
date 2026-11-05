@@ -7,7 +7,7 @@
 1. [README](../README.md) / [AGENTS](../AGENTS.md) — 定位与贡献规则
 2. [WORK](WORK.md) — 当前事实（不把静态 Demo 视为生产 Trace）
 3. [统一 Trace 规范 v0.2（中文精简修订稿）](specs/unified-trace-v0.2.md) — **当前唯一候选正文**；轻量化和四项语义判定条款已修订，正式一致性测试未完成
-4. [v0.2 中文精简稿语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) — **复审历史结论**：架构/轻量化通过；四项 P0 现已文字补充关闭判据，机器验证待做
+4. [v0.2 中文精简稿语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) — **复审历史结论**：架构/轻量化通过；四项 P0 已补 Gate+正负例，新增版本/ORPHAN/裁决/C08a-b 边界；机器验证待做
 5. [v0.2 极简与反例评审](reviews/unified-trace-v0.2-minimality-review.md) — 四场景及六项整改依据；旧稿问题已文字处理
 6. [v0.1 架构评审与冻结阻塞](reviews/unified-trace-v0.1-architecture-review.md) — 六项修订来源；[v0.1 历史草案](specs/unified-trace-v0.1.md) 仅供对照
 7. [排障可回答性审计](design/trace-debuggability-audit.md) — 诊断 Q1–Q6、P8-D4 来源缺口、S1–S3
