@@ -2,11 +2,11 @@
 
 **Updated · 2026-11-05**
 
-**本轮纠偏（当前生效）**：Stage A 当前唯一候选为 [**Unified Trace v0.2 草案**](specs/unified-trace-v0.2.md)。v0.1 [架构审查](reviews/unified-trace-v0.1-architecture-review.md) 的六项 P0 已在 **v0.2 文本语义**处理：Execution 传递与孤儿关联、不可变记录/活动生命周期、精确关系、核心类型 Registry、Material/Owner Stream Closure、单一语义与在线/离线编码解耦。**下一步只做独立反例审查→规范批准→机器 Schema/黑盒向量；不得提前修改 Producer。**
+**规范优先阶段（历史记录，2026-11-05 已暂停作为主线）**：Stage A 当前唯一候选为 [**Unified Trace v0.2 草案**](specs/unified-trace-v0.2.md)。v0.1 [架构审查](reviews/unified-trace-v0.1-architecture-review.md) 的六项 P0 已在 **v0.2 文本语义**处理：Execution 传递与孤儿关联、不可变记录/活动生命周期、精确关系、核心类型 Registry、Material/Owner Stream Closure、单一语义与在线/离线编码解耦。**上述是过去的规范阶段计划；现在不以 Schema/黑盒向量冻结阻塞 Viewer。Producer 仍不提前修改。**
 
 **v0.2 修订进展**：[极简与反例评审](reviews/unified-trace-v0.2-minimality-review.md) 的六项减重意见已落实到[中文精简正文](specs/unified-trace-v0.2.md)。[独立语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) 已完成：架构/减重方向通过，尚余 **4 项 P0**（目标产品责任矩阵、能力 PASS 的覆盖范围、复合 Interaction 的阶段/材料定位、最小规范类型语义）。**根据最新文本审查，四项 P0 均增加对应 Gate 和正负向判例；明确 recordRef/typeVersion 演进、ORPHAN 不可变、竞争裁决、产品 Profile 声明、C08a 有损投影与 C08b 归档闭包、术语三维状态。所有 P0 仍 OPEN，机器 Schema/测试向量未运行，不批准冻结。** Producer 暂停；机器 Schema、OTLP 和测试向量尚未冻结。
 
-**Stage B — Demo 重新实现：PAUSED / NOT_AUTHORIZED。** 规范批准之后再决定各 Producer/Consumer 一次性迁移顺序与旧 Adapter 清理。**下列 D0–D5 和 DSH 验收是历史工作/候选清单，不是当前要继续执行的步骤**；不要因阅读旧交接自动启动 DSH/Runtime/Agent Demo 代码开发。
+**当前产品主线（Viewer-first）**：D1/D1.1 本地导入已可用，按 S1 → S2 → S3 实际阅读故事推进。先做来源感知的 Inspector、最小受控材料下钻和异常定位；随后评估 Agent Model→Tool→Model 阅读和精确关联。验收依据是 Q1–Q6，保留 Q7–Q9 的材料准确性要求，不把 Viewer 变成重演执行引擎。**跨仓 Producer/Consumer 迁移 Stage B 仍 PAUSED / NOT_AUTHORIZED**；旧 D0–D5 表是能力清单，不要求一次全部建设。
 
 **当前主线已调整：** 第一版必须同时验证 [真实执行可排障](design/trace-debuggability-audit.md) 的 **Q1–Q6/S1–S3** 与 [Agent 可复现/可学习准备](design/trace-reproducibility-learning-audit.md) 的 **Q7–Q9/S4**。下表 D2–D5 是之前的功能候选，**不是需要按顺序全部建设的既定工作包**；OTLP/Profile/多 Producer 改造等待上述排障实证。
 
