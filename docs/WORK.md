@@ -2,11 +2,12 @@
 
 **Updated: 2026-11-05**
 **当前规范基线：[统一 Trace v0.2 中文精简修订稿](specs/unified-trace-v0.2.md)，DRAFT。[独立复审已完成](reviews/unified-trace-v0.2-semantic-freeze-review.md)：架构/轻量化通过，4 项 P0 已与 C01–C10/C08a/C08b 的正负向样例关联，但仍是 OPEN，机器一致性测试未开始。 Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
-**Scope: 当前切回统一 Trace 规范设计；暂停 Producer/DSH/Runtime 代码工作，既有实现及验收记录不撤销。2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
+**Scope: Viewer-first：先在本仓做真实来源记录阅读、按异常导航和来源分明的 Inspector；统一 Trace v0.2 保留 Draft、候选机器验证在 [PR #1](https://github.com/odango-chan/trace-viewer/pull/1)，不作为 Viewer 实现门禁。跨仓 Producer/DSH/Runtime 代码工作仍暂停，既有实现及验收记录不撤销。2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
-| **统一 Trace v0.2（当前主线）** | **DRAFT / 复审整改已写入正文、尚未冻结**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **仅文档**：公共最小契约、条件能力、真实来源/材料、分离 Owner 结果；Producer 未改 | 四个最小场景通过文本复核；**4 项 P0 已有 Gate+正负例，仍 OPEN**：产品责任、能力范围/覆盖、复合交互阶段、基本类型。用户新增的身份/N/A、裁决、L0/L2、材料/投影、负例等要求亦已写入；机器 Schema/黑盒测试/OTLP 选型 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
+| **Viewer MVP（本轮主线）** | **REAL SOURCE FIRST**：现有 D1/D1.1 Adapter 基础上，优先修 Inspector 的证据状态、诊断下钻、异常定位和 Q1–Q6 可回答性；不等待新 Schema | **本仓 Viewer 小步开发**：来源感知的 Material/Evidence 状态与导入来源标签，保持隐藏敏感正文 | 小范围纯函数回归与分支 V8 检查 PASS；Node 24 / Browser / 真实 P8-D4 完整排障仍 NOT_RUN |
+| **统一 Trace v0.2（候选规范，非 Viewer 主线）** | **DRAFT / 复审整改已写入正文、尚未冻结**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **仅文档**：公共最小契约、条件能力、真实来源/材料、分离 Owner 结果；Producer 未改 | 四个最小场景通过文本复核；**4 项 P0 已有 Gate+正负例，仍 OPEN**：产品责任、能力范围/覆盖、复合交互阶段、基本类型。用户新增的身份/N/A、裁决、L0/L2、材料/投影、负例等要求亦已写入；机器 Schema/黑盒测试/OTLP 选型 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
 | D0 文档治理 / 责任边界 | ACCEPTED | IMPLEMENTED | main 已核验；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 浅色 Web 壳 / 合成 DSH 轨迹 | ACCEPTED (D0) | IMPLEMENTED | [CI 单测/类型检查/静态构建 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)；Browser NOT_RUN |
 | D0 Synthetic 异常、确定性对照样本 | ACCEPTED (D0) | IMPLEMENTED | 5 unit tests PASS（[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)） |
