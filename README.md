@@ -2,7 +2,7 @@
 
 **只读的 Agent / Harness / Runtime 执行轨迹可视化 Demo。** 本仓沿用 [Skill Studio](https://github.com/odango-chan/ca-skill-studio-demo) 的轻量 Web 与文档治理方式，继承 [CA Console 的 DSH-inspired Trajectory 阅读模型](https://github.com/odango-chan/ca-console/blob/main/docs/design/tasks-and-runs.md)，不把轨迹简化为一张确定性 Procedure 图。
 
-> 当前状态：**D0–D0.8 合成 Trace UI / Phoenix PoC / Native 结构审计；Console-inspired 四视图已实现，真实 owner import 未开始**。示例是明确标注的合成数据，不代表真实 Agent、Runtime 或 5GC 验收。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
+> 当前状态：**D0–D0.8 合成 Trace UI / Phoenix PoC / Native 结构审计；Console-inspired 四模式与 Chromium UI 8 checks PASS，真实 owner import 未开始**。示例是明确标注的合成数据，不代表真实 Agent、Runtime 或 5GC 验收。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
 
 ## 定位
 

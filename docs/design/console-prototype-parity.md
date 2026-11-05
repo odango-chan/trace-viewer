@@ -1,6 +1,7 @@
 # CA Console 轨迹 Demo → Trace Viewer 复用对照
 
-**Status: Console-inspired synthetic UI slice implemented; browser gate pending · 2026-11-05**
+**Status: CONSOLE_SYNTHETIC_UI_SMOKE_PASS · 2026-11-05**
+**Evidence: [Viewer Chromium UI PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41956396421) · [Screenshot + diagnostic artifact](https://github.com/odango-chan/trace-viewer/actions/runs/41956396421/artifacts/13383166824) · [CI 10 Node / 8 Python tests](https://github.com/odango-chan/trace-viewer/actions/runs/41956588953)**
 **Scope: Viewer UI/presentation only; not a new owner-native event contract**
 
 ## 参考基线
@@ -45,5 +46,7 @@
 - [5 个 Console-parity 测试](../../tests/console-parity.test.mjs)：四模式、精确 Model/Tool folding、歧义拒绝、Host/Runtime 状态独立、四泳道。
 - [Chromium UI smoke](../../tests/viewer_ui_smoke.py)：实际点击四模式、Inspector Source、Focus unknown、乱序 ToolResult、无 LLM 确定性案例。
 - 对应 [GitHub Workflow](../../.github/workflows/viewer-ui.yml)，截图与 JSON 仅包含合成数据。
+
+实际 Chromium 测试包含 8 个交互断言：显著 synthetic 标签、Model folding、四泳道、Raw/Inspector、Host RESULT_UNKNOWN 与 Runtime SUCCEEDED 的区分、ToolResult 乱序精确配对、无 LLM Model-only 空状态和无 JS 错误。**不等于 Console 全部 UI parity**：System/Context/Tools/Response 详情、真实 Runtime stages、Evidence 无损仍未验收。
 
 下一阶段必须从 **owner-generated golden source** 开始，不能从 Console HTML demo 或本仓 handcrafted fixture 反推新的 Producer schema。需要优先在 `ca-agent-demo` 私有环境调用现有 `TraceStore.persist` / `load_run` 生成并验收合成 golden Run，再经审查提取无敏感字段的可公开测试材料。之后才做真实离线 Adapter。

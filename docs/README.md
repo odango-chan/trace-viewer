@@ -1,6 +1,6 @@
 # Trace Viewer 文档地图
 
-**Status: Initial D0 baseline · 2026-11-04**
+**Status: D0.8 Console synthetic Viewer slice / Chromium gate PASS · 2026-11-05**
 
 请按以下顺序阅读：
 
