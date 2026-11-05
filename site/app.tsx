@@ -6,6 +6,7 @@ import { findPrimaryUnknown, projectLanes, projectSectionRows } from './console-
 import { importTraceStoreFiles } from './native-import.mjs'
 import { importReviewDiagnosticFile } from './review-diagnostic.mjs'
 import { readLocalReviewDetail, reviewDetailAvailable } from './review-detail.mjs'
+import { importReviewFindingFile } from './review-finding.mjs'
 
 type TraceRecord = {
   ref: string
@@ -45,6 +46,18 @@ type LocalReviewDetail = {
   sourceLine: number
   kind: string
 }
+type ReviewFinding = {
+  sourceKind: 'REVIEW_FINDING'
+  title: string
+  sourceLocator: string
+  sourceAuthority: string
+  fields: {label: string; value: string}[]
+  bindingNames: string[]
+  suppressedOriginalText: boolean
+  ownerSequence: null
+  runAssociation: 'NOT_ESTABLISHED'
+  evidenceIntegrity: 'NOT_VERIFIED'
+}
 type ViewMode = 'readable' | 'model' | 'owners' | 'raw'
 type InspectorTab = 'summary' | 'source' | 'links'
 type ExampleRun = {
@@ -80,6 +93,9 @@ function App() {
   const [reviewRun, setReviewRun] = useState<ExampleRun | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
   const [importing, setImporting] = useState(false)
+  const [finding, setFinding] = useState<ReviewFinding | null>(null)
+  const [findingVisible, setFindingVisible] = useState(false)
+  const [findingError, setFindingError] = useState<string | null>(null)
   const directoryRef = useRef<HTMLInputElement | null>(null)
   const reviewFileRef = useRef<{file: File; runId: string} | null>(null)
   const detailRequest = useRef(0)
@@ -120,6 +136,24 @@ function App() {
       input.value = ''
     }
   }
+  async function importFinding(event: React.ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    if (!file) return
+    setFindingError(null)
+    setFindingVisible(false)
+    setFinding(null)
+    try {
+      const parsed = await importReviewFindingFile(file) as ReviewFinding
+      setFinding(parsed)
+      setFindingVisible(true)
+    } catch {
+      setFindingError('This standalone diagnosis JSON is unsupported or unsafe.')
+    } finally {
+      input.value = ''
+    }
+  }
+
   const [runId, setRunId] = useState(syntheticRuns[0].id)
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(syntheticRuns[0])))
   const [selectedRef, setSelectedRef] = useState<string>(syntheticRuns[0].sections[1].records[2].ref)
@@ -232,6 +266,7 @@ function App() {
 
   function selectRun(next: ExampleRun) {
     hideLocalDetail()
+    setFindingVisible(false)
     setRunId(next.id)
     setExpanded(new Set(defaultOpenSections(next)))
     setFilter('all')
@@ -280,6 +315,15 @@ function App() {
             <input id="review-jsonl" type="file" accept=".jsonl" aria-label="Import archived diagnostic JSONL"
               onChange={importReview} />
             <small>Separate unversioned review export; NOT TraceStore v2.</small>
+            <label htmlFor="review-finding-json">Import standalone diagnosis JSON</label>
+            <input id="review-finding-json" type="file" accept=".json"
+              aria-label="Import standalone diagnosis JSON" onChange={importFinding} />
+            <small>Independent review note · never attached to the selected Run or timeline.</small>
+            {finding && <button type="button" className="finding-open-control"
+              onClick={() => setFindingVisible(value => !value)}>
+              {findingVisible ? 'Hide standalone finding' : 'View standalone finding'}
+            </button>}
+            {findingError && <p role="alert" className="import-error">{findingError}</p>}
             {importError && <p className="import-error" role="alert">{importError}</p>}
           </div>
           <div className="run-list">
@@ -330,6 +374,34 @@ function App() {
             <span className="info-note-icon">i</span>
             <span><strong>{run.sourceKind === 'SYNTHETIC' ? 'Illustration, not an execution result.' : run.sourceKind === 'NATIVE_LOCAL' ? 'Native local source · not owner-certified.' : 'Real archived review export · not an owner-native TraceStore.'}</strong> {run.note}</span>
           </div>
+
+          {finding && findingVisible && (
+            <section className="finding-report" aria-label="Standalone diagnosis report">
+              <div className="finding-topline">
+                <div>
+                  <div className="eyebrow">INDEPENDENT REVIEW SOURCE</div>
+                  <h2>{finding.title}</h2>
+                </div>
+                <button type="button" className="finding-hide" onClick={() => setFindingVisible(false)}>Hide</button>
+              </div>
+              <p className="finding-caveat">This standalone report is NOT linked to the selected Run. Source assertions only; no Owner sequence, material verification or cross-Owner causal evidence has been established.</p>
+              <dl className="finding-fields">
+                {finding.fields.map(field => (
+                  <React.Fragment key={field.label}>
+                    <dt>{field.label}</dt>
+                    <dd>{field.value}</dd>
+                  </React.Fragment>
+                ))}
+                <dt>Reported binding names</dt>
+                <dd>{finding.bindingNames.length ? finding.bindingNames.join(', ') : 'NOT AVAILABLE'}</dd>
+                <dt>Full root cause text</dt>
+                <dd>{finding.suppressedOriginalText ? 'WITHHELD — use authorized original report' : 'NOT PROVIDED'}</dd>
+                <dt>Owner evidence integrity</dt>
+                <dd>{finding.evidenceIntegrity}</dd>
+              </dl>
+              <div className="finding-source">Unversioned local diagnosis · {finding.sourceLocator} · no remote upload or execution controls</div>
+            </section>
+          )}
 
           <div className="trace-heading">
             <div>
