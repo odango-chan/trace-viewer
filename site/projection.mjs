@@ -12,7 +12,7 @@ export function validateSyntheticRun(run) {
 }
 
 export function validatePresentationRun(run) {
-  if (!run || !['SYNTHETIC','NATIVE_LOCAL'].includes(run.sourceKind) || !Array.isArray(run.sections)) {
+  if (!run || !['SYNTHETIC','NATIVE_LOCAL','REVIEW_DIAGNOSTIC'].includes(run.sourceKind) || !Array.isArray(run.sections)) {
     throw new Error('Only validated synthetic or local native presentation is supported')
   }
   const ids = new Set()
@@ -24,12 +24,17 @@ export function validatePresentationRun(run) {
     }
     sections.add(section.id)
     for (const record of section.records) {
-      if (!record.ref || !record.sourceAuthority || !Number.isSafeInteger(record.ownerSequence) || record.ownerSequence < 0) {
-        throw new Error('Record must have exact ref, owner authority, and owner-local sequence')
+      const isReview = run.sourceKind === 'REVIEW_DIAGNOSTIC'
+      const validPosition = isReview
+        ? record.ownerSequence === null && Number.isSafeInteger(record.sourceLine) && record.sourceLine >= 1
+        : Number.isSafeInteger(record.ownerSequence) && record.ownerSequence >= 0
+      if (!record.ref || !record.sourceAuthority || !validPosition) {
+        throw new Error('Record must have exact ref, authority and native owner sequence or review-file line')
       }
       if (ids.has(record.ref)) throw new Error('Repeated record ref')
       ids.add(record.ref)
-      const key = record.sourceAuthority + ':' + record.ownerSequence
+      const key = record.sourceAuthority + (run.sourceKind === 'REVIEW_DIAGNOSTIC'
+        ? ':file-line=' + record.sourceLine : ':owner-seq=' + record.ownerSequence)
       if (ownerSequences.has(key)) throw new Error('Duplicate owner-local sequence')
       ownerSequences.add(key)
       if (record.causalRefs !== undefined && (!Array.isArray(record.causalRefs) || record.causalRefs.some(ref => typeof ref !== 'string'))) {
