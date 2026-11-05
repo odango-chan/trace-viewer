@@ -39,7 +39,7 @@ test('ToolResult folding uses explicit call ref and not arrival order', () => {
   assert.equal(b.members[1].ref, 'synthetic:parallel-result-b')
   const changed = structuredClone(sample)
   changed.sections[0].records.find(item => item.ref === 'synthetic:parallel-result-a').causalRefs = ['synthetic:parallel-call-b']
-  assert.equal(projectSectionRows(changed, changed.sections[0]).filter(row => row.label === 'Tool Interaction').length, 1)
+  assert.equal(projectSectionRows(changed, changed.sections[0]).filter(row => row.label === 'Tool Interaction').length, 0)
 })
 
 test('RESULT_UNKNOWN is Host knowledge, Runtime SUCCEEDED remains distinct', () => {
