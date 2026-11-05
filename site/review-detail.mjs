@@ -52,6 +52,7 @@ const SAFE_CHARS = /^[a-zA-Z0-9 _.,:;()=+\/-]{1,240}$/
 const SENSITIVE = /(?:supi|imsi|imei|msisdn|gpsi|subscriber|authorization|bearer|password|passwd|secret|token|api[_-]?key|cookie|session[_-]?key|private|identity[_-]?document|\b[a-f0-9]{32,}\b|\b\d{5,}\b|\b\d{1,3}(?:\.\d{1,3}){3}\b|[\w.+-]+@[\w.-]+\.[a-z]{2,})/i
 
 function safeScalar(value) {
+  if (value === null) return '[NOT PROVIDED IN SOURCE]'
   if (typeof value === 'boolean') return String(value)
   if (typeof value === 'number') {
     return Number.isFinite(value) && Math.abs(value) < 10000 ? String(value) : WITHHELD
