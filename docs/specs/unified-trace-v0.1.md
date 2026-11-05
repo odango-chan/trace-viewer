@@ -1,11 +1,12 @@
 # Unified Trace Specification v0.1
 
-**状态：DRAFT / 讨论基线，尚未冻结机器 Schema；[v0.1 架构审查结论：方向接受、冻结阻塞（6 P0）](../reviews/unified-trace-v0.1-architecture-review.md)**
+**状态：HISTORICAL DRAFT / 已由 [Unified Trace v0.2](unified-trace-v0.2.md) 替代为当前唯一候选规范；不作为未来 Producer 设计依据。**
+**v0.1 审查结论：[方向接受、冻结阻塞（6 P0）](../reviews/unified-trace-v0.1-architecture-review.md)**
 **日期：2026-11-05**
 **定位：跨 Agent、Harness、Runtime 与外部工具的统一执行轨迹规范**
 **原则：规范先行，现有各仓 Demo 后续按它适配；此版本不要求也不启动 Producer 改造。**
 
-本文件是统一 Trace 的**唯一候选规范正文**。现状分析与已有实验见 [需求审计](../design/trace-requirements-audit.md)、[诊断可回答性](../design/trace-debuggability-audit.md)、[可复现与学习](../design/trace-reproducibility-learning-audit.md)。它们用于解释本规范**为什么**这样设计，不反向决定新规范的存储结构。
+本文件是**历史草案**，用于说明 v0.2 的修订来源。当前唯一候选正文为 [Unified Trace v0.2](unified-trace-v0.2.md)。现状分析与已有实验见 [需求审计](../design/trace-requirements-audit.md)、[诊断可回答性](../design/trace-debuggability-audit.md)、[可复现与学习](../design/trace-reproducibility-learning-audit.md)。它们用于解释本规范**为什么**这样设计，不反向决定新规范的存储结构。
 
 规范用「**必须**」表达 v0.1 候选的强制行为；「**应**」表达推荐；「**可**」表达可选。**DRAFT 不等于已批准实施。** 字段名是待冻结的逻辑字段，不是承诺已经存在的 API/JSON 文件。
 

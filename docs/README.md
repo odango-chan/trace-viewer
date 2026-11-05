@@ -1,13 +1,13 @@
 # Trace Viewer 文档地图
 
-**Status: Unified Trace v0.1 DRAFT（当前设计主线）；D1/DSH/Runtime/Phoenix 验收记录均为历史参考 · 2026-11-05**
+**Status: Unified Trace v0.2 DRAFT（当前唯一候选规范）；v0.1、D1/DSH/Runtime/Phoenix 均为历史分析/实现证据 · 2026-11-05**
 
 请按以下顺序阅读：
 
 1. [README](../README.md) / [AGENTS](../AGENTS.md) — 定位与贡献规则
 2. [WORK](WORK.md) — 当前事实（不把静态 Demo 视为生产 Trace）
-3. [Unified Trace Specification v0.1](specs/unified-trace-v0.1.md) — **唯一候选规范正文**；DRAFT，未冻结
-4. [v0.1 架构评审与冻结阻塞](reviews/unified-trace-v0.1-architecture-review.md) — **当前必读**：6 P0、P1 建议、v0.2 收敛顺序；不授权修改 Producer
+3. [Unified Trace Specification v0.2](specs/unified-trace-v0.2.md) — **当前唯一候选规范正文**；已覆盖 6 P0，但未冻结、未通过机器一致性测试
+4. [v0.1 架构评审与冻结阻塞](reviews/unified-trace-v0.1-architecture-review.md) — 六项修订来源；[v0.1 历史草案](specs/unified-trace-v0.1.md) 仅供对照
 5. [排障可回答性审计](design/trace-debuggability-audit.md) — 诊断 Q1–Q6、P8-D4 来源缺口、S1–S3
 6. [Agent 可复现 / 可学习准备](design/trace-reproducibility-learning-audit.md) — **共同的第一版验收入口**：L0–L2、Q7–Q9/S4、既有 DSH 快照/Benchmark 闭包
 7. [DSH Skill/Reference Owner Golden](experiments/dsh-skill-replay-golden.md) — source-only Snapshot Builder PASS、完整 DSH Agent Loop 仍待验收

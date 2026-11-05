@@ -1,12 +1,12 @@
 # Trace Viewer 当前状态
 
 **Updated: 2026-11-05**
-**Current planning baseline: [Unified Trace Specification v0.1](specs/unified-trace-v0.1.md) DRAFT, not approved or machine-validated. Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
+**Current planning baseline: [Unified Trace Specification v0.2](specs/unified-trace-v0.2.md) DRAFT, six prior P0 addressed in text but not independently approved or machine-validated. Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
 **Scope: 当前切回统一 Trace 规范设计；暂停 Producer/DSH/Runtime 代码工作，既有实现及验收记录不撤销。2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
-| **Unified Trace v0.1（当前主线）** | **DRAFT / 方向接受，冻结阻塞**：[唯一规范正文](specs/unified-trace-v0.1.md)；[6 P0 架构评审](reviews/unified-trace-v0.1-architecture-review.md) | **DOCS_ONLY**：未冻结机器 Schema、OTLP/Profile，未修改任何 Producer | 已完成架构文本审查；冻结 **BLOCKED**，C01–C08 的正式跨 Producer 一致性测试 **NOT_RUN** |
+| **Unified Trace v0.2（当前主线）** | **DRAFT / P0 文字整改已覆盖，仍待独立评审**：[唯一候选规范](specs/unified-trace-v0.2.md)；[v0.1 六项评审依据](reviews/unified-trace-v0.1-architecture-review.md) | **DOCS_ONLY**：Execution 传播、Activity 幂等/生命周期、typed causal refs、核心类型、capture closure、online/offline 分层；未修改 Producer | v0.2 机器 Schema/类型 Registry、C01–C10 跨 Producer 黑盒测试 **NOT_RUN**；OTLP 决策 **PENDING**，冻结 **NOT_APPROVED** |
 | D0 文档治理 / 责任边界 | ACCEPTED | IMPLEMENTED | main 已核验；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 浅色 Web 壳 / 合成 DSH 轨迹 | ACCEPTED (D0) | IMPLEMENTED | [CI 单测/类型检查/静态构建 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)；Browser NOT_RUN |
 | D0 Synthetic 异常、确定性对照样本 | ACCEPTED (D0) | IMPLEMENTED | 5 unit tests PASS（[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)） |

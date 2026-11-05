@@ -3,7 +3,7 @@
 参考 [Skill Studio AGENTS](https://github.com/odango-chan/ca-skill-studio-demo/blob/main/AGENTS.md) 与 [CA Console 文档治理](https://github.com/odango-chan/ca-console/blob/main/docs/DOCUMENTATION.md)。
 
 - `README.md` 只导航：不要堆逐阶段流水账。
-- `docs/specs/unified-trace-v0.1.md` 是当前**唯一跨 Agent/Harness/Runtime 的统一 Trace 候选规范**；DRAFT 未批准时不将它冒充机器契约或 Producer 的迁移授权。
+- `docs/specs/unified-trace-v0.2.md` 是当前**唯一跨 Agent/Harness/Runtime 的统一 Trace 候选规范**；v0.1 是历史草案；DRAFT 未批准时不将它冒充机器契约或 Producer 的迁移授权。
 - `docs/design/trace-*-audit.md` 与旧 D1/Phoenix/DSH 实验是**需求与实现证据**，不能当作未来规范的第二套定义。
 - `docs/WORK.md` 只存唯一当前状态；验收没有实际执行一律 NOT_RUN。
 - `docs/TRACEABILITY.md` 用可追溯的设计/owner 来源、代码、测试、证据定位符。

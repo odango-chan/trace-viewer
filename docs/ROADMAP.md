@@ -2,7 +2,7 @@
 
 **Updated · 2026-11-05**
 
-**本轮纠偏（当前生效）**：正式进入 **Stage A — Unified Trace Specification v0.1 设计/评审**，见 [规范草案](specs/unified-trace-v0.1.md)。[架构评审](reviews/unified-trace-v0.1-architecture-review.md) 已确认方向正确，但存在 6 项 P0 冻结阻塞：Execution 身份传播、Activity 生命周期、Relation 语义、最小 Fact 类型、Material/Replay 完整闭包、在线交换与离线归档解耦。先评审四项未定决策（唯一交换编码、Execution/Run/Attempt 引用规则、Material/完整性、类型与状态 Registry），修订到可以冻结的规范，再考虑编写机器 Schema/Conformance 测试向量。
+**本轮纠偏（当前生效）**：Stage A 当前唯一候选为 [**Unified Trace v0.2 草案**](specs/unified-trace-v0.2.md)。v0.1 [架构审查](reviews/unified-trace-v0.1-architecture-review.md) 的六项 P0 已在 **v0.2 文本语义**处理：Execution 传递与孤儿关联、不可变记录/活动生命周期、精确关系、核心类型 Registry、Material/Owner Stream Closure、单一语义与在线/离线编码解耦。**下一步只做独立反例审查→规范批准→机器 Schema/黑盒向量；不得提前修改 Producer。**
 
 **Stage B — Demo 重新实现：PAUSED / NOT_AUTHORIZED。** 规范批准之后再决定各 Producer/Consumer 一次性迁移顺序与旧 Adapter 清理。**下列 D0–D5 和 DSH 验收是历史工作/候选清单，不是当前要继续执行的步骤**；不要因阅读旧交接自动启动 DSH/Runtime/Agent Demo 代码开发。
 
