@@ -2,6 +2,10 @@
 
 **Updated · 2026-11-05**
 
+**当前主线已调整：** 第一版以 [真实执行可排障审计](design/trace-debuggability-audit.md) 的 **Q1–Q6** 和三个故事 **S1–S3** 验收。下表 D2–D5 是之前的功能候选，**不是需要按顺序全部建设的既定工作包**；OTLP/Profile/多 Producer 改造等待上述排障实证。
+
+**紧接着只做一个最小工作包：** 在授权私有环境，选 P8-D4 一个 Predicate、一个 CALL_RESULT 和一个异常转移，做**默认隐藏、按需展示**的诊断 Detail/Source Inspector；对每个 Q1–Q6 标 PASS/PARTIAL/NOT_AVAILABLE。保持 source locator、缺失提示、不外传材料。**不得**以 106 行能加载替代诊断回答能力。
+
 | 里程碑 | 目标 | 明确不做 |
 |---|---|---|
 | D0 Initialization | Repo governance、浅色单页骨架、显著 synthetic DSH Turn/Tool/Runtime 与确定性示例 | 不声称真实 Trace、没有 owner adapter |

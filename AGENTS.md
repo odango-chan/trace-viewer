@@ -12,7 +12,7 @@
 2. `docs/WORK.md`（当前状态）、`docs/TRACEABILITY.md`（实现→测试→证据）
 3. `docs/architecture/ownership.md`
 4. `docs/contracts/trace-inputs.md`（D1/D2 输入格式与验证前置要求）
-5. `docs/design/console-prototype-parity.md`（Console Demo 的展示语义基线，不是 owner 机器契约）、`docs/design/otel-genai-mapping.md`、`docs/experiments/phoenix-otel-poc.md`（候选规范与合成实测，不是新的 Source authority）
+5. `docs/design/trace-debuggability-audit.md`（诊断使用者主验收）和 `docs/design/console-prototype-parity.md`（Console Demo 的展示语义基线，不是 owner 机器契约）、`docs/design/otel-genai-mapping.md`、`docs/experiments/phoenix-otel-poc.md`（候选规范与合成实测，不是新的 Source authority）
 6. `docs/design/trajectory-viewer.md`、`docs/design/source-adapters.md`
 7. 变更页面前读现有 `site/` 和 `tests/`
 

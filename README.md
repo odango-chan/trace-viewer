@@ -6,7 +6,7 @@
 
 ## 统一 Trace 目标（先审计需求，再定格式）
 
-目标是**一套对外 Trace 契约**，覆盖 Agent、Harness、Runtime 诊断、确定性/LLM/混合执行；当前多格式仅服务存量兼容。先读 [需求及现状审计（R01–R13 / T1–T6）](docs/design/trace-requirements-audit.md)，再看 [候选 OTel/OTLP 统一评估](docs/design/trace-unification-assessment.md)。**OTLP 尚未冻结为最终方案，Producer 未改。**
+目标是**一套对外 Trace 契约**，覆盖 Agent、Harness、Runtime 诊断、确定性/LLM/混合执行；当前多格式仅服务存量兼容。**第一版先验收排障可回答性**：打开一次执行，能定位步骤、解释原因、核验调用与证据、区分 Owner 状态、指出缺失信息。优先阅读 [第二维审计：Q1–Q6 / S1–S3](docs/design/trace-debuggability-audit.md)，再看 [需求库存 R01–R13](docs/design/trace-requirements-audit.md) 和 [候选 OTel/OTLP 评估](docs/design/trace-unification-assessment.md)。**OTLP 尚未冻结为最终方案，Producer 未改。**
 
 ## 定位
 
@@ -30,6 +30,6 @@ npm run dev
 
 ## 文档
 
-[AGENTS.md](AGENTS.md) · [文档地图](docs/README.md) · [当前状态](docs/WORK.md) · [实现追溯](docs/TRACEABILITY.md) · [架构边界](docs/architecture/ownership.md) · [UX 基线](docs/design/trajectory-viewer.md) · [Console Demo 对照](docs/design/console-prototype-parity.md) · [输入格式要求](docs/contracts/trace-inputs.md) · [OTel GenAI 字段映射](docs/design/otel-genai-mapping.md) · [Phoenix PoC/Chromium UI 实测](docs/experiments/phoenix-otel-poc.md) · [Native ↔ OTel 缺口](docs/experiments/native-otel-gap.md) · [D1 Owner Golden 互操作](docs/experiments/native-d1-import.md) · [D1.1 真实 P8-D4 诊断导入](docs/experiments/real-p8d4-review-import.md) · [Adapter 方案](docs/design/source-adapters.md) · [里程碑](docs/ROADMAP.md)
+[AGENTS.md](AGENTS.md) · [文档地图](docs/README.md) · [当前状态](docs/WORK.md) · [实现追溯](docs/TRACEABILITY.md) · [架构边界](docs/architecture/ownership.md) · [排障可回答性审计](docs/design/trace-debuggability-audit.md) · [UX 基线](docs/design/trajectory-viewer.md) · [Console Demo 对照](docs/design/console-prototype-parity.md) · [输入格式要求](docs/contracts/trace-inputs.md) · [OTel GenAI 字段映射](docs/design/otel-genai-mapping.md) · [Phoenix PoC/Chromium UI 实测](docs/experiments/phoenix-otel-poc.md) · [Native ↔ OTel 缺口](docs/experiments/native-otel-gap.md) · [D1 Owner Golden 互操作](docs/experiments/native-d1-import.md) · [D1.1 真实 P8-D4 诊断导入](docs/experiments/real-p8d4-review-import.md) · [Adapter 方案](docs/design/source-adapters.md) · [里程碑](docs/ROADMAP.md)
 
 本仓不直接修改其他仓的业务行为、Schema、Source/Runtime 规则。Pages 发布和真实浏览器验收只有在工作流实际通过后才标记为 PASS。

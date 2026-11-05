@@ -5,6 +5,8 @@
 **范围：Agent / DSH、Harness、Runtime、诊断、Console / Trace Viewer；兼容确定性、纯 LLM、混合执行**
 **本轮不修改 Producer、不冻结 OTLP Profile，也不另建多种 Trace Schema。**
 
+> **优先阅读 [第二维：排障可回答性审计](trace-debuggability-audit.md)**。本页 R01–R13 是覆盖清单，**并非要求第一版 Demo 同时交付 13 个 P0/P1 领域**；当前第一版以 Q1–Q6 的诊断问题和 S1–S3 的三条执行故事作为实际通过门槛。
+
 > **一句话目标：一个可采集、存储、关联、搜索、离线查看的执行轨迹体系；正常轨迹可读，异常诊断足够深，全部事实可追溯。** Runtime 诊断与 Agent Model/Tool 轨迹同等重要。现阶段都是 Demo，允许调整 Producer，而不是靠 Viewer 长期维护不同格式。
 
 ## A. 需求基线（先于格式选择）
