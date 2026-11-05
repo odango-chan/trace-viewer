@@ -30,7 +30,7 @@ function safeText(value) {
 
 export async function importReviewFindingFile(file) {
   if (!file || typeof file.name!=='string' || !SAFE_LABEL.test(file.name) ||
-      !Number.isSafeInteger(file.size) || file.size<=0 || file.size>MAX_BYTES ||
+      SENSITIVE.test(file.name) || !Number.isSafeInteger(file.size) || file.size<=0 || file.size>MAX_BYTES ||
       typeof file.text!=='function') fail('UNSAFE_CONTENT','Select one bounded local .json diagnosis report')
   const bytes=await file.text()
   if(typeof bytes!=='string' || bytes.length>MAX_BYTES) fail('UNSAFE_CONTENT','Diagnosis is too large')
@@ -66,7 +66,7 @@ export async function importReviewFindingFile(file) {
   let bindingNames=[]
   if(object(source.bindingsSupplied)){
     const names=Object.keys(source.bindingsSupplied)
-    if(names.length<=16 && names.every(name=>/^[A-Za-z][A-Za-z0-9_]{0,64}$/.test(name)))
+    if(names.length<=16 && names.every(name=>/^[A-Za-z][A-Za-z0-9_]{0,64}$/.test(name) && !SENSITIVE.test(name)))
       bindingNames=names.slice().sort()
   }
   return {
