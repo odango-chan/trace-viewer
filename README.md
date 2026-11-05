@@ -6,7 +6,7 @@
 
 ## 统一 Trace 目标（先审计需求，再定格式）
 
-目标是**一套对外 Trace 契约**，覆盖 Agent、Harness、Runtime 诊断、确定性/LLM/混合执行；当前多格式仅服务存量兼容。**第一版同时验收可诊断与 Agent 可复现**：既能定位步骤、解释原因、核验证据，也能在授权范围内离线重建模型当时实际可见的输入/ToolResult，并做最小隔离重演；训练或自学习先保留合格数据与评测来源，不自动训练。优先阅读 [诊断审计 Q1–Q6/S1–S3](docs/design/trace-debuggability-audit.md) 与 [Agent Replay/可学习审计 Q7–Q9/S4](docs/design/trace-reproducibility-learning-audit.md) 和 [真实 Model→Tool→Model 归档实证](docs/experiments/agent-replay-archive-audit.md)，再看 [需求库存 R01–R16](docs/design/trace-requirements-audit.md) 和 [候选 OTel/OTLP 评估](docs/design/trace-unification-assessment.md)。**OTLP 尚未冻结为最终方案，Producer 未改。**
+目标是**一套对外 Trace 契约**，覆盖 Agent、Harness、Runtime 诊断、确定性/LLM/混合执行；当前多格式仅服务存量兼容。**第一版同时验收可诊断与 Agent 可复现**：既能定位步骤、解释原因、核验证据，也能在授权范围内离线重建模型当时实际可见的输入/ToolResult，并做最小隔离重演；训练或自学习先保留合格数据与评测来源，不自动训练。优先阅读 [诊断审计 Q1–Q6/S1–S3](docs/design/trace-debuggability-audit.md) 与 [Agent Replay/可学习审计 Q7–Q9/S4](docs/design/trace-reproducibility-learning-audit.md) 和 [真实 Model→Tool→Model 的摘要/ToolCatalog/Observation Stub 复核](docs/experiments/agent-replay-archive-audit.md)，再看 [需求库存 R01–R16](docs/design/trace-requirements-audit.md) 和 [候选 OTel/OTLP 评估](docs/design/trace-unification-assessment.md)。**OTLP 尚未冻结为最终方案，Producer 未改。**
 
 ## 定位
 

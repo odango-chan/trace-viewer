@@ -4,7 +4,7 @@
 **范围：Agent / DSH 为重点，同时覆盖 Harness、Runtime、Service Fabric 与外部环境**
 **本轮仅复核和收敛需求：不改 Producer、不创建 Replay Event 类型、不启动训练管线、不冻结 OTLP 格式。**
 
-> **实证更新（2026-11-05）**：已在私有 ca-console Owner 归档对 03/04 两条 Model→Tool→Model 运行检查 exact ToolResult body/ref，结果 **PASS（交接）**，但完整 Tool Catalog、Skill/Reference 和材料摘要尚未验证，**L0 PARTIAL，L1/L2 NOT_RUN，训练资格 NOT_QUALIFIED**。见 [真实归档审计报告](../experiments/agent-replay-archive-audit.md)。
+> **实证更新（2026-11-05）**：私有 03/04 两份真实 ProductTask Owner 归档已核验 **Request/Response Snapshot JSON SHA、实际模型 user 消息中的完整 Tool Catalog 与 Owner SurfaceDigest、ToolResult/Next Model ref+body、无副作用 Observation Stub 均 PASS**。[审计证据](../experiments/agent-replay-archive-audit.md)。这条 ProductTask 路线的 Skill/Reference 为 **N/A**；另需测试需要 Skill Context 的 DSH/Planner 路线。完整 L0 执行环境 PARTIAL、L1/L2 全程 NOT_RUN、训练资格 NOT_QUALIFIED。
 
 ## 0. 产品目标更新
 
