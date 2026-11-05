@@ -2,7 +2,8 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
 import { basename, join, relative, sep } from 'node:path'
-import { importTraceStoreFiles, NativeImportError } from '../site/native-import.mjs'
+import { importTraceStoreFiles } from '../site/native-import.mjs'
+import { projectSectionRows } from '../site/console-parity.mjs'
 
 const root = process.env.GOLDEN_ROOT
 function filesFor(runId) {
@@ -43,6 +44,7 @@ test('Golden: Python TraceRecorder.persist/load_run -> JS parser deterministic',
   assert.equal(run.nativeMeta.ownerLoaderVerified,false)
   assert.ok(run.sections.flatMap(x=>x.records).some(x=>x.kind==='PROCEDURE_ENTER'))
   assert.ok(run.sections.flatMap(x=>x.records).every(x=>x.sourceAuthority==='ca-agent-demo'))
+  assert.equal(run.sections.flatMap(x=>projectSectionRows(run,x,'model')).length,0)
 })
 
 test('Golden: Python model identity and response explicit source refs', {skip: !root}, async () => {
