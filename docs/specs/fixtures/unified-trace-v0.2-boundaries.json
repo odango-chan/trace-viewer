@@ -1,7 +1,7 @@
 {
   "fixtureVersion": "unified-trace-v0.2-boundary-candidate-1",
   "authority": "SYNTHETIC_HARNESS_ORACLE_NOT_PRODUCER_WIRE_SCHEMA",
-  "note": "oracle is a synthetic independently controlled trusted input for these tests; producer claims cannot substitute for verified source, publication, registry and retention evidence.",
+  "note": "oracle is a synthetic independently controlled trusted input for these tests; producer claims cannot substitute for verified source, publication, registry and retention evidence. For adjudication, trustedDecisionPublicationOrders is from independent ordering evidence in a single authority scope (never owner-local sequence or claimant-supplied timestamp).",
   "resultContract": {
     "gateStatus": [
       "PASS",
@@ -731,14 +731,14 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
             "ruleRef": "policy/r1",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-A/decision-1"
@@ -761,7 +761,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "PASS",
@@ -783,13 +787,13 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-A/decision-1"
@@ -812,7 +816,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "UNRESOLVED",
@@ -836,14 +844,14 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
             "ruleRef": "policy/r1",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-A/decision-1"
@@ -866,7 +874,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "UNRESOLVED",
@@ -890,14 +902,14 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
             "ruleRef": "policy/r1",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-A/decision-1"
@@ -920,7 +932,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "UNRESOLVED",
@@ -944,14 +960,14 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
             "ruleRef": "policy/r1",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-A/decision-1"
@@ -974,7 +990,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "UNRESOLVED",
@@ -998,14 +1018,14 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
             "ruleRef": "policy/r1",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-B/decision-2"
@@ -1028,7 +1048,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "FAIL",
@@ -1052,14 +1076,14 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
             "ruleRef": "policy/r2",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-A/decision-1"
@@ -1082,7 +1106,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "UNRESOLVED",
@@ -1106,14 +1134,14 @@
             "owner": "owner-A",
             "outcome": "SUCCESS",
             "ruleRef": "policy/r1",
-            "publicationOrder": 11
+            "ruleVersion": "1"
           },
           {
             "recordRef": "owner-B/decision-2",
             "owner": "owner-B",
             "outcome": "FAILURE",
             "ruleRef": "policy/r1",
-            "publicationOrder": 12
+            "ruleVersion": "1"
           }
         ],
         "claimedWinnerRef": "owner-A/decision-1"
@@ -1136,7 +1164,11 @@
           }
         ],
         "publishedDecisionOrdersVerified": true,
-        "allowedRulePublisher": "policy-owner"
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
       },
       "expected": {
         "gateStatus": "UNRESOLVED",
@@ -1554,6 +1586,179 @@
         "disposition": "FALSE_REDACTION_CLAIM",
         "issueCodes": [
           "SOURCE_NOT_PRESERVED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A09-decision-order-not-verified",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "DECISION_ORDER_UNVERIFIED"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A10-rule-version-mismatch",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "2"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 100,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_VERSION_MISMATCH"
+        ],
+        "warnings": [],
+        "winnerRef": null
+      }
+    },
+    {
+      "id": "A11-rule-expired-before-second-decision",
+      "gate": "C07",
+      "kind": "ADJUDICATION",
+      "input": {
+        "scope": "operation:op1",
+        "decisions": [
+          {
+            "recordRef": "owner-A/decision-1",
+            "owner": "owner-A",
+            "outcome": "SUCCESS",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          },
+          {
+            "recordRef": "owner-B/decision-2",
+            "owner": "owner-B",
+            "outcome": "FAILURE",
+            "ruleRef": "policy/r1",
+            "ruleVersion": "1"
+          }
+        ],
+        "claimedWinnerRef": "owner-A/decision-1"
+      },
+      "oracle": {
+        "trustedRuleSnapshot": [
+          {
+            "recordRef": "policy/r1",
+            "ruleVersion": "1",
+            "publisher": "policy-owner",
+            "verifiedPublisher": true,
+            "scope": "operation:op1",
+            "publicationOrder": 4,
+            "effectiveFromOrder": 5,
+            "effectiveUntilOrder": 11,
+            "rankByOwner": {
+              "owner-A": 1,
+              "owner-B": 2
+            }
+          }
+        ],
+        "publishedDecisionOrdersVerified": true,
+        "allowedRulePublisher": "policy-owner",
+        "trustedDecisionPublicationOrders": {
+          "owner-A/decision-1": 11,
+          "owner-B/decision-2": 12
+        }
+      },
+      "expected": {
+        "gateStatus": "UNRESOLVED",
+        "disposition": "DISPUTED",
+        "issueCodes": [
+          "RULE_NOT_EFFECTIVE"
         ],
         "warnings": [],
         "winnerRef": null
