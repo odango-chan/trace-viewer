@@ -59,7 +59,7 @@ type ExampleRun = {
 const syntheticRuns = samples as unknown as ExampleRun[]
 
 function statusClass(status: string): string {
-  if (['FAILED', 'BLOCKED', 'OUTCOME_UNKNOWN', 'RESULT_UNKNOWN', 'UNRESOLVED', 'DENIED', 'SAFE_STOPPED'].includes(status)) return 'status danger'
+  if (['FAIL', 'UNKNOWN', 'FAILED', 'BLOCKED', 'OUTCOME_UNKNOWN', 'RESULT_UNKNOWN', 'UNRESOLVED', 'DENIED', 'SAFE_STOPPED'].includes(status)) return 'status danger'
   if (['PASS', 'SUCCEEDED', 'COMMITTED', 'COMPLETED', 'DELIVERED'].includes(status)) return 'status good'
   if (['ATTEMPTED', 'RUNNING', 'REQUESTED'].includes(status)) return 'status pending'
   return 'status neutral'
