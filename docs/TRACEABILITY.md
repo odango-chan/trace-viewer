@@ -1,6 +1,6 @@
 # Trace Viewer 实施追溯
 
-**Date: 2026-11-04 · D0 engineering CI verified**
+**Date: 2026-11-05 · D0/D0.7 synthetic-only engineering checks**
 
 | Scope | Canonical design | Code / artifact | Test | Evidence |
 |---|---|---|---|---|
@@ -9,7 +9,9 @@
 | D0 DSH-inspired foldable Turn/Tool/Runtime UI | [trajectory-viewer](design/trajectory-viewer.md) | `site/app.tsx`、`site/light.css` | `tests/projection.test.mjs` + future browser test | Browser NOT_RUN |
 | D0.5 source-native Trace inputs inventory | [Trace format requirements](contracts/trace-inputs.md) | `docs/contracts/trace-inputs.md` + owner references; no parser | Implementation tests NOT_RUN | Doc-based review; native owner golden fixture NOT_CAPTURED |
 | D0.6 OTel/GenAI candidate source mapping | [Mapping](design/otel-genai-mapping.md) | doc-only; no producer/schema change | Contract adoption NOT_RUN | OTel/GenAI upstream comparison; PoC covers synthetic subcase only |
-| D0.6 Phoenix synthetic OTLP ingestion + attribute readback | [Experiment](experiments/phoenix-otel-poc.md) | `scripts/phoenix_otel_poc.py`, `.github/workflows/phoenix-otel-poc.yml` | SDK 2 roots/9 spans, Phoenix query 9 spans + five CA attributes | [PoC CI PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41814143545); UI/real owner NOT_RUN |
+| D0.6 Phoenix synthetic OTLP ingestion + attribute readback | [Experiment](experiments/phoenix-otel-poc.md) | `scripts/phoenix_otel_poc.py`, `.github/workflows/phoenix-otel-poc.yml` | SDK 2 roots/9 spans, Phoenix query 9 spans + five CA attributes | [PoC CI PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41814143545); limited Chromium UI PASS, full parity / real owner NOT_RUN |
+| D0.6 Phoenix browser trace list | [PoC](experiments/phoenix-otel-poc.md) | `tests/phoenix_ui_smoke.py` (headless Chromium) | Project click, 2 synthetic roots visible, agent children | [Phoenix UI CI PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41948042278) + [synthetic screenshot/diagnostics](https://github.com/odango-chan/trace-viewer/actions/runs/41948042278/artifacts/13379323341); DSH full parity NOT_RUN |
+| D0.7 TraceStore structural / no-fabricated-timing gate | [Native ↔ OTel loss audit](experiments/native-otel-gap.md) | `scripts/native_trace_audit.py` + `tests/test_native_trace_audit.py` | 8 schema-shaped synthetic tests, refusal of unsafe input; output metadata only | [CI 8/8 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41948042263); owner-generated fixture NOT_RUN |
 | D1 native Agent Demo import | [source-adapters](design/source-adapters.md) | NOT_STARTED | NOT_RUN | NOT_RUN |
 | D2 Console/Runtime adapter | [source-adapters](design/source-adapters.md) | NOT_STARTED | NOT_RUN | NOT_RUN |
 

@@ -1,6 +1,7 @@
 # Native TraceStore v2 → OpenTelemetry: field-level loss audit
 
-**Status: synthetic structural tests only; cross-owner/real-source parity NOT_RUN · 2026-11-05**
+**Status: SYNTHETIC_STRUCTURAL_8/8_PASS · 2026-11-05**
+**Proof: [Native v2 audit CI](https://github.com/odango-chan/trace-viewer/actions/runs/41948042263); true owner-generated fixture / full native validation / round-trip NOT_RUN.**
 
 这不是另一个生产 TraceStore/validator，也不是已实现的 OTel native exporter。它是为了设计明确的 loss inventory：**原生记录有哪些字段无法仅用 Span 层级表达？**
 
@@ -32,7 +33,7 @@ Owner reference: [TraceStore / ca-agent-demo](https://github.com/odango-chan/ca-
 
 ### D1 验收未完成
 
-- 8 条 synthetic tests 均需由 CI 证明通过，不能等同 upstream Producer-generated golden fixture。
+- **8 条 synthetic tests 已在 CI PASS**（valid、零事件、Unicode/摘要、乱序、错误序号、缺失材料、额外 metadata、敏感键）。但不能等同 upstream Producer-generated golden fixture。
 - 未捕获任何真实 \`.runs/<run_id>\`，未迁移修改其他仓。
 - 未做字段级原生→OTLP→原生逆向重建；目前仅有原生 source 能力审查和导入安全边界。
 - 设计结论：**OTel 优先做可观测层，不应代替没有 native timestamps 的完整事件流记录**。如未来 owner 增加独立 event time，必须由 owner schema/版本定义。 

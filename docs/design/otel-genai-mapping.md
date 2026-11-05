@@ -1,6 +1,6 @@
 # OpenTelemetry GenAI × ConnectionAgent 语义映射与缺口
 
-**Status: D0.6 candidate mapping · 2026-11-04**
+**Status: D0.6 candidate mapping + D0.7 native source gap audit · 2026-11-05**
 **Applies to: read-only exploration, NOT approved cross-repo machine contract**
 **Companion experiment:** [Phoenix/OTLP synthetic PoC](../experiments/phoenix-otel-poc.md)
 
@@ -89,10 +89,17 @@ OTel SDK / GenAI spans      Native Evidence/Record export
 | P1 | Phoenix UI 的 cards 不一定支持 Procedure/Predicate/Evidence 所需 Inspector | 浏览器手动/自动化验收；不凭 API 读回宣布 UI parity |
 | P1 | 演示/公共仓的敏感数据边界 | 明确 synthetic-only、脱敏/授权和浏览器展示策略 |
 
-## 5. 下一步决定标准前的门禁
+## 5. 已完成的最低可运行实验
 
-- **PoC-1**：SDK → Phoenix OTLP → readback：两条 synthetic traces、9 个 spans、关键 owner refs 和状态仍在。
-- **PoC-2**：浏览器审查：Agent Span 卡片、Model/Tool Request/Result、异常、未关联证据是否可解释。
+- OTLP + Phoenix readback：**PASS**，2 synthetic roots、9 spans、5 个 `ca.*` 属性。
+- Phoenix Chromium UI：**LIMITED PASS**，项目页面显示两条 root，点击 Agent root 后子层可见；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41948042278)。**不是完整 DSH/Inspection parity**。
+- TraceStore.v2 结构审计：**8/8 synthetic PASS**，发现原生每事件时间戳本来不存在，不能伪造 OTel Span start/end；[对照与缺口](../experiments/native-otel-gap.md)。
+- License gate：Phoenix **ELv2**，自托管基础能力可用于 PoC，商业嵌入/修改/托管用途须单独审核许可证。不能把它当作 MIT/Apache 通用组件直接复制进 Viewer。
+
+## 6. 下一步决定标准前的门禁
+
+- **PoC-1 PASS**：SDK → Phoenix OTLP → readback：两条 synthetic traces、9 个 spans、五个关键 `ca.*` 字段仍在。
+- **PoC-2 PARTIAL**：浏览器列表与 Agent 子项 PASS；完整 Model/Tool Request/Result、异常、未关联证据、折叠 UI 仍待验收。
 - **PoC-3**：原生真实材料经授权脱敏后的 **字段级无损对照**：Agent Demo TraceStore.v2、Runtime RunEvent.v1、Agent DSH SessionEvent，必须显示完整性差别。
 - **PoC-4**：采样、超限、重启、断网、部分材料等负向验证。
 - 只有 1–4 完成并经对应 owner 接受，才在 \`connectionagent\` 治理仓正式提议共享 Producer conformance。**本仓 D0.6 不以设计代替实现。**

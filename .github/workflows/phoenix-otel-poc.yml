@@ -7,7 +7,6 @@ on:
       - '.github/workflows/phoenix-otel-poc.yml'
       - 'scripts/phoenix_otel_poc.py'
       - 'tests/phoenix_ui_smoke.py'
-      - 'docs/experiments/phoenix-otel-poc.md'
   workflow_dispatch:
 
 jobs:

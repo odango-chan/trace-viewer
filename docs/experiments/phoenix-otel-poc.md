@@ -1,6 +1,6 @@
 # Phoenix × OpenTelemetry GenAI — Synthetic PoC
 
-**Status: SDK_SHAPE_PASS + OTLP_INGEST_PASS + NATIVE_ATTRIBUTE_READBACK_PASS · 2026-11-04**
+**Status: SDK_SHAPE_PASS + OTLP_INGEST_PASS + NATIVE_ATTRIBUTE_READBACK_PASS + CHROMIUM_TRACE_LIST_PASS · 2026-11-05**
 **Proof: [PoC run: 41814143545](https://github.com/odango-chan/trace-viewer/actions/runs/41814143545) · main commit [7622d70](https://github.com/odango-chan/trace-viewer/commit/7622d70cf3a7cde490e49e8ce75682f4f65de955)**
 
 目的：判断开源 Phoenix 能否从 OpenTelemetry SDK/OTLP 接收并通过自己的查询 API 重新读出两条典型 Trace，同时评估 DSH Agent 轨迹和确定性 Procedure/Evidence 的展示能力。**真实业务和完整性不能由此 PoC 验收。**
@@ -24,7 +24,8 @@
 | Span 父子关系 | **PASS**：Harness → Tool、Reconcile → Procedure | SDK 内存断言 |
 | OTLP/HTTP 写入、Phoenix 查询读回 | **PASS**：Phoenix API 返回 9 spans | Phoenix Client get_spans_dataframe |
 | 五个 CA 业务属性的服务端读回 | **PASS** | Phoenix 查询返回的 **`attributes.ca`** 嵌套结构 |
-| 网页 UI、可折叠 DSH 轨迹 | **NOT_RUN** | 无浏览器截图/交互验收 |
+| Phoenix Chromium project → traces → Agent child | **PASS (limited)**：浏览器看见两条 Trace root；点击 Agent root 后有 Model/Tool 子项 | [UI CI](https://github.com/odango-chan/trace-viewer/actions/runs/41948042278)，[截图与诊断 artifact](https://github.com/odango-chan/trace-viewer/actions/runs/41948042278/artifacts/13379323341) |
+| 完整 DSH Turn/Step / Evidence Inspector UI parity | **NOT_RUN** | 不从列表可见推完整交互等价 |
 | Owner 原生 source / Evidence digest / 完整性 | **NOT_RUN** | 未采集生产记录 |
 
 实际读回并断言的五个字段：`ca.operation.outcome=OUTCOME_UNKNOWN`、`ca.reconcile.resolution=COMMITTED`、`ca.external.disposition=UNAVAILABLE`、`ca.tool.result.source_ref=synthetic-tool-result-1`、`ca.evidence.ref=synthetic-evidence-1`。
@@ -52,8 +53,12 @@
 
 1. **SDK_SHAPE_PASS（已证实）**：内存里 9 条 Span、2 个独立 Trace，父子关系与关键 `ca.*` 原生属性齐全。
 2. **OTLP_INGEST_PASS（已证实，含 5 个 CA 属性）**：本机 Phoenix 接收，读回至少 9 个 Span 且关键命名可见。
-3. **UI_PARITY_NOT_RUN**：浏览器未核验折叠 Turn/ToolResult、异常、材料下钻。
+3. **CHROMIUM_TRACE_LIST_PASS（已证实）**：进入项目、显示两根 Trace、Agent 子层展示；**FULL_UI_PARITY_NOT_RUN**：折叠 Turn/ToolResult、异常与材料下钻未验收。
 4. **OWNER_NATIVE_NOT_RUN**：没有读任何真实 `ca-agent-demo`、`ca-runtime` 文件或运行。
 5. **EVIDENCE_COMPLETENESS_NOT_RUN**：没有证明采样、Crash、Collector 数据丢失条件下的完整性。
+
+**Browser observation (Phoenix 21.0.0):** `/projects?timeRangeKey=7d` 显示 `trace-viewer-synthetic-poc`；点击后进入项目 `/projects/<opaque-id>/spans?timeRangeKey=7d`，页面出现 Agent/Procedure 两条 root，点击 Agent root 后子项可见。无 console page errors；UI proof 是合成截图和 DOM 摘要。
+
+**许可注意：** Phoenix 现行源代码的发行许可证为 **Elastic License 2.0 (ELv2)**，不等于 MIT/Apache；决定直接嵌入、修改或分发前应按官方 LICENSE 审核条款。独立本地服务的 PoC 不代表已批准产品化复用。
 
 官方资料：[Phoenix quickstart](https://github.com/Arize-ai/phoenix#run-locally)、[Phoenix OTel 注册](https://github.com/Arize-ai/phoenix/blob/main/.agents/skills/phoenix-tracing/references/setup-python.md)、[OpenTelemetry GenAI Agent Spans](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md)、[Execute Tool](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md)。
