@@ -1,6 +1,6 @@
 # 统一 Trace 规范 v0.2（精简修订稿）
 
-**状态：草案；4 项 P0 已补充 Gate 对应的正负例，但一致性测试未执行，均保持 OPEN；不授权修改 Producer 或 Consumer。**  
+**状态：DRAFT；已新增 10 个 P0 + 29 个边界合成机器断言，候选验证器执行 39/39 PASS；独立/跨实现一致性测试仍 NOT_RUN，4 项 P0 全部 OPEN；不授权修改 Producer 或 Consumer。**  
 **日期：2026-11-05。**  
 本文件是当前唯一候选规范；[v0.1 架构审查](../reviews/unified-trace-v0.1-architecture-review.md)及[v0.2 最小化审查](../reviews/unified-trace-v0.2-minimality-review.md)仅作为评审依据。[语义冻结复审](../reviews/unified-trace-v0.2-semantic-freeze-review.md)提出的四项 P0 已有候选判定规则，**还没有通过实际机器验证**。
 
@@ -8,7 +8,7 @@
 
 相对 v0.1，本稿保留统一身份、事实、因果与材料语义，**删除强制统一存储/活动双记录/全部事件类型/无条件 Capture Manifest**，改为按行为与产品目标验收。此轮进一步明确身份触发、材料与能力覆盖、复合交互引用、类型结果、在线投影。以下 P0 **文本已补充，尚未完成机器一致性验证，不代表 CLOSED**：
 
-**机器测试夹具的判定层（仅夹具约定，不冻结 Producer 的 JSON/OTLP wire schema）：** `gateStatus` 为 `PASS | FAIL | NOT_RUN | N_A | UNRESOLVED`；`coverage` 为 `COMPLETE | PARTIAL | UNKNOWN | N_A`；`productStatus` 为 `PASS | TARGET_GAP | NOT_RUN | N_A`。三者不得混用：`PARTIAL` 是覆盖状态，不是 Gate 的另一种 FAIL；`TARGET_GAP` 是预登记产品的聚合结论，不是单记录 verdict。负例的 `issueCodes` 是本轮夹具断言标签，尚不是跨仓错误码注册表。测试读取结构化输入并比较这些字段，不能只对比一句中文结论。最小八个可解析 JSON 判例见 [P0 一致性向量](fixtures/unified-trace-v0.2-p0.json)。
+**机器测试夹具的判定层（仅夹具约定，不冻结 Producer 的 JSON/OTLP wire schema）：** `gateStatus` 为 `PASS | FAIL | NOT_RUN | N_A | UNRESOLVED`；`coverage` 为 `COMPLETE | PARTIAL | UNKNOWN | N_A`；`productStatus` 为 `PASS | TARGET_GAP | NOT_RUN | N_A | UNRESOLVED`。三者不得混用：`PARTIAL` 是覆盖状态，不是 Gate 的另一种 FAIL；`TARGET_GAP` 是预登记产品的聚合结论，不是单记录 verdict。负例的 `issueCodes` 是本轮夹具断言标签，尚不是跨仓错误码注册表。测试读取结构化输入并比较这些字段，不能只对比一句中文结论。最小十个可解析 JSON 判例见 [P0 一致性向量](fixtures/unified-trace-v0.2-p0.json)，另有 [29 个独立边界向量](fixtures/unified-trace-v0.2-boundaries.json)。这些均是**合成测试夹具语义槽位**，不批准 Producer wire Schema。
 
 | P0 / 类型 | Gate（按实际行为） | 输入向量形态（正/负） | 期望结构化输出（正 / 负） | 当前状态 |
 |---|---|---|---|---|
@@ -17,7 +17,9 @@
 | **P0-3 复合交互／语义规则** | C02/C06 | 一条复合 Tool Interaction，内有稳定的 request/result/delivery 材料定位；后续模型有效请求包含脱敏版/错误声称消费原版 | `gateStatus=PASS` / `gateStatus=FAIL, issueCodes=[MATERIAL_ROLE_MISMATCH]` | **OPEN** |
 | **P0-4 类型语义／语义规则** | C01（Predicate）；C05a 通用身份规则另检，C07 只在 Outcome/裁决时检 | **同一 Observation 缺失条件**下的一对 Predicate Fact：`observedStatus=UNAVAILABLE`、有原因，分别令 `verdict=UNKNOWN` 与伪造 `verdict=FAIL, observedValue=FALSE` | `gateStatus=PASS` / `gateStatus=FAIL, issueCodes=[INVALID_PREDICATE_VERDICT]`；逐项检查 `type/typeVersion` 与必填缺失原因 | **OPEN** |
 
-**按类型关闭 P0：** P0-1/P0-2 属验收流程类：产品声明/范围输入、覆盖证明、聚合规则、结构化预期与实际输出已经确定且可独立运行；P0-3/P0-4 属语义规则类：版本化类型、阶段定位与 Predicate 字段/枚举的机器判定规则已确定，含合法/非法成对向量。**每项均须正负例独立一致性执行、断言完全匹配并通过版本审查**，方可分别 CLOSED；不互相等待无关 Schema，也不把文档 lint/工程 CI 视为一致性 PASS。当前全部 **NOT_RUN / OPEN**。
+**独立验收依据约束：** 被测 Producer/产品的 `claimed*`、`verified=true`、`sourceRangeComplete=true` 一类声明**本身不是证据**。合成向量将输入 `input` 与受测试框架控制的 `oracle` 分开；未来真实验收应从可信 Owner 来源范围/封口记录、Material 可读性/摘要复核、Profile 发布与生效证明、实际外发模型请求恢复依据建立 oracle。无依据时必须返回对应的 `UNKNOWN/UNRESOLVED`，若仍宣称范围 `PASS` 则拒绝该声明，**不得由同一 Producer 的布尔值互相证明**。Product Profile 明确不存在时为 `N_A`；声明存在但其事前发布无法核验时为 `UNRESOLVED`，不可偷换 `N_A`。夹具增加了这两类错误断言的边界。
+
+**按类型关闭 P0：** P0-1/P0-2 属验收流程类：产品声明/范围输入、覆盖证明、聚合规则、结构化预期与实际输出已经确定且可独立运行；P0-3/P0-4 属语义规则类：版本化类型、阶段定位与 Predicate 字段/枚举的机器判定规则已确定，含合法/非法成对向量。**每项均须正负例独立一致性执行、断言完全匹配并通过版本审查**，方可分别 CLOSED；不互相等待无关 Schema，也不把文档 lint/工程 CI 视为一致性 PASS。**当前候选验证器对合成向量 39/39 PASS；跨语言/跨 Owner 独立一致性仍 `NOT_RUN`，四项 P0 均 `OPEN`**。
 
 **其他冻结项**（机器 Schema、编码、权限政策、投影映射和黑盒测试）是上述语义定型后的**工程/互操作交付**，不是第五至第九项语义 P0。不得因表格出现 OPEN 而擅自启动各仓改造。
 
@@ -49,7 +51,7 @@
 
 缺少可信上游 Execution 的回调，保留本地身份并标记未关联；以后以独立关联 Fact 和可核查依据补充，禁止凭时间邻近推断或悄悄改写旧记录。**ORPHAN 是记录产生时“尚无可信执行归属”的不可变来源断言**；后续确认的关联不回写 ORPHAN 记录，视图可依据新链接 Fact 展示“原为 ORPHAN，现已关联到 Execution E”，原断言仍可追溯。真正独立的新根任务才创建新 Execution。
 
-**Fact 不可静默覆盖；recordRef 与 typeVersion 是不同维度**：recordRef 是**一次已发布源事实**的身份，其身份不依赖 typeVersion 字符串，发布后所关联的类型与版本也**不可原地升级**。同一发布身份（已含 Owner 命名空间的 `recordRef`，或 `Owner 命名空间 + 本地 recordRef`）作为对比键；不同 Owner 的同形本地 ID 不能直接互判冲突。**最小实质差异集**：规范类型、`typeVersion`、权威 Owner、源时间的原始精度/未知及原因、类型定义的必需内容（含该类型必需的关系目标）、所有声称属于原文的材料摘要描述符（算法、规范字节/编码范围、摘要值）。上述任一已确定字段不同 → **IDENTITY_CONFLICT**；完全等价 → 幂等重发；导入时间、展示排序、读取 locator、采集批次等非权威元数据变化只记 `METADATA_DRIFT` 告警，不改写源 Fact。比较须使用类型版本指定的无损规范化规则，保留原始时间精度及 `missing`/ `unknown` 区别；**没有已批准的规范化规则或材料不能核对时，结论是 `IDENTITY_UNVERIFIABLE`，不得自认相等或冲突**。后续新增摘要只能标为派生，不能冒充已发布的源摘要。
+**Fact 不可静默覆盖；recordRef 与 typeVersion 是不同维度**：recordRef 是**一次已发布源事实**的身份，其身份不依赖 typeVersion 字符串，发布后所关联的类型与版本也**不可原地升级**。同一发布身份（已含 Owner 命名空间的 `recordRef`，或 `Owner 命名空间 + 本地 recordRef`）作为对比键；不同 Owner 的同形本地 ID 不能直接互判冲突。**最小实质差异集**：规范类型、`typeVersion`、权威 Owner、源时间的原始精度/未知及原因、类型定义的必需内容（含该类型必需的关系目标）、所有声称属于原文的材料摘要描述符（算法、规范字节/编码范围、摘要值）。上述任一已确定字段不同 → **IDENTITY_CONFLICT**；完全等价 → 幂等重发；导入时间、展示排序、读取 locator、采集批次等非权威元数据变化只记 `METADATA_DRIFT` 告警，不改写源 Fact。比较须使用类型版本指定的无损规范化规则，保留原始时间精度及 `missing`/ `unknown` 区别；**没有已批准的规范化规则或材料不能核对时，结论是 `IDENTITY_UNVERIFIABLE`，不得自认相等或冲突**。后续新增摘要只能标为派生，不能冒充已发布的源摘要。比较应**先检可证实的硬差异，再检查其余字段可核验性**：已验证的类型/版本/源时间/摘要差异可以直接判冲突；若无硬差异但缺必需字段、规范化规则或权威材料校验，就返回 `IDENTITY_UNVERIFIABLE`，不可“默认相等”。Owner 命名空间也必须从可信身份来源验证，不能仅接受自报字符串。
 
 **合法版本演进分两种**：① 新发生的事实采用新 typeVersion，使用自己的新 recordRef；② 对历史事实的编码或查看投影升级，原始 source recordRef、source typeVersion 和原文保持不变，投影独立标注 `projectionVersion`；若权威 Owner 确实发布替代/更正事实，必须新建 recordRef，并用明确的 `supersedes` 关联旧 recordRef、保留两者。不得借换版重写旧身份。一个 Activity 可以有共享的 `activityRef`，但“开始 Fact”“结束 Fact”和最终 Activity 记录各有**不同 recordRef**，所以合法地共存，不会误判冲突。Activity 可以是一条完整记录，也可以由开始/结束事实表达；**不强制双重记录**。没有结束依据就标为未知，不臆测失败、取消或零耗时。活动技术完成不等于业务副作用成功。
 
@@ -59,7 +61,7 @@
 
 **Tool 产生结果 ≠ Host 获得结果 ≠ 模型下一次请求实际包含结果。** 异步、结果丢失或 Host 未知时须保留独立事实；简单同步请求允许用一条有类型的交互记录无损呈现请求、结果及交付，无须机械拆成多条事件。
 
-技术 Activity 状态、Runtime terminal、Operation 副作用确定性、Host knowledge、Reconcile 和外部世界状态属于**不同维度**。多个 Owner 声称的不同结果都必须保留，不能折叠成通用 SUCCESS。允许具有明确权限的 Owner **另记裁决/调和 Fact**，写明裁决者、所裁决的对象与作用范围、来源证据和采用的规则版本；Consumer 可以据此展示“当前有依据的结论”，但不能改写/隐藏原始分歧。**不同裁决 Fact 使用不同 recordRef**：两名有权 Owner 的裁决相反，是合法的**跨事实分歧**，而非同 ID 内容冲突。只有可查证的**事前规则记录**能够证明某裁决优先时，视图才可显示相应结论并保留其他裁决。规则记录以独立且不可覆写的 `recordRef` 发布，至少载明发布者/授权来源、`ruleVersion`、适用 Owner/事实类型/范围、优先级或决策顺序、`publishedAt` 与生效区间；可存于可审计的配置或记录仓，**不要求独立规则服务**。裁决 Fact 必须引用具体规则 `recordRef` 及其版本，并提供适用于被裁决对象的来源证据；规则须能够证明在**首次受其约束的相关裁决发布前**已经存在且生效（可靠发布记录/版本顺序均可，不能只信本机时钟）。规则变更以新 `recordRef` 发布，必要时用 `supersedes` 连接，不能事后覆写旧规则。无引用、无权限/范围匹配、无法证明事先发布、或者两条有效规则仍不能唯一裁定时，显示 **DISPUTED / UNRESOLVED** 和来源，不自行排序或改写为一个成功状态。没有授权裁决就显示多方结论与未知，不让 Viewer 猜。
+技术 Activity 状态、Runtime terminal、Operation 副作用确定性、Host knowledge、Reconcile 和外部世界状态属于**不同维度**。多个 Owner 声称的不同结果都必须保留，不能折叠成通用 SUCCESS。允许具有明确权限的 Owner **另记裁决/调和 Fact**，写明裁决者、所裁决的对象与作用范围、来源证据和采用的规则版本；Consumer 可以据此展示“当前有依据的结论”，但不能改写/隐藏原始分歧。**不同裁决 Fact 使用不同 recordRef**：两名有权 Owner 的裁决相反，是合法的**跨事实分歧**，而非同 ID 内容冲突。只有可查证的**事前规则记录**能够证明某裁决优先时，视图才可显示相应结论并保留其他裁决。规则记录以独立且不可覆写的 `recordRef` 发布，至少载明发布者/授权来源、`ruleVersion`、适用 Owner/事实类型/范围、优先级或决策顺序、`publishedAt` 与生效区间；可存于可审计的配置或记录仓，**不要求独立规则服务**。裁决 Fact 必须引用具体规则 `recordRef` 及其版本，并提供适用于被裁决对象的来源证据；规则须能够证明在**首次受其约束的相关裁决发布前**已经存在，并在**每条被它裁决的事实发布时**均生效（可信公共发布登记的顺序证据/版本日志均可，不能比较不同 Owner 的本地 `sequence`，更不能只信本机时钟）。裁决 Fact 引用的 `ruleVersion` 必须与已验证的规则记录版本匹配；缺版本、缺可信发布顺序或作用域不符时不得唯一优选。规则变更以新 `recordRef` 发布，必要时用 `supersedes` 连接，不能事后覆写旧规则。无引用、无权限/范围匹配、无法证明事先发布、或者两条有效规则仍不能唯一裁定时，显示 **DISPUTED / UNRESOLVED** 和来源，不自行排序或改写为一个成功状态。没有授权裁决就显示多方结论与未知，不让 Viewer 猜。
 
 **复合 Interaction 的最小可寻址规则：** 无论同步调用合并为一条记录，还是拆成多个 Facts，都必须能准确区分**请求、结果、交付**三个实际发生的阶段及各自的状态、接收者和材料角色。关系可以指向独立 recordRef，或指向复合记录内稳定、版本化的阶段/材料位置（不得只指向含糊的整条 Activity）。`consumes` 必须由当次实际外发模型请求的完整有效输入证明；ToolResult 已保存/已交付并不证明下一轮模型见过它。不存在某阶段时标记 N/A，不能补造交付事实。
 
@@ -132,7 +134,7 @@ Material 可内嵌在受控文件，也可通过受控引用读取；**不要求
 
 **目标产品责任不是 Producer 自由选择，但由谁评估必须明确：** 目标产品的责任主体（例如应用集成方/验收负责人）必须在验收前登记**产品 Profile 声明**，至少写明产品标识、版本、目标范围（Run、Execution 或有限来源段）、参与 Producer/消费者及其角色、要求的能力、评价者和测试配置/版本。**TARGET_GAP 是该声明的范围级聚合验收结果**，由产品验收者计算/发布，不是某单一 Producer 的运行事实；没有产品声明时不得凭“你应该属于某产品”默认赋予 TARGET_GAP。新 Producer 只要产出记录就须满足 CORE；有 Predicate/Verification 等实际判断的 Owner 须满足该记录的 DIAGNOSTIC；真正调用模型的 Agent/Adapter 须对**当次交互**提供 AGENT_L0；跨 Owner 请求边界须满足适用的 DISTRIBUTED；产品声称某一有限执行范围能完整离线复核时，须满足该范围的 ARCHIVE；独立的数据评测/准备环节负责 LEARNING_CANDIDATE，普通 Recorder 不替样本打正标签。组件可如实声明缺失，但**目标产品必须报告 TARGET_GAP，不能通过全部自选 CORE 来宣称已达成诊断和复现目标**。
 
-**产品 Profile 声明的可追溯发布：** 声明本身是产品责任 Owner 发布的**不可静默覆盖的治理 Fact**，遵守 §2 的发布身份/冲突规则，不要求它虚构运行时 Execution。必须有声明的 `recordRef`、`profileVersion`、产品/责任 Owner、`publishedAt`、适用范围、要求能力、参与角色、评价者与测试配置版本；聚合报告精确引用所用声明 `recordRef` 与版本。修订必须新建记录并以 `supersedes` 关联、保留旧声明；修改后的规则仅影响它明确适用的后续验收，不得追溯漂白旧 `TARGET_GAP`。没有可验证的事前声明，产品级判定为 `N_A`，而不是凭空产生 `TARGET_GAP`。
+**产品 Profile 声明的可追溯发布：** 声明本身是产品责任 Owner 发布的**不可静默覆盖的治理 Fact**，遵守 §2 的发布身份/冲突规则，不要求它虚构运行时 Execution。必须有声明的 `recordRef`、`profileVersion`、产品/责任 Owner、`publishedAt`、适用范围、要求能力、参与角色、评价者与测试配置版本；聚合报告精确引用所用声明 `recordRef` 与版本。修订必须新建记录并以 `supersedes` 关联、保留旧声明；修改后的规则仅影响它明确适用的后续验收，不得追溯漂白旧 `TARGET_GAP`。**只有可信确认未登记该产品声明时**，产品级判定才为 `N_A`，不得凭空产生 `TARGET_GAP`；**提交了声明但其事前发布/版本/作用域不可核验时**，应为 `UNRESOLVED`，不能以 `N_A` 逃避产品责任。
 
 **能力 PASS 必须带判定单位与覆盖依据**：至少区分单记录、单次交互、Run、Execution、有限来源段。内容完整性与来源捕获覆盖是两项独立判断。一个 Model Interaction 的 L0 PASS **不推导**整个 Run/Execution L0 PASS；一个 Predicate 可诊断 **不证明**整个 Run 没漏事件。范围覆盖未知则范围级 `UNKNOWN/PARTIAL`，不能因现存记录都通过就判完整；不适用为 N/A，未执行测试为 NOT_RUN，应发生却没采集为缺口而非 N/A。
 
@@ -152,7 +154,7 @@ Material 可内嵌在受控文件，也可通过受控引用读取；**不要求
 | `REDACTED_BY_POLICY` | 底层权威副本仍保留完整原描述符；当前读者无权看，视图有可核验的保留/脱敏策略及受限标记 | 不视为篡改；若无法验证底层保留，只能 `UNRESOLVED`，**不能宣称无损 PASS** |
 | `OMITTED` | 投影未保留原描述符、也不能证明安全受限保留 | 必须标 `LOSSY`，列入已知字段缺失；只允许作为**如实披露的有损投影**，不得声称源摘要无损保留 |
 
-投影可为派生/转码内容**追加新摘要**，须另给算法、计算范围、转换来源和派生内容标识，不得替换源摘要。故意省略并已申明 `LOSSY` 不等同于篡改，但未申明、伪装成保留、或原值被改写均使 C08a FAIL。其余非必需字段的省略也须披露**已知的**采样/裁剪/缺失范围；无法知道漏了多少，标为覆盖 `UNKNOWN`，**不得为了满足格式凭空生成每条不可观测丢失的缺失 Fact**。单记录投影保真与整段执行覆盖是两个不同断言。
+投影可为派生/转码内容**追加新摘要**，须另给算法、计算范围、转换来源和派生内容标识，不得替换源摘要。故意省略并已申明 `LOSSY` 不等同于篡改，但未申明、伪装成保留、或原值被改写均使 C08a FAIL。对 `REDACTED_BY_POLICY`，只接受从独立受信来源验证底层保留与权限政策的依据，不能把当前投影自己声称的 `retained=true` 当作证明；对 `OMITTED + LOSSY`，**最多允许 C08a 有损投影断言 PASS**，不意味着相应原始材料可读，**不推导 C06、AGENT_L0 或 C08b ARCHIVE PASS**。其余非必需字段的省略也须披露**已知的**采样/裁剪/缺失范围；无法知道漏了多少，标为覆盖 `UNKNOWN`，**不得为了满足格式凭空生成每条不可观测丢失的缺失 Fact**。单记录投影保真与整段执行覆盖是两个不同断言。
 
 **旧资料导入**：如果缺少 Owner 原生 Record ID，可使用稳定的导入合成标识 `importRef`，须带原始来源 locator、合成标记及导入 Profile/映射版本；不可将它标记为原生 `recordRef`。同一来源再次导入时应依明确的原始 locator/版本与导入规则重复生成同一投影身份，不以浏览顺序派生。旧 OTLP 的 TraceId/SpanId 仅用于遥测相关性，**不能直接反推 Execution ID**；若有可信关联，由单独且带证据的链接 Fact 表达，保留旧记录原文。
 
@@ -192,6 +194,8 @@ OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方�
 | **C08b（归档）** | ARCHIVE；**有限来源范围级能力 Gate**：宣称无损导出、重开、读回，逐项对比原始身份、类型、材料摘要及可信封口/覆盖；只做在线投影者 N/A |
 | **C09** | **L0：只读重建**，不得触发真实 Tool/5GC；**L2（未来另验）：隔离控制流重演**，须禁用真实副作用。**不能以 C09 要求 L0 实现 L2 Engine** |
 | **C10** | LEARNING_CANDIDATE：独立评估/Oracle、授权、完整来源和数据集隔离；普通 Producer N/A |
+
+**机器向量本地运行方式（合成夹具，非对真实 Owner 的认证）：** 从仓库根目录执行 `node docs/specs/fixtures/verify-p0.mjs` 与 `node docs/specs/fixtures/verify-boundaries.mjs`。两个验证器只从各自 JSON 夹具的 `input`（被测声明）和 `oracle`（受测试框架控制的独立合成事实）计算输出，再逐字段对比 `expected`；不访问外网、不启动业务代码、不读真实敏感材料。2026-11-05 已将 GitHub 分支上的同一判定逻辑在隔离 V8 执行，10/10 + 29/29 PASS；**Node 命令、独立双实现比较、真实 Owner 来源和跨语言一致性测试仍 NOT_RUN**。这个 PASS 只能说明候选条款在上述合成子集内有自洽的可执行解释，不代表 v0.2 已通过 Conformance。
 
 **适用范围详见文首**；本节 Gate 仅针对对应产品声明、组件角色及已发生行为执行，不能对存量实现追溯授权。
 
