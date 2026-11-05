@@ -256,7 +256,7 @@ function App() {
                           {projectLanes(shown).map(lane => (
                             <div className={'owner-lane lane-' + lane.id} key={lane.id}>
                               <div className="lane-heading">{lane.label} <span>{lane.rows.length}</span></div>
-                              {lane.rows.length ? lane.rows.map(row => renderRecordRow(row)) :
+                              {lane.rows.length ? lane.rows.map((row: PresentationRow) => renderRecordRow(row)) :
                                 <div className="lane-empty">NOT REPORTED IN THIS STEP</div>}
                             </div>
                           ))}
