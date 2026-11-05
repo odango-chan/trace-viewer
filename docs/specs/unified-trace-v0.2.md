@@ -124,28 +124,58 @@ Material 可内嵌在受控文件，也可通过受控引用读取；**不要求
 
 **在线遥测**可以采样、裁剪或丢失，但保留的事实不能改变身份与语义，且须如实披露已知的覆盖限制；它不能仅凭可浏览就声称完整归档或 Replay。
 
+**有损投影的最低不变量（C08）：** 凡声称“这是源记录 R 的投影”，已保留的 `recordRef`、类型/版本、Owner/来源、源时间及其未知标记、已保留关系的目标引用、材料摘要均不得改写或用新语义冒充源数据。允许不展示非必需字段，但要显式标为 `LOSSY` 并公开**已知的**采样/裁剪/字段缺失范围；无法知道漏了多少，标为覆盖未知，**不得为了满足格式凭空生成每条不可观测丢失的缺失 Fact**。对原记录的忠实保留与对整段执行的完整覆盖是两个不同断言。
+
+**旧资料导入**：如果缺少 Owner 原生 Record ID，可使用稳定的导入合成标识 `importRef`，须带原始来源 locator、合成标记及导入 Profile/映射版本；不可将它标记为原生 `recordRef`。同一来源再次导入时应依明确的原始 locator/版本与导入规则重复生成同一投影身份，不以浏览顺序派生。旧 OTLP 的 TraceId/SpanId 仅用于遥测相关性，**不能直接反推 Execution ID**；若有可信关联，由单独且带证据的链接 Fact 表达，保留旧记录原文。
+
 **宣称无损的持久化、导出和重新导入**必须对选定来源范围保留全部必要的身份、类型、因果、时间/未知情况、材料引用及摘要。只有宣称一个有限 Owner 来源范围 `COMPLETE` 时，才必须提供可检查的来源边界、记录覆盖、损失/截断、材料完整性和封口依据。**不强制每个实时 Demo 建立 Capture Manifest**。无法证明范围完整时报告 UNKNOWN；跨 Owner 全局完整性不能从局部完整性自动推出。
 
 OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方案**。一套语义可以有在线有损投影与离线完整归档两种编码，不代表两套机器事实标准。
 
 ## 7. 四个最小反例（文本推演，并非已运行测试）
 
-| 场景 | 最小合规表示 | 不需要 |
-|---|---|---|
-| 单进程 Predicate | 一条含 verdict、expected/observed、原因与证据的 Fact | Attempt、Activity、Tool、Manifest |
-| 单轮模型调用、无 Tool | 请求/响应两条关联事实，或一条完整交互 Activity；保留实际请求、响应及材料校验 | ToolResult、Skill、跨 Owner 关联、额外重试 |
-| Runtime 成功、Host 未知 | 同一 Operation 引用下的 Runtime outcome 和 Host knowledge；有调和时另记事实 | 强行统一成 SUCCESS、每跳一条事件 |
-| 旧 JSONL/OTLP 部分导入 | 原来源 locator、显式合成的导入 ID、未知与截断声明 | 假冒原生 Sequence、时间或完整性 |
+| 场景 | 最小合规表示 | 不需要 | 负例：会违反什么 |
+|---|---|---|---|
+| 单进程 Predicate | 一条含 verdict、expected/observed、原因与证据的 Fact | Attempt、Activity、Tool、Manifest | 只写 PASS 不留评价依据违反 DIAGNOSTIC；**额外真实 Attempt 不违规**，伪造重试才违规 |
+| 单轮模型调用、无 Tool | 请求/响应两条关联事实，或一条完整交互 Activity；保留实际请求、响应及材料校验 | ToolResult、Skill、跨 Owner 关联、额外重试 | 只保存 SHA、没有可读取原文却宣称 AGENT_L0 PASS 违规 |
+| Runtime 成功、Host 未知 | 同一 Operation 引用下的 Runtime outcome 和 Host knowledge；有调和时另记事实 | 每跳一条事件或全局 Manifest | 把 Host UNKNOWN 覆盖为 SUCCESS，或无授权裁决就只显示一方结果违规 |
+| 旧 JSONL/OTLP 部分导入 | 原来源 locator、显式合成的导入 ID、未知与截断声明 | 原生 Sequence、时间或完整性若原文没有则不要求 | 用 JSONL 行号冒充 Owner sequence、把采样 Trace 声称为完整归档违规 |
+
+**额外负例 M1（覆盖范围）**：3 次 Model 调用只留第 3 次。可以宣称“交互 3：L0 PASS”，但“整个 Execution：L0 PASS”违规，必须报告前两次缺口/范围未知。
+
+**额外负例 M2（交互阶段）**：同一个 Tool Interaction 保存原始敏感结果和脱敏结果，而下一次模型请求只包含脱敏版。若 `consumes` 只指向整条 Activity，进而声称原始敏感结果被模型看见，违反 §3 的材料阶段定位及 AGENT_L0。
 
 ## 8. 一致性要求与冻结条件
 
-未来所有实现共用一致性测试语义，但**按其宣称的能力**执行，不适用记 N/A，未验证记 NOT_RUN：
+未来所有实现共用一致性测试语义，**按角色、实际行为及所声明能力**执行。N/A 仅限确实不适用，NOT_RUN 表示尚未验收；**目标产品本应提供却未采集的能力是 TARGET_GAP/FAIL，不可填写 N/A**。
 
-- **C01/C07**：判断依据完整，Owner 结果不互相覆盖（DIAGNOSTIC）。
-- **C02/C09**：精确模型输入/交接可恢复，Replay 不触发真实副作用（AGENT_L0，后续 L2）。
-- **C03/C04**：执行身份传播、迟到、重试、乱序和可信关联（DISTRIBUTED；CORE 只验稳定身份）。
-- **C05**：重复投递去重，冲突不覆盖，未知终态不冒充失败（CORE）。
-- **C06/C08**：材料校验、访问和缺失分离；声明无损的归档读回保真（ARCHIVE/AGENT_L0）。
-- **C10**：无独立质量依据、权限或来源闭包则不能称训练合格样本（LEARNING_CANDIDATE）。
+| Gate | 条件与应验收行为 |
+|---|---|
+| **C01** | DIAGNOSTIC：发生 Predicate/Verification 判断时保留有效 verdict/UNKNOWN、依据与材料 |
+| **C02** | AGENT_L0：实际 Model 交互精确可重建；有 Tool 才检验返回、交付和下一次请求消费；交互级 PASS 不升级成 Execution PASS |
+| **C03** | DISTRIBUTED：确实跨 Owner 时验证 Execution 传播、异步和可信迟到关联；纯本地 N/A |
+| **C04** | CORE：身份/同一记录稳定；DISTRIBUTED：发生 retry、乱序时额外检验不猜测因果和新 Attempt 身份 |
+| **C05** | CORE：同 Record ID 去重/冲突；若记录包含终态，不得将“未收到结束事实”冒充失败，不要求所有 CORE Producer 建立 State 系统 |
+| **C06** | AGENT_L0 / ARCHIVE：所要求材料的编码、摘要、原文可取回性、权限与缺失分别检验；无关记录 N/A |
+| **C07** | DIAGNOSTIC / DISTRIBUTED：存在不同 Owner Outcome/Host Knowledge 时并存并按授权裁决，禁止合并 SUCCESS |
+| **C08** | ARCHIVE：声明无损的有限范围导出/读回保真；在线有损投影只测不变量和覆盖声明，不要求 ARCHIVE |
+| **C09** | **L0：只读重建**，不得触发真实 Tool/5GC；**L2（未来另验）：隔离控制流重演**，须禁用真实副作用。**不能以 C09 要求 L0 实现 L2 Engine** |
+| **C10** | LEARNING_CANDIDATE：独立评估/Oracle、授权、完整来源和数据集隔离；普通 Producer N/A |
+
+**当前版本的适用范围**：以上是**未来新实现、或明确自愿升级至此 Profile 的组件**的候选验收要求。已有 DSH/Agent Demo/Runtime/Viewer 不会自动获得或丧失 CORE、L0、ARCHIVE 等能力标签，旧版测试也不能替代本规范的一致性验收。
+
+**术语表（候选语义与尚待冻结的机器表达分开）：**
+
+| 术语 | 当前已经明确的语义 | 机器层仍待冻结 |
+|---|---|---|
+| Execution / Run / Attempt | 业务目标 / 一次执行实例 / 一次真实尝试；分层按行为出现 | ID 编码、分发/续程的消息承载 |
+| Fact / Record ID | 单次不可悄悄改写的事实及其唯一记录身份 | 类型注册、Canonical 编码及冲突校验 |
+| Activity / Activity ID | 有时间边界的活动；可由一条记录或多事实表达 | 阶段定位与 Span/Log 映射 |
+| Request / Operation | 精确调用身份、尝试与潜在副作用 | 字段路径、跨信任域绑定 |
+| Owner / Host knowledge | 权威事实宣告者 / Host 对某次结果的真实认知 | 认证方式及数据类型枚举 |
+| terminal / effect / Reconcile | 执行终态 / 外部作用确定性 / 带证据的后续调和 | 规范类型、合法值与裁决规则版本 |
+| Material | 可内联或按引用获得的实际输入/响应/证据内容 | 字节范围、编码、摘要和权限政策 |
+| ORPHAN / importRef | 缺可信执行关联 / 导入器显式合成身份 | 信任映射、导入定位规则 |
+| Capture / Projection | 有证据的来源范围封口 / 可有损的在线视图 | Manifest/OTLP 的字段映射及格式 |
 
 **尚未冻结的决策**：机器字段/类型 Registry、ID 格式与批次继承、材料规范编码及默认安全政策、在线/离线具体映射、黑盒正负向一致性用例。此阶段仅修订规范；不修改 DSH、Agent Demo、Runtime、Fabric、Console 或 Viewer 运行代码。
