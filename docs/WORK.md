@@ -6,7 +6,7 @@
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
-| **Viewer MVP（本轮主线）** | **REAL SOURCE FIRST**：现有 D1/D1.1 Adapter 基础上，优先修 Inspector 的证据状态、诊断下钻、异常定位和 Q1–Q6 可回答性；不等待新 Schema | **本仓 Viewer 小步开发**：来源感知的证据状态、按需读取本地 JSONL 选定行的安全标量字段、Predicate `FAIL/UNKNOWN` 异常导航、缺失原因明确标记；原始敏感正文不出读取器 | 当前 GitHub 分支 JS 4 组测试文件共 24 组，隔离 V8 **23 PASS / 1 私有路径 SKIP / 0 FAIL**；私有 P8-D4 attempt 2 的 85/85 诊断事件仅进行本地逻辑白名单读取验证；Node 24 / typecheck / build / Chromium / 完整 Q1–Q6 仍 NOT_RUN |
+| **Viewer MVP（本轮主线）** | **REAL SOURCE FIRST**：现有 D1/D1.1 Adapter 基础上，优先修 Inspector 的证据状态、诊断下钻、异常定位和 Q1–Q6 可回答性；不等待新 Schema | **本仓 Viewer 小步开发**：来源感知的证据状态、按需读取本地 JSONL 选定行的安全标量字段、Predicate `FAIL/UNKNOWN` 异常导航、缺失原因明确标记；原始敏感正文不出读取器 | 当前 GitHub 分支 JS 4 组测试文件共 24 组，隔离 V8 **23 PASS / 1 私有路径 SKIP / 0 FAIL**；私有 P8-D4 attempt 2 的 85/85 诊断事件仅进行本地逻辑白名单读取验证；Node 24 单测/typecheck/build [CI PASS](https://github.com/odango-chan/trace-viewer/actions/runs/42026816957)；合成 Chromium 新旧交互 [11/11 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/42026816846)；私有真实文件 Chromium / 完整 Q1–Q6 仍 NOT_RUN |
 | **统一 Trace v0.2（候选规范，非 Viewer 主线）** | **DRAFT / 复审整改已写入正文、尚未冻结**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **仅文档**：公共最小契约、条件能力、真实来源/材料、分离 Owner 结果；Producer 未改 | 四个最小场景通过文本复核；**4 项 P0 已有 Gate+正负例，仍 OPEN**：产品责任、能力范围/覆盖、复合交互阶段、基本类型。用户新增的身份/N/A、裁决、L0/L2、材料/投影、负例等要求亦已写入；机器 Schema/黑盒测试/OTLP 选型 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
 | D0 文档治理 / 责任边界 | ACCEPTED | IMPLEMENTED | main 已核验；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 浅色 Web 壳 / 合成 DSH 轨迹 | ACCEPTED (D0) | IMPLEMENTED | [CI 单测/类型检查/静态构建 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)；Browser NOT_RUN |
