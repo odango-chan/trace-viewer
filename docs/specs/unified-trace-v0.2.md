@@ -1,21 +1,27 @@
 # 统一 Trace 规范 v0.2（精简修订稿）
 
-**状态：草案；4 项语义 P0 已补充可判定条款，仍待机器一致性验证与正式批准；不授权修改 Producer 或 Consumer。**  
+**状态：草案；4 项 P0 已补充 Gate 对应的正负例，但一致性测试未执行，均保持 OPEN；不授权修改 Producer 或 Consumer。**  
 **日期：2026-11-05。**  
-本文件是当前唯一候选规范；[v0.1 架构审查](../reviews/unified-trace-v0.1-architecture-review.md)及[v0.2 最小化审查](../reviews/unified-trace-v0.2-minimality-review.md)仅作为评审依据。**最新复审：[中文精简稿语义冻结评审](../reviews/unified-trace-v0.2-semantic-freeze-review.md)——架构/减重基本通过，4 项 P0 待补。**
+本文件是当前唯一候选规范；[v0.1 架构审查](../reviews/unified-trace-v0.1-architecture-review.md)及[v0.2 最小化审查](../reviews/unified-trace-v0.2-minimality-review.md)仅作为评审依据。[语义冻结复审](../reviews/unified-trace-v0.2-semantic-freeze-review.md)提出的四项 P0 已有候选判定规则，**还没有通过实际机器验证**。
 
 ## 修订摘要与冻结门禁
 
 相对 v0.1，本稿保留统一身份、事实、因果与材料语义，**删除强制统一存储/活动双记录/全部事件类型/无条件 Capture Manifest**，改为按行为与产品目标验收。此轮进一步明确身份触发、材料与能力覆盖、复合交互引用、类型结果、在线投影。以下 P0 **文本已补充，尚未完成机器一致性验证，不代表 CLOSED**：
 
-| P0 | 影响能力 | 关闭判据 | 当前状态 |
-|---|---|---|---|
-| P0-1 产品责任 | CORE / DIAGNOSTIC / AGENT_L0 / DISTRIBUTED | §5 明确目标产品角色对应必需能力，组件可不适用，但产品不能以 N/A 掩盖缺口 | OPEN（文本已补） |
-| P0-2 能力范围 | 全部能力 | §5 规定单记录/交互/Run/Execution 的覆盖证据与 PASS/未知规则 | OPEN（文本已补） |
-| P0-3 复合交互 | AGENT_L0 / DIAGNOSTIC | §3 规定请求、结果、交付分阶段、可定位的材料和引用，含不匹配负例 | OPEN（文本已补） |
-| P0-4 类型语义 | DIAGNOSTIC / AGENT_L0 / DISTRIBUTED | §4 规定少量基础类型的必需含义、UNKNOWN 与缺观察判定 | OPEN（文本已补） |
+| P0 | 对应 Gate | 正例 → 预期 | 负例 → 预期 | 当前状态 |
+|---|---|---|---|---|
+| **P0-1 产品责任** | C01、C02、C03、C10；产品能力声明 | 产品预声明 Agent 必须提供 L0；该范围所有模型交互均具有效材料 → 产品该项 PASS | 同一声明下 Agent 只输出 CORE，却将整体诊断/复现判 PASS → **TARGET_GAP** | **OPEN**（待运行对应向量） |
+| **P0-2 覆盖范围** | C02、C06、C08b | 声明 3 次模型调用，3 次均有可核对请求与响应及来源覆盖证明 → Execution L0 可 PASS | 只保留第 3 次，就将 Execution 标为 L0 PASS → **FAIL/PARTIAL** | **OPEN**（待运行对应向量） |
+| **P0-3 复合交互** | C02、C06 | 单条 Interaction 内有稳定的请求/结果/交付定位，模型只引用真正注入的脱敏结果 → PASS | 仅引用整个 Activity 却声称原始敏感结果被模型消费 → **FAIL** | **OPEN**（待运行对应向量） |
+| **P0-4 类型语义** | C01、C05、C07 | Predicate 无法获取 Observation，verdict=UNKNOWN 并说明原因 → PASS | Observation 不可用却将 verdict 记为观察值明确为 FALSE 的 FAIL → **FAIL** | **OPEN**（待运行对应向量） |
+
+**P0 关闭规则：** 对应 Gate 的机器 Schema/类型规则已确定，**正例与负例均在独立一致性验证中按表得到预期结果**，完成版本审查后才可将该项标记 CLOSED；只存在中文规则或工程 CI 成功不能关闭。以上输入/预期是**待转成机器测试向量的判例**，不是声称已执行的测试。
 
 **其他冻结项**（机器 Schema、编码、权限政策、投影映射和黑盒测试）是上述语义定型后的**工程/互操作交付**，不是第五至第九项语义 P0。不得因表格出现 OPEN 而擅自启动各仓改造。
+
+## 适用范围（先读）
+
+本版仅约束**未来按本 Profile 建设的新组件**，或**明确选择升级到此 Profile 的现有组件**。存量 DSH、Agent Demo、Runtime、Viewer 不因本草案自动取得或失去合规资格。是否达成“统一 Trace 产品目标”，以**产品自身预先登记的能力声明和验收范围**判断；未登记目标产品时，不能凭本规范替某组件生成 TARGET_GAP。旧实现的历史验收不自动替代本 Profile 的 Gate。
 
 ## 1. 目标与原则
 
@@ -162,7 +168,7 @@ OTLP、JSONL、Protobuf、归档容器和 Phoenix 都是**待评估的承载方�
 | **C09** | **L0：只读重建**，不得触发真实 Tool/5GC；**L2（未来另验）：隔离控制流重演**，须禁用真实副作用。**不能以 C09 要求 L0 实现 L2 Engine** |
 | **C10** | LEARNING_CANDIDATE：独立评估/Oracle、授权、完整来源和数据集隔离；普通 Producer N/A |
 
-**当前版本的适用范围**：以上是**未来新实现、或明确自愿升级至此 Profile 的组件**的候选验收要求。已有 DSH/Agent Demo/Runtime/Viewer 不会自动获得或丧失 CORE、L0、ARCHIVE 等能力标签，旧版测试也不能替代本规范的一致性验收。
+**适用范围详见文首**；本节 Gate 仅针对对应产品声明、组件角色及已发生行为执行，不能对存量实现追溯授权。
 
 **术语表（候选语义与尚待冻结的机器表达分开）：**
 
