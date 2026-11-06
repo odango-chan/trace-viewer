@@ -76,6 +76,13 @@ def main():
             assert row.bounding_box()["height"] <= 44
             page.set_viewport_size({"width": 1600, "height": 1000})
             checks.append("Readable records use one physical line at desktop and laptop widths")
+            harness = page.locator(".ledger-event").filter(has_text="Harness · Admission").first
+            assert harness.is_visible()
+            assert harness.bounding_box()["height"] <= 44
+            assert "HARNESS_ADMISSION" in harness.locator(".ledger-kind").inner_text()
+            assert "synthetic:runtime" in harness.locator(".ledger-authority").inner_text()
+            assert harness.locator(".ledger-ref-count").inner_text() == "↳1"
+            checks.append("Harness Admission remains one line with explicit source and causal-ref count")
             page.get_by_role("button", name="All owners", exact=True).click()
             assert page.locator(".owner-lane").count() >= 4
             assert page.locator(".ledger-view").count() == 0
