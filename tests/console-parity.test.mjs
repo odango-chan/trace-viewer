@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { samples } from '../site/fixtures.mjs'
+const compact = samples.find(item => item.id === 'synthetic-agent-recovery')
 import { VIEW_MODES, projectSectionRows, projectLanes, findPrimaryUnknown } from '../site/console-parity.mjs'
 import { validateSyntheticRun, allRecords } from '../site/projection.mjs'
 
@@ -15,7 +16,7 @@ test('four Console reading modes preserve native refs and do not add owner recor
 })
 
 test('Model Request and Response fold only by an explicit response causalRef', () => {
-  const sample = samples[0]
+  const sample = compact
   const rows = projectSectionRows(sample, sample.sections[0])
   const model = rows.find(row => row.label === 'Model Interaction')
   assert.deepEqual(model.members.map(item => item.ref), ['synthetic:model-req-1', 'synthetic:model-resp-1'])
@@ -55,7 +56,7 @@ test('RESULT_UNKNOWN is Host knowledge, Runtime SUCCEEDED remains distinct', () 
 })
 
 test('Model only excludes Runtime; All owners keeps four separate presentation lanes', () => {
-  const sample = samples[0]
+  const sample = compact
   const modelOnly = sample.sections.flatMap(section => projectSectionRows(sample, section, 'model'))
   assert.ok(modelOnly.every(row => row.lane === 'agent'))
   const deterministic = samples.find(item => item.id === 'synthetic-deterministic')
