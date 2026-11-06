@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { samples } from '../site/fixtures.mjs'
-import { validateSyntheticRun, allRecords, getSourceLinks, runSummary, defaultOpenSections, inspectorEvidenceStatus, reviewFileNeighbors, sourceOverviewLabel } from '../site/projection.mjs'
+import { validateSyntheticRun, allRecords, getSourceLinks, runSummary, defaultOpenSections, inspectorEvidenceStatus, recordReadingContext, reviewFileNeighbors, sourceOverviewLabel } from '../site/projection.mjs'
 
 test('synthetic cases are explicitly labeled; DSH and deterministic modes remain separate', () => {
   assert.equal(samples.length, 4)
@@ -96,4 +96,35 @@ test('review context never jumps over missing lines or to unrelated local files'
   ]}
   assert.equal(reviewFileNeighbors(run,first).next,null)
   assert.equal(reviewFileNeighbors(run,third).previous,null)
+})
+
+test('reading context stays inside one section and does not infer cross-owner causality',()=>{
+  const run=samples[0]
+  const left=run.sections[0].records[0]
+  const right=run.sections[0].records[1]
+  const c=recordReadingContext(run,left)
+  assert.equal(c.sectionTitle,run.sections[0].title)
+  assert.equal(c.position,1)
+  assert.equal(c.total,run.sections[0].records.length)
+  assert.equal(c.previous,null)
+  assert.equal(c.next.ref,right.ref)
+  assert.equal(recordReadingContext(run,run.sections[0].records.at(-1)).next,null)
+  const nextSection=run.sections[1].records[0]
+  assert.equal(recordReadingContext(run,nextSection).previous,null)
+  assert.deepEqual(recordReadingContext(run,null),{
+    sectionTitle:null,position:0,total:0,previous:null,next:null
+  })
+  assert.deepEqual(recordReadingContext(run,{...left,ref:'fake:source'}),{
+    sectionTitle:null,position:0,total:0,previous:null,next:null
+  })
+  assert.deepEqual(recordReadingContext(run,{...left,sourceAuthority:'foreign:owner'}),{
+    sectionTitle:null,position:0,total:0,previous:null,next:null
+  })
+})
+
+test('review context preserves physical report section bounds without joining runs',async()=>{
+  const sample=structuredClone(samples[0])
+  const base=sample.sections[0].records[0]
+  assert.equal(recordReadingContext(sample,base).previous,null)
+  assert.deepEqual(base.causalRefs, samples[0].sections[0].records[0].causalRefs)
 })
