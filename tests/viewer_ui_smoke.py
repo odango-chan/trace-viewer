@@ -53,14 +53,21 @@ def main():
             assert page.locator(".metric").first.bounding_box()["height"] <= 58
             assert page.locator(".timeline").bounding_box()["y"] < 450
             page.locator(".turn-card .turn-header").first.click()
-            assert page.locator(".timeline .event-kind").first.is_visible()
-            assert "MODEL_" in page.locator(".timeline .event-kind").first.inner_text()
+            assert page.locator(".timeline .ledger-kind").first.is_visible()
+            assert "MODEL_" in page.locator(".timeline .ledger-kind").first.inner_text()
             checks.append("Compact above-fold trajectory retains explicit source kinds and accurate totals")
-            assert page.locator(".trace-event .event-meta").filter(has_text="Model Interaction").count() >= 1
-            checks.append("Readable view folds explicit Model Request/Response")
+            assert page.locator(".ledger-view").count() >= 1
+            assert page.locator(".owner-lane").count() == 0
+            assert page.locator(".ledger-head").first.is_visible()
+            assert page.locator(".ledger-event .ledger-kind").filter(has_text="Model Interaction").count() >= 1
+            assert "synthetic:agent" in page.locator(".ledger-event .ledger-authority").first.inner_text()
+            assert "synthetic:model-req-1" in page.locator(".ledger-event .ledger-ref").first.inner_text()
+            assert page.locator(".ledger-event .event-side").first.is_visible()
+            checks.append("Readable source ledger shows folded interaction, authority, exact ref, status and position")
             page.get_by_role("button", name="All owners", exact=True).click()
             assert page.locator(".owner-lane").count() >= 4
-            checks.append("All owners uses separate Agent/Runtime/Fabric/World lanes")
+            assert page.locator(".ledger-view").count() == 0
+            checks.append("All owners retains separate Agent/Runtime/Fabric/World lanes")
             page.get_by_role("button", name="Raw records", exact=True).click()
             assert "synthetic:model-req-1" in page.locator(".timeline").inner_text()
             page.locator(".turn-card .trace-event").first.click()
@@ -84,7 +91,7 @@ def main():
 
             page.get_by_role("combobox", name="Choose demo example").select_option(label="Parallel reads · out-of-order ToolResults")
             page.locator(".turn-card .turn-header").first.click()
-            assert page.locator(".trace-event .event-meta").filter(has_text="Tool Interaction").count() == 2
+            assert page.locator(".ledger-event .ledger-kind").filter(has_text="Tool Interaction").count() == 2
             page.get_by_text("query_session (A)", exact=True).click()
             assert page.locator(".paired-sources button").count() == 2
             page.locator(".paired-sources button").nth(1).click()

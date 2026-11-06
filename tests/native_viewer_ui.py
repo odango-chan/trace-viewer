@@ -26,7 +26,7 @@ def main():
         page.locator(".timeline .event-meta").filter(has_text="ca-agent-demo").first.wait_for(timeout=10000)
         directory.set_input_files(str(GOLDEN / "synthetic-owner-model-v2"))
         page.get_by_role("heading", name="TraceStore v2 · synthetic-owner-model-v2", exact=True).wait_for(timeout=15000)
-        page.locator(".timeline .event-meta").filter(has_text="Model Interaction").first.wait_for(timeout=10000)
+        page.locator(".timeline .ledger-kind").filter(has_text="Model Interaction").first.wait_for(timeout=10000)
         page.get_by_role("button", name="Source", exact=True).click()
         assert "NATIVE_LOCAL" in page.locator(".source-preview").inner_text()
         assert not page_errors, page_errors

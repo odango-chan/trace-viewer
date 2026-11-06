@@ -321,21 +321,30 @@ function App() {
   }
   function renderRecordRow(row: PresentationRow) {
     const active = row.members.some(member => member.ref === selectedRef)
+    const isLedger = viewMode === 'readable'
     const source = row.source
     const terminal = row.members[row.members.length - 1]
     const warning = row.members.some(isException)
     return (
       <button key={row.key} type="button"
-        className={'trace-event ' + (active ? 'selected' : '')}
+        className={'trace-event ' + (active ? 'selected' : '') + (isLedger ? ' ledger-event' : '')}
         data-source-ref={source.ref}
         onClick={() => selectRecord(source.ref)} aria-pressed={active}>
         <span className={'event-glyph ' + (warning ? 'glyph-warning' : '')}>{kindSymbol(source.kind)}</span>
         <span className="event-detail">
-          <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}{viewMode !== 'raw' && <span className="event-kind"> · {source.kind}</span>}</span>
+          {!isLedger && <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}{viewMode !== 'raw' && <span className="event-kind"> · {source.kind}</span>}</span>}
           <strong>{viewMode === 'raw' ? source.kind : source.title}</strong>
           <small>{viewMode === 'raw' ? source.ref : source.summary}</small>
-          {row.isFolded && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · ' + recordPosition(member)).join('  →  ')}</span>}
+          {row.isFolded && !isLedger && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · ' + recordPosition(member)).join('  →  ')}</span>}
         </span>
+        {isLedger && (
+          <span className="ledger-source">
+            <span className="ledger-kind">{row.isFolded ? row.label + ' · ' + source.kind : source.kind}</span>
+            <span className="ledger-authority" title={source.sourceAuthority}>{source.sourceAuthority}{source.stage ? ' · ' + source.stage : ''}</span>
+            <span className="ledger-ref" title={source.ref}>{source.ref}</span>
+            {(source.causalRefs?.length ?? 0) > 0 && <span className="ledger-ref-count">{source.causalRefs.length} declared causal ref{source.causalRefs.length === 1 ? '' : 's'}</span>}
+          </span>
+        )}
         <span className="event-side">
           <span className={statusClass(terminal.status)}>{terminal.status}</span>
           <small>{row.isFolded ? row.members.length + ' exact sources' : recordPosition(source)}</small>
@@ -526,7 +535,7 @@ function App() {
             ))}
           </div>
           <div className="view-hint">
-            {viewMode === 'readable' && 'Paired Model/Tool interactions are presentation-only; Runtime and external facts remain separate.'}
+            {viewMode === 'readable' && 'Compact source ledger · folded pairs require explicit refs · display order is not cross-owner sequence or causality.'}
             {viewMode === 'model' && 'Agent/Model owner records only. Runtime omission here is a filter, not missing execution.'}
             {viewMode === 'owners' && 'Unfolded owner-native records in separate lanes. No global cross-owner sequence.'}
             {viewMode === 'raw' && 'Source refs and origin. Diagnostic file lines are not owner-local sequences. Material bodies are never shown automatically.'}
@@ -539,7 +548,7 @@ function App() {
               if (!shown.length) return null
               const isOpen = expanded.has(section.id)
               const containsWarning = section.records.some(isException)
-              const useLanes = viewMode === 'readable' || viewMode === 'owners'
+              const useLanes = viewMode === 'owners'
               return (
                 <section className={'turn-card ' + (containsWarning ? 'has-warning' : '')} key={section.id}>
                   <button type="button" className="turn-header" onClick={() => toggleSection(section.id)} aria-expanded={isOpen}>
@@ -552,8 +561,15 @@ function App() {
                     <span className="chevron">{isOpen ? '⌄' : '›'}</span>
                   </button>
                   {isOpen && (
-                    <div className={'turn-body ' + (useLanes ? 'laned' : '')}>
-                      {useLanes ? (
+                    <div className={'turn-body ' + (useLanes ? 'laned' : '') + (viewMode === 'readable' ? ' ledger-body' : '')}>
+                      {viewMode === 'readable' ? (
+                        <div className="ledger-view" aria-label="Compact source ledger">
+                          <div className="ledger-head" aria-hidden="true">
+                            <span></span><span>EVENT</span><span>SOURCE / RECORD KIND</span><span>STATUS / POSITION</span>
+                          </div>
+                          {shown.map(row => renderRecordRow(row))}
+                        </div>
+                      ) : useLanes ? (
                         <div className="owner-lanes">
                           {projectLanes(shown).map(lane => (
                             <div className={'owner-lane lane-' + lane.id} key={lane.id}>
