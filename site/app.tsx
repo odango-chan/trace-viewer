@@ -331,7 +331,7 @@ function App() {
         onClick={() => selectRecord(source.ref)} aria-pressed={active}>
         <span className={'event-glyph ' + (warning ? 'glyph-warning' : '')}>{kindSymbol(source.kind)}</span>
         <span className="event-detail">
-          <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}</span>
+          <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}{viewMode !== 'raw' && <span className="event-kind"> · {source.kind}</span>}</span>
           <strong>{viewMode === 'raw' ? source.kind : source.title}</strong>
           <small>{viewMode === 'raw' ? source.ref : source.summary}</small>
           {row.isFolded && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · ' + recordPosition(member)).join('  →  ')}</span>}
@@ -464,8 +464,8 @@ function App() {
 
           <div className="metric-row">
             <div className="metric"><span>{run.sourceKind === 'SYNTHETIC' ? 'Execution mode' : 'Imported source'}</span><strong>{sourceOverviewLabel(run)}</strong></div>
-            <div className="metric"><span>Visible records</span><strong>{summary.events}</strong></div>
-            <div className="metric"><span>Owner streams</span><strong>{summary.ownerStreams}</strong></div>
+            <div className="metric"><span>Source records</span><strong>{summary.events}</strong></div>
+            <div className="metric"><span>Source authorities</span><strong>{summary.ownerStreams}</strong></div>
             <div className="metric"><span>Exception flags</span><strong className="warning-text">{summary.exceptions}</strong></div>
           </div>
 
@@ -504,8 +504,8 @@ function App() {
 
           <div className="trace-heading">
             <div>
-              <h2>Execution trajectory</h2>
-              <p>Console-inspired reading modes · exact source refs · read-only</p>
+              <h2>Execution trajectory <span className="trajectory-count">{run.sections.length} sections · {summary.events} source records</span></h2>
+              <p>Exact source refs · read-only · display order is not cross-owner causality</p>
             </div>
             <div className="toolbar" aria-label="Trajectory presentation controls">
               <button type="button" className={filter === 'all' ? 'tool active' : 'tool'} onClick={() => setFilter('all')}>All</button>
@@ -548,7 +548,7 @@ function App() {
                       <strong>{section.title}</strong>
                       <small>{section.subtitle}</small>
                     </span>
-                    <span className={'turn-count ' + (containsWarning ? 'turn-count-warning' : '')}>{section.records.length} owner records</span>
+                    <span className={'turn-count ' + (containsWarning ? 'turn-count-warning' : '')}>{section.records.length} records{containsWarning ? ' · ' + section.records.filter(isException).length + ' flagged' : ''}</span>
                     <span className="chevron">{isOpen ? '⌄' : '›'}</span>
                   </button>
                   {isOpen && (
