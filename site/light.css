@@ -78,3 +78,10 @@
 .finding-fields dd{margin:0;color:#35475f;font-family:ui-monospace,Consolas,monospace;line-height:1.6;overflow-wrap:anywhere;user-select:text}
 .finding-source{border-top:1px solid #ece5da;padding-top:12px;margin-top:18px;color:#9b8d7b;font-size:10px}
 @media(max-width:750px){.finding-fields{grid-template-columns:1fr;gap:4px}.finding-fields dd{margin-bottom:8px}}
+
+.review-line-context{margin-top:14px;padding:12px;background:#f8fafc;border:1px solid #dce6f2;border-radius:8px}
+.review-line-context p{color:#6d809b;font-size:10px;line-height:1.6;margin:8px 0 12px}
+.review-line-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.review-line-actions button{padding:8px 5px;border:1px solid #d1deef;border-radius:6px;color:#345a8b;background:#fff;font-size:10px;font-weight:700}
+.review-line-actions button:disabled{opacity:.4;cursor:not-allowed}
+.review-line-actions button:not(:disabled):hover{background:#eef5ff}
