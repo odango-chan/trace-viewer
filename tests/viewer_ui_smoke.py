@@ -92,7 +92,8 @@ def main():
             page.set_viewport_size({"width": 1190, "height": 850})
             splitter = page.get_by_role("separator", name="Resize Inspector width")
             assert splitter.is_visible()
-            assert int(splitter.get_attribute("aria-valuemax")) <= 476
+            page.wait_for_function("document.querySelector('.inspector-resizer')?.getAttribute('aria-valuemax') === '476'")
+            assert int(splitter.get_attribute("aria-valuemax")) == 476
             splitter.focus()
             page.keyboard.press("End")
             assert page.locator(".canvas").bounding_box()["width"] >= 477
