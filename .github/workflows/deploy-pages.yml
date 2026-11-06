@@ -7,7 +7,6 @@ on:
       - 'site/**'
       - 'scripts/build.mjs'
       - 'package.json'
-      - 'package-lock.json'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -35,7 +34,7 @@ jobs:
         with:
           node-version: '24'
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
       - name: Build read-only static Viewer
         run: npm run build
       - name: Verify publish-only static files
