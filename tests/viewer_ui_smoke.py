@@ -29,6 +29,17 @@ def main():
             assert page.locator(".run-empty").is_visible()
             assert page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()") == "#0c8e7b"
             checks.append("Studio teal tokens and bottom-left synthetic example picker visible")
+            surfaces = page.evaluate("""() => Object.fromEntries(
+                ['.topbar', '.sidebar', '.canvas', '.inspector', '.turn-card', '.turn-header', '.turn-body']
+                  .map(selector => [selector, getComputedStyle(document.querySelector(selector)).backgroundColor])
+            )""")
+            assert surfaces[".sidebar"] == "rgb(229, 237, 244)"
+            assert surfaces[".canvas"] == "rgb(234, 240, 246)"
+            assert surfaces[".inspector"] == "rgb(241, 245, 249)"
+            assert surfaces[".turn-card"] == "rgb(255, 255, 255)"
+            assert surfaces[".turn-header"] == "rgb(243, 247, 250)"
+            assert len(set(surfaces.values())) >= 5
+            checks.append("Distinct slate explorer, canvas, inspector and white trajectory surfaces")
             page.locator(".turn-card .turn-header").first.click()
             assert page.locator(".trace-event .event-meta").filter(has_text="Model Interaction").count() >= 1
             checks.append("Readable view folds explicit Model Request/Response")
