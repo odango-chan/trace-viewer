@@ -587,7 +587,10 @@ function App() {
               const isActive = section.records.some(record => record.ref === selectedRef)
               const exceptionCount = section.records.filter(isException).length
               const showAll = sidebarShowAll.has(section.id)
-              const shownRecords = showAll ? section.records : section.records.slice(0, 8)
+              const shownRecords = showAll ? section.records : [
+                ...section.records.slice(0, 8),
+                ...section.records.slice(8).filter(record => record.ref === selectedRef),
+              ]
               return (
                 <div key={section.id} className={'sidebar-section ' + (isActive ? 'sidebar-section-active' : '')}>
                   <div className="sidebar-section-row">
