@@ -45,6 +45,65 @@ def main():
             page.get_by_role("menuitemcheckbox", name="Show Inspector").click()
             assert page.locator(".inspector").is_visible()
             checks.append("View menu toggles Inspector without losing selected source")
+            splitter = page.get_by_role("separator", name="Resize Inspector width")
+            inspector = page.locator(".inspector")
+            assert splitter.is_visible()
+            assert splitter.get_attribute("aria-orientation") == "vertical"
+            assert abs(inspector.bounding_box()["width"] - 380) <= 3
+            assert splitter.get_attribute("aria-valuenow") == "380"
+            assert page.locator(".canvas").bounding_box()["width"] >= 480
+
+            divider_box = splitter.bounding_box()
+            drag_x = divider_box["x"] + divider_box["width"] / 2
+            drag_y = divider_box["y"] + divider_box["height"] / 2
+            page.mouse.move(drag_x, drag_y)
+            page.mouse.down()
+            page.mouse.move(drag_x - 100, drag_y, steps=8)
+            page.mouse.up()
+            grown = inspector.bounding_box()["width"]
+            assert grown >= 470 and grown <= 490, grown
+            assert page.locator(".canvas").bounding_box()["width"] >= 480
+            assert abs(int(splitter.get_attribute("aria-valuenow")) - grown) <= 3
+            assert page.evaluate("localStorage.getItem('trace-viewer:inspector-width')") == str(round(grown))
+            page.reload(wait_until="domcontentloaded")
+            page.get_by_text("SYNTHETIC DATA", exact=True).wait_for(timeout=15000)
+            splitter = page.get_by_role("separator", name="Resize Inspector width")
+            inspector = page.locator(".inspector")
+            assert abs(inspector.bounding_box()["width"] - grown) <= 3
+            checks.append("Desktop Inspector divider drags wider and persists on reload")
+
+            splitter.focus()
+            prior = int(splitter.get_attribute("aria-valuenow"))
+            page.keyboard.press("ArrowLeft")
+            assert int(splitter.get_attribute("aria-valuenow")) == prior + 16
+            page.keyboard.press("ArrowRight")
+            assert int(splitter.get_attribute("aria-valuenow")) == prior
+            page.keyboard.press("Home")
+            assert int(splitter.get_attribute("aria-valuenow")) == 300
+            assert abs(inspector.bounding_box()["width"] - 300) <= 3
+            page.keyboard.press("End")
+            assert int(splitter.get_attribute("aria-valuenow")) == 640
+            assert page.locator(".canvas").bounding_box()["width"] >= 480
+            splitter.dblclick()
+            assert splitter.get_attribute("aria-valuenow") == "380"
+            assert page.evaluate("localStorage.getItem('trace-viewer:inspector-width')") == "380"
+            checks.append("Inspector divider supports keyboard bounds and double-click reset")
+
+            page.set_viewport_size({"width": 1190, "height": 850})
+            splitter = page.get_by_role("separator", name="Resize Inspector width")
+            assert splitter.is_visible()
+            assert int(splitter.get_attribute("aria-valuemax")) <= 476
+            splitter.focus()
+            page.keyboard.press("End")
+            assert page.locator(".canvas").bounding_box()["width"] >= 477
+            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+            page.set_viewport_size({"width": 1024, "height": 850})
+            assert not splitter.is_visible()
+            assert page.locator(".inspector").is_visible()
+            page.set_viewport_size({"width": 1600, "height": 1000})
+            splitter = page.get_by_role("separator", name="Resize Inspector width")
+            splitter.dblclick()
+            checks.append("Resizing is bounded at 1190px and hidden for stacked Inspector")
 
             page.get_by_role("button", name="Navigate", exact=True).click()
             nav_menu = page.get_by_role("menu", name="Navigate menu")
@@ -437,6 +496,7 @@ def main():
             page.set_viewport_size({"width": 680, "height": 860})
             assert picker.is_visible()
             assert page.locator(".sidebar-bottom").is_visible()
+            assert not page.get_by_role("separator", name="Resize Inspector width").is_visible()
             assert page.evaluate("getComputedStyle(document.body).overflow") == "visible"
             assert page.locator(".canvas").evaluate("(el) => getComputedStyle(el).overflowY") == "visible"
             assert page.locator(".page-heading").bounding_box()["height"] <= 38
