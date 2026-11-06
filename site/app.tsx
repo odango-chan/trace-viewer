@@ -340,9 +340,9 @@ function App() {
         {isLedger && (
           <span className="ledger-source">
             <span className="ledger-kind">{row.isFolded ? row.label + ' · ' + source.kind : source.kind}</span>
-            <span className="ledger-authority">{source.sourceAuthority}{source.stage ? ' · ' + source.stage : ''}</span>
+            <span className="ledger-authority" title={source.sourceAuthority}>{source.sourceAuthority}{source.stage ? ' · ' + source.stage : ''}</span>
             <span className="ledger-ref" title={source.ref}>{source.ref}</span>
-            {source.causalRefs.length > 0 && <span className="ledger-ref-count">{source.causalRefs.length} declared causal ref{source.causalRefs.length === 1 ? '' : 's'}</span>}
+            {(source.causalRefs?.length ?? 0) > 0 && <span className="ledger-ref-count">{source.causalRefs.length} declared causal ref{source.causalRefs.length === 1 ? '' : 's'}</span>}
           </span>
         )}
         <span className="event-side">
