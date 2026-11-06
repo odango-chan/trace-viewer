@@ -83,6 +83,33 @@ export function reviewFileNeighbors(run, record) {
   return {previous:at(selected.sourceLine-1),next:at(selected.sourceLine+1)}
 }
 
+/**
+ * Read-time navigation within ONE presentation section.
+ * The source list order is not Owner sequence, causality or execution time.
+ * No cross-section/Owner adjacency is invented.
+ */
+export function recordReadingContext(run, record) {
+  const empty = {sectionTitle:null, position:0, total:0, previous:null, next:null}
+  if (!record) return empty
+  validatePresentationRun(run)
+  for (const section of run.sections) {
+    const index = section.records.findIndex(item=>item.ref===record.ref)
+    if (index<0) continue
+    const source = section.records[index]
+    if (source.sourceAuthority!==record.sourceAuthority ||
+        source.ownerSequence!==record.ownerSequence ||
+        source.sourceLine!==record.sourceLine) return empty
+    return {
+      sectionTitle:section.title,
+      position:index+1,
+      total:section.records.length,
+      previous:index>0 ? section.records[index-1] : null,
+      next:index+1<section.records.length ? section.records[index+1] : null,
+    }
+  }
+  return empty
+}
+
 export function runSummary(run) {
   const records = allRecords(run)
   const statuses = records.filter(item => EXCEPTION_STATUSES.has(item.status))
