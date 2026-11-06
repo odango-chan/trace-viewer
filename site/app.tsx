@@ -464,12 +464,12 @@ function App() {
                   ['model', 'Model only'], ['raw', 'Raw records'],
                 ] as [ViewMode, string][]).map(([mode, label]) => (
                   <button key={mode} type="button" role="menuitemradio" aria-checked={viewMode === mode}
-                    onClick={() => applyViewMode(mode)}><span>{label}</span><span className="menu-check">{viewMode === mode ? '✓' : ''}</span></button>
+                    onClick={() => applyViewMode(mode)}><span>{label}</span><span className="menu-check" aria-hidden="true">{viewMode === mode ? '✓' : ''}</span></button>
                 ))}
                 <div className="app-menu-separator" />
                 <button type="button" role="menuitemcheckbox" aria-checked={inspectorVisible}
                   onClick={() => runMenuAction(() => setInspectorVisible(value => !value))}>
-                  <span>Show Inspector</span><span className="menu-check">{inspectorVisible ? '✓' : ''}</span>
+                  <span>Show Inspector</span><span className="menu-check" aria-hidden="true">{inspectorVisible ? '✓' : ''}</span>
                 </button>
               </div>
             )}
