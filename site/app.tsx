@@ -289,6 +289,7 @@ function App() {
     const record = findPrimaryUnknown(run) as TraceRecord | null
     if (!record) return
     if (record.ref === selectedRef) {
+      hideLocalDetail()
       setViewMode('raw')
       const section = run.sections.find(part=>part.records.some(item=>item.ref===record.ref))
       if (section) setExpanded(previous=>new Set(previous).add(section.id))
