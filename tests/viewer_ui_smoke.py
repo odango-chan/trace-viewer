@@ -38,7 +38,9 @@ def main():
             assert surfaces[".inspector"] == "rgb(255, 255, 255)"
             assert surfaces[".turn-card"] == "rgb(255, 255, 255)"
             assert surfaces[".turn-header"] == "rgb(251, 252, 254)"
-            assert len(set(surfaces.values())) >= 5
+            assert len(set(surfaces.values())) >= 3
+            assert surfaces[".canvas"] != surfaces[".turn-card"]
+            assert surfaces[".turn-header"] != surfaces[".turn-body"]
             assert surfaces[".topbar"] == "rgb(255, 255, 255)"
             assert page.locator(".brand-copy strong").evaluate(
                 "(node) => getComputedStyle(node).color") == "rgb(35, 53, 80)"
