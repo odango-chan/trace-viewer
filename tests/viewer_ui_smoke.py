@@ -21,6 +21,14 @@ def main():
             page.goto(URL, wait_until="domcontentloaded", timeout=30000)
             page.get_by_text("SYNTHETIC DATA", exact=True).wait_for(timeout=20000)
             checks.append("App loads and synthetic provenance visible")
+            picker = page.get_by_role("combobox", name="Choose demo example")
+            assert picker.is_visible()
+            assert picker.input_value() == "synthetic-agent-recovery"
+            assert picker.locator("option").count() == 5
+            assert page.locator(".run-list .run-option").count() == 0
+            assert page.locator(".run-empty").is_visible()
+            assert page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()") == "#0c8e7b"
+            checks.append("Studio teal tokens and bottom-left synthetic example picker visible")
             page.locator(".turn-card .turn-header").first.click()
             assert page.locator(".trace-event .event-meta").filter(has_text="Model Interaction").count() >= 1
             checks.append("Readable view folds explicit Model Request/Response")
@@ -34,7 +42,7 @@ def main():
             assert '"sourceKind": "SYNTHETIC"' in page.locator(".source-preview").inner_text()
             checks.append("Raw records and Inspector source refs preserve original identity")
 
-            page.get_by_role("button", name="Delivery failure · Host RESULT_UNKNOWN").click()
+            page.get_by_role("combobox", name="Choose demo example").select_option(label="Delivery failure · Host RESULT_UNKNOWN")
             page.get_by_role("button", name="Focus unknown").click()
             assert page.locator(".inspector-title").inner_text() == "Host delivery interrupted"
             assert "RESULT_UNKNOWN" in page.locator(".inspector").inner_text()
@@ -48,7 +56,7 @@ def main():
             assert page.locator(".timeline .trace-event.selected").count() == 1
             checks.append("Locate selected reveals collapsed source and selects its exact raw row")
 
-            page.get_by_role("button", name="Parallel reads · out-of-order ToolResults").click()
+            page.get_by_role("combobox", name="Choose demo example").select_option(label="Parallel reads · out-of-order ToolResults")
             page.locator(".turn-card .turn-header").first.click()
             assert page.locator(".trace-event .event-meta").filter(has_text="Tool Interaction").count() == 2
             page.get_by_text("query_session (A)", exact=True).click()
@@ -57,7 +65,7 @@ def main():
             assert "synthetic:parallel-result-a" in page.locator(".source-preview").inner_text()
             checks.append("Two out-of-order ToolResults pair by exact call ref")
 
-            page.get_by_role("button", name="Frozen Procedure · without a model call").click()
+            page.get_by_role("combobox", name="Choose demo example").select_option(label="Frozen Procedure · without a model call")
             page.get_by_role("button", name="Model only", exact=True).click()
             assert page.locator(".timeline .empty-state").count() == 1
             page.get_by_role("button", name="All owners", exact=True).click()
@@ -151,7 +159,7 @@ def main():
             page.get_by_text("smf.create_context", exact=True).wait_for(timeout=10000)
             assert "smf.create_context" in page.locator(".local-detail").inner_text()
             assert "synthetic-hidden-binding" not in page.locator(".app-shell").inner_text()
-            page.get_by_role("button", name="Frozen Procedure · without a model call").click()
+            page.get_by_role("combobox", name="Choose demo example").select_option(label="Frozen Procedure · without a model call")
             assert page.locator(".local-detail").count() == 0
             checks.append("Changing selected record or Run clears local diagnostic preview")
 
@@ -189,12 +197,19 @@ def main():
             assert page.locator(".run-list .run-option").count() == before_runs
             checks.append("Independent local finding is readable without fabricating owner events or Run linkage")
 
-            page.get_by_role("button", name="Delivery failure · Host RESULT_UNKNOWN").click()
+            page.get_by_role("combobox", name="Choose demo example").select_option(label="Delivery failure · Host RESULT_UNKNOWN")
             assert report.count() == 0
             page.get_by_role("button", name="View standalone finding").click()
             report.wait_for(timeout=10000)
             assert "NOT linked to the selected Run" in report.inner_text()
             checks.append("Switching Run hides unrelated report; explicit re-open keeps source warning")
+
+            page.set_viewport_size({"width": 680, "height": 860})
+            assert picker.is_visible()
+            assert page.locator(".sidebar-bottom").is_visible()
+            assert picker.locator("option").count() == 5
+            page.set_viewport_size({"width": 1600, "height": 1000})
+            checks.append("Built-in example picker remains accessible on narrow screens")
 
             page.screenshot(path=str(OUT / "trace-viewer-console-parity.png"), full_page=True)
             assert not errors, f"Browser JavaScript errors: {errors}"
