@@ -151,6 +151,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{
 }
 .event-glyph{background:#e8f3f0;color:#138477}
 .trace-event.selected .event-glyph{background:#caebdf;color:#087b6d}
+/* Preserve warning glyph semantics even after the shared Studio accent override. */
+.event-glyph.glyph-warning,.trace-event.selected .event-glyph.glyph-warning{background:#fff0de;color:#ba7e33}
 .reading-context{background:#f8fcfa;border-color:#d5e9df}
 .reading-context-top button,.reading-actions button,.review-line-actions button{
   border-color:#c5e0d8;color:#137e70
