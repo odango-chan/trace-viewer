@@ -541,3 +541,85 @@ html,body,.app-shell,.workbench{background:var(--bg)}
   .ledger-source .ledger-authority{max-width:100%}
   .ledger-source .ledger-ref{max-width:100%}
 }
+
+/* Readable ledger: one physical line per event at workbench widths.
+   Full strings stay in the Inspector and on hover; ellipsis is visual only. */
+.ledger-head,.ledger-event{
+  grid-template-columns:22px minmax(0,2.1fr) minmax(0,1.1fr) minmax(0,1.4fr) minmax(110px,.8fr);
+  gap:7px;
+}
+.ledger-event{
+  padding:5px 9px;min-height:34px;
+}
+.ledger-event .event-glyph{grid-column:1}
+.ledger-event-main{
+  grid-column:2;display:flex;align-items:baseline;gap:8px;
+  min-width:0;overflow:hidden;white-space:nowrap;text-align:left;
+}
+.ledger-event-main strong{
+  flex:0 1 auto;max-width:66%;min-width:0;
+  font-size:11px;font-weight:700;color:#263f59;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-event-main small{
+  flex:1 1 auto;min-width:0;
+  font-size:10px;color:#71869a;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-event>.ledger-kind{
+  grid-column:3;min-width:0;text-align:left;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:9px;font-weight:700;color:#1d665f;
+}
+.ledger-event>.ledger-source{
+  grid-column:4;display:flex;flex-direction:row;
+  align-items:center;gap:5px;min-width:0;white-space:nowrap;
+}
+.ledger-event .ledger-authority{
+  flex:0 1 auto;min-width:0;max-width:45%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-event .ledger-ref{
+  flex:1 1 auto;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-event .ledger-ref-count{
+  flex:none;font-size:9px;color:#577d78;white-space:nowrap;
+}
+.ledger-event>.event-side{
+  grid-column:5;display:flex;flex-direction:row;
+  gap:6px;align-items:center;justify-content:flex-end;
+  min-width:0;white-space:nowrap;
+}
+.ledger-event .event-side small{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-size:9px;max-width:100%;
+}
+.ledger-head{padding:6px 9px}
+@media (max-width:960px){
+  .ledger-event{
+    grid-template-columns:22px minmax(0,2.1fr) minmax(0,1.1fr) minmax(0,1.4fr) minmax(100px,.8fr);
+    grid-template-areas:none;column-gap:6px;row-gap:0;
+  }
+  .ledger-event .event-glyph,
+  .ledger-event .ledger-event-main,
+  .ledger-event .ledger-kind,
+  .ledger-event .ledger-source,
+  .ledger-event .event-side{grid-area:auto}
+  .ledger-event>.ledger-source{
+    display:flex;flex-direction:row;flex-wrap:nowrap;gap:4px;
+  }
+}
+@media (max-width:700px){
+  .ledger-event{
+    grid-template-columns:22px minmax(0,1fr) minmax(95px,auto);
+    grid-template-areas:"glyph detail side" ". provenance side";
+    column-gap:8px;row-gap:3px;min-height:0;
+  }
+  .ledger-event .event-glyph{grid-area:glyph}
+  .ledger-event .ledger-event-main{grid-area:detail}
+  .ledger-event .ledger-kind{grid-area:provenance;display:none}
+  .ledger-event .ledger-source{grid-area:provenance;min-width:0}
+  .ledger-event .event-side{grid-area:side}
+  .ledger-event-main strong{max-width:75%}
+}
