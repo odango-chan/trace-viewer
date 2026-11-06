@@ -882,3 +882,79 @@ html,body,.app-shell,.workbench{background:var(--bg)}
   .page-heading h1{max-width:54%;font-size:14px}
   .page-heading p{font-size:10px}
 }
+
+/* Viewport scroll ownership: application chrome stays visible while panes scroll.
+   The old min-height workbench grew the document beyond 100vh and its sticky
+   sidebar/Inspector scrolled independently from the top bar and status bar. */
+@media (min-width:751px){
+  html,body,#root{
+    height:100%;min-height:0;overflow:hidden;
+  }
+  .app-shell{
+    display:flex;flex-direction:column;
+    height:100vh;height:100dvh;min-height:0;
+    overflow:hidden;
+  }
+  .topbar{flex:0 0 54px}
+  .file-inputs{flex:none}
+  .workbench{
+    flex:1 1 0;
+    height:auto;min-height:0;min-width:0;
+    overflow:hidden;
+    grid-template-rows:minmax(0,1fr);
+  }
+  .sidebar{
+    position:relative;top:auto;
+    height:auto;max-height:none;min-height:0;
+    align-self:stretch;overflow:hidden;
+    overscroll-behavior:contain;
+  }
+  .sidebar .section-index{min-height:0;overflow-y:auto}
+  .canvas{
+    height:100%;min-height:0;min-width:0;
+    overflow-x:hidden;overflow-y:auto;
+    overscroll-behavior-y:contain;
+    scrollbar-gutter:stable;
+  }
+  .inspector{
+    position:relative;top:auto;
+    height:100%;max-height:none;min-height:0;
+    align-self:stretch;overflow-y:auto;
+    overscroll-behavior-y:contain;
+    scrollbar-gutter:stable;
+  }
+  .app-statusbar{
+    position:relative;bottom:auto;
+    flex:0 0 auto;
+  }
+}
+@media (min-width:751px) and (max-width:1150px){
+  .workbench{
+    grid-template-rows:minmax(0,1fr) minmax(185px,.65fr);
+  }
+  .sidebar{grid-column:1;grid-row:1 / span 2}
+  .canvas{grid-column:2;grid-row:1}
+  .inspector{
+    grid-column:2;grid-row:2;min-height:0;
+  }
+  .workbench.inspector-hidden{
+    grid-template-rows:minmax(0,1fr);
+  }
+  .workbench.inspector-hidden .sidebar{grid-row:1}
+  .workbench.inspector-hidden .canvas{grid-row:1}
+}
+@media (max-width:750px){
+  html,body,#root{height:auto;min-height:100%;overflow:visible}
+  .app-shell{
+    display:block;height:auto;min-height:100vh;min-height:100dvh;
+    overflow:visible;
+  }
+  .workbench,.workbench.inspector-hidden{
+    display:block;height:auto;min-height:0;overflow:visible;
+  }
+  .sidebar,.canvas,.inspector{
+    position:static;top:auto;height:auto;max-height:none;
+    min-height:0;overflow:visible;overscroll-behavior:auto;
+  }
+  .app-statusbar{position:static;bottom:auto}
+}
