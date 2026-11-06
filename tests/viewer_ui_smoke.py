@@ -41,6 +41,11 @@ def main():
             page.get_by_role("button", name="All", exact=True).click()
             assert "Runtime SUCCEEDED" in page.locator(".timeline").inner_text()
             checks.append("Host RESULT_UNKNOWN distinct from Runtime SUCCEEDED")
+            page.get_by_role("button", name="Collapse normal").click()
+            page.get_by_role("button", name="Locate selected").click()
+            assert page.get_by_role("button", name="Raw records", exact=True).get_attribute("aria-pressed") == "true"
+            assert page.locator(".timeline .trace-event.selected").count() == 1
+            checks.append("Locate selected reveals collapsed source and selects its exact raw row")
 
             page.get_by_role("button", name="Parallel reads · out-of-order ToolResults").click()
             page.locator(".turn-card .turn-header").first.click()
@@ -125,6 +130,18 @@ def main():
             assert '"sourceLine": 1' in page.locator(".source-preview").inner_text()
             assert "does not establish causality" in page.locator(".review-line-context").inner_text()
             checks.append("Source Inspector traverses physical file neighbors, never inferred causal refs")
+
+            page.get_by_role("button", name="Summary", exact=True).click()
+            context = page.get_by_role("region", name="Reading context")
+            assert "1 / 3 in section" in context.inner_text()
+            assert "not causal" in context.inner_text()
+            assert page.get_by_role("button", name="Previous record", exact=True).is_disabled()
+            page.get_by_role("button", name="Next record", exact=True).click()
+            assert page.locator(".inspector-title").inner_text() == "CALL_RESULT"
+            page.get_by_role("button", name="Back to prior source", exact=True).click()
+            assert page.locator(".inspector-title").inner_text() == "PREDICATE_EVALUATED"
+            assert page.get_by_role("button", name="Back to prior source", exact=True).is_disabled()
+            checks.append("Reading context navigates one section and returns to prior source")
 
             page.get_by_role("button", name="All", exact=True).click()
             page.locator(".timeline .trace-event").filter(has_text="CALL_RESULT").first.click()
