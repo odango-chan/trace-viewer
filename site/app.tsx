@@ -413,6 +413,17 @@ function App() {
   function toggleMenu(menu: MainMenu) {
     setOpenMenu(previous => previous === menu ? null : menu)
   }
+  function menuKeyboardNavigation(event: React.KeyboardEvent<HTMLElement>) {
+    if (!openMenu || !['ArrowDown', 'ArrowUp'].includes(event.key)) return
+    const buttons = Array.from(menuBarRef.current?.querySelectorAll<HTMLButtonElement>('[role="menu"] button:not(:disabled)') ?? [])
+    if (!buttons.length) return
+    const index = buttons.indexOf(document.activeElement as HTMLButtonElement)
+    const next = event.key === 'ArrowDown'
+      ? (index + 1) % buttons.length
+      : (index <= 0 ? buttons.length - 1 : index - 1)
+    buttons[next].focus()
+    event.preventDefault()
+  }
   function toggleSection(id: string) {
     setExpanded(previous => {
       const next = new Set(previous)
@@ -430,7 +441,7 @@ function App() {
           <strong>Trace Viewer</strong>
           <small>ConnectionAgent / Developer Tools</small>
         </div>
-        <nav className="app-menus" aria-label="Application menus" ref={menuBarRef}>
+        <nav className="app-menus" aria-label="Application menus" ref={menuBarRef} onKeyDown={menuKeyboardNavigation}>
           <div className="app-menu">
             <button type="button" className={'app-menu-trigger ' + (openMenu === 'file' ? 'active' : '')}
               aria-haspopup="menu" aria-expanded={openMenu === 'file'} onClick={() => toggleMenu('file')}>File</button>
@@ -846,6 +857,44 @@ function App() {
           <div className="inspector-bottom">SOURCE-FIRST · NO EXECUTION CONTROLS</div>
         </aside>
       </div>
+      <footer className="app-statusbar" aria-label="Workbench status">
+        <span className="statusbar-source"><span className="statusbar-dot" />{run.sourceKind === 'SYNTHETIC' ? 'SYNTHETIC EXAMPLE' : run.sourceKind === 'NATIVE_LOCAL' ? 'LOCAL NATIVE · UNVERIFIED' : 'ARCHIVED DIAGNOSTIC'}</span>
+        <span className="statusbar-privacy">READ ONLY · BROWSER LOCAL</span>
+        <span className="statusbar-selected" title={activeRecord ? activeRecord.ref : 'No selected record'}>
+          {activeRecord ? activeRecord.kind + ' · ' + activeRecord.sourceAuthority + ' · ' + recordPosition(activeRecord) : 'NO SOURCE SELECTED'}
+        </span>
+        <span className="statusbar-count">{summary.events} records · {summary.exceptions} flagged</span>
+      </footer>
+      {helpTopic && (
+        <div className="help-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setHelpTopic(null) }}>
+          <section className="help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-dialog-title">
+            <header>
+              <h2 id="help-dialog-title">{helpTopic === 'quick' ? 'Quick start' : helpTopic === 'semantics' ? 'Trace semantics' : 'About Trace Viewer'}</h2>
+              <button type="button" aria-label="Close help" onClick={() => setHelpTopic(null)} autoFocus>×</button>
+            </header>
+            {helpTopic === 'quick' && (
+              <div className="help-content">
+                <p>Use <strong>File</strong> to open a local TraceStore v2 folder, archived diagnostic JSONL, or a standalone diagnosis JSON. Files remain in your browser; this Demo has no server upload.</p>
+                <p>Pick a local Run in the Explorer or a synthetic example at the bottom. Use <strong>View</strong> to switch between the compact Readable ledger, separated owner lanes, Model-only records, and raw source rows.</p>
+                <p>Select any record to inspect provenance, source identity, and explicitly declared links. Use <strong>Navigate</strong> to find unknown outcomes and jump to the exact source.</p>
+              </div>
+            )}
+            {helpTopic === 'semantics' && (
+              <div className="help-content">
+                <p><strong>Source-first, not inferred causality.</strong> Rows can be projected or folded for reading, but only explicit source references establish declared links. Display order never implies cross-owner execution order.</p>
+                <p>Native local sources are not Owner-certified by this browser; archived JSONL file lines are not Owner-local sequences. Synthetic examples are illustrations only, not execution evidence.</p>
+                <p>Materials, private payloads and raw diagnostic bodies are not displayed automatically. Use the Inspector to see the supported source and evidence subset.</p>
+              </div>
+            )}
+            {helpTopic === 'about' && (
+              <div className="help-content">
+                <p>Trace Viewer is a read-only ConnectionAgent execution-trace inspection Demo using React, TypeScript and a static Web build.</p>
+                <p>It currently works with browser-local imports and built-in synthetic examples. A local server or native desktop shell is not part of this version.</p>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   )
 }
