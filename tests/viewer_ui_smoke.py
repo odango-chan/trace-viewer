@@ -21,6 +21,49 @@ def main():
             page.goto(URL, wait_until="domcontentloaded", timeout=30000)
             page.get_by_text("SYNTHETIC DATA", exact=True).wait_for(timeout=20000)
             checks.append("App loads and synthetic provenance visible")
+            assert page.get_by_role("navigation", name="Application menus").is_visible()
+            assert page.get_by_role("contentinfo", name="Workbench status").is_visible()
+            assert "SYNTHETIC EXAMPLE" in page.locator(".app-statusbar").inner_text()
+            assert page.locator(".import-block").count() == 0
+            file_button = page.get_by_role("button", name="File", exact=True)
+            file_button.click()
+            file_menu = page.get_by_role("menu", name="File menu")
+            assert file_menu.get_by_role("menuitem").count() == 3
+            with page.expect_file_chooser(timeout=10000) as chooser:
+                file_menu.get_by_role("menuitem", name="Open TraceStore v2 folder").click()
+            assert chooser.value.element.get_attribute("id") == "native-directory"
+            assert not file_menu.is_visible()
+            checks.append("File menu opens browser-local folder picker without sidebar import form")
+
+            page.get_by_role("button", name="View", exact=True).click()
+            view_menu = page.get_by_role("menu", name="View menu")
+            assert view_menu.get_by_role("menuitemradio", name="Readable ledger").get_attribute("aria-checked") == "true"
+            view_menu.get_by_role("menuitemcheckbox", name="Show Inspector").click()
+            assert not page.locator(".inspector").is_visible()
+            assert page.locator(".workbench.inspector-hidden").count() == 1
+            page.get_by_role("button", name="View", exact=True).click()
+            page.get_by_role("menuitemcheckbox", name="Show Inspector").click()
+            assert page.locator(".inspector").is_visible()
+            checks.append("View menu toggles Inspector without losing selected source")
+
+            page.get_by_role("button", name="Navigate", exact=True).click()
+            nav_menu = page.get_by_role("menu", name="Navigate menu")
+            nav_menu.get_by_role("menuitem", name="Expand all").click()
+            assert page.locator(".timeline .trace-event").count() >= 2
+            page.get_by_role("button", name="Navigate", exact=True).click()
+            page.get_by_role("menuitem", name="Collapse all sections").click()
+            assert page.locator(".timeline .trace-event").count() == 0
+            checks.append("Navigate menu expands and collapses all sections")
+
+            page.get_by_role("button", name="Help", exact=True).click()
+            page.get_by_role("menuitem", name="Trace semantics").click()
+            assert page.get_by_role("dialog", name="Trace semantics").is_visible()
+            assert "not inferred causality" in page.get_by_role("dialog").inner_text().lower()
+            page.keyboard.press("Escape")
+            assert page.get_by_role("dialog").count() == 0
+            checks.append("Help explains source semantics and closes with Escape")
+            page.reload(wait_until="domcontentloaded")
+            page.get_by_text("SYNTHETIC DATA", exact=True).wait_for(timeout=15000)
             picker = page.get_by_role("combobox", name="Choose demo example")
             assert picker.is_visible()
             assert picker.input_value() == "synthetic-agent-recovery"
@@ -102,7 +145,8 @@ def main():
             page.get_by_role("button", name="Readable", exact=True).click()
             assert "Runtime SUCCEEDED" in page.locator(".timeline").inner_text()
             checks.append("Host RESULT_UNKNOWN distinct from Runtime SUCCEEDED")
-            page.get_by_role("button", name="Collapse normal").click()
+            page.get_by_role("button", name="Navigate", exact=True).click()
+            page.get_by_role("menuitem", name="Collapse all sections").click()
             page.get_by_role("button", name="Locate selected").click()
             assert page.get_by_role("button", name="Raw records", exact=True).get_attribute("aria-pressed") == "true"
             assert page.locator(".timeline .trace-event.selected").count() == 1
@@ -259,6 +303,8 @@ def main():
             page.set_viewport_size({"width": 680, "height": 860})
             assert picker.is_visible()
             assert page.locator(".sidebar-bottom").is_visible()
+            assert page.get_by_role("button", name="File", exact=True).is_visible()
+            assert page.get_by_role("contentinfo", name="Workbench status").is_visible()
             assert picker.locator("option").count() == 5
             page.set_viewport_size({"width": 1600, "height": 1000})
             checks.append("Built-in example picker remains accessible on narrow screens")
