@@ -10,6 +10,12 @@
 
 真实 P8-D4 attempt 2 JSONL（106 行）与独立 attempt 1 诊断报告的安全投影，均已在授权私有 Chromium 环境验收；公开合成浏览器交互 **14/14 PASS**。只有诊断来源中的物理行邻接可导航，**跨 Owner 因果关联、真实原生 Run 与材料闭包仍未验证**。详见 [V1 归档实验](docs/experiments/real-p8d4-review-import.md) 与 [PR #2](https://github.com/odango-chan/trace-viewer/pull/2)。
 
+## 界面选型与示例体验
+
+Viewer 采用 React 19 + TypeScript + esbuild 的浏览器只读架构，静态部署于 GitHub Pages。与 Skill Studio 共用浅色视觉语言（`#f5f7fb` 背景、`#0c8e7b` 青绿交互强调色），但不引入 Studio 专用的 React Flow/ELK/Monaco：这里阅读的是真实来源记录，而非编辑流程图。
+
+默认内置四个**合成**示例，通过左侧栏底部 **Built-in examples** 下拉框切换。左侧上方 **Local runs** 仅列出用户在浏览器中手动导入的轨迹。真实诊断、材料或 Owner 证据不会作为公开示例打包上传。
+
 ## Viewer 当前主线与 Trace 规范状态
 
 **当前优先工作是 Viewer 的真实来源阅读、异常定位和 Inspector 下钻，而不是继续扩大 Trace 规范工作。** 先复用已实现的 TraceStore v2 和真实诊断 JSONL 本地导入，用真实故障故事验收 Q1–Q6；不要求等统一机器 Schema 冻结才改善 Viewer。
