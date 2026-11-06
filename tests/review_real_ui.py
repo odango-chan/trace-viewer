@@ -85,6 +85,14 @@ def main():
             page.get_by_text("[NOT PROVIDED IN SOURCE]", exact=True).wait_for(timeout=10000)
             checks.append("Real null Predicate reason is labeled absent, not redacted")
 
+            # Source-only locality is not cross-Owner causality or an event sequence.
+            page.get_by_role("button", name="Source", exact=True).click()
+            assert '"sourceLine": ' + str(no_reason) in page.locator(".source-preview").inner_text()
+            page.get_by_role("button", name="Next line · " + str(no_reason+1), exact=True).click()
+            assert '"sourceLine": ' + str(no_reason+1) in page.locator(".source-preview").inner_text()
+            assert "does not establish causality" in page.locator(".review-line-context").inner_text()
+            checks.append("Real source adjacent line navigation preserves file-only provenance")
+
             # The separate, real attempt-1 diagnosis must not become an event or join.
             baseline = page.locator(".run-list .run-option").count()
             page.locator("#review-finding-json").set_input_files(str(FINDING))
