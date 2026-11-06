@@ -91,6 +91,21 @@ function kindSymbol(kind: string): string {
   return '○'
 }
 
+const DEFAULT_INSPECTOR_WIDTH = 380
+const MIN_INSPECTOR_WIDTH = 300
+const MAX_INSPECTOR_WIDTH = 640
+const MIN_TRACE_WIDTH = 480
+
+function readInspectorWidth(): number {
+  try {
+    const saved = Number(window.localStorage.getItem('trace-viewer:inspector-width'))
+    if (Number.isInteger(saved) && saved >= MIN_INSPECTOR_WIDTH && saved <= MAX_INSPECTOR_WIDTH) return saved
+  } catch {
+    // Private browsing or browser policy may disable local storage.
+  }
+  return DEFAULT_INSPECTOR_WIDTH
+}
+
 function App() {
   const [nativeRun, setNativeRun] = useState<ExampleRun | null>(null)
   const [reviewRun, setReviewRun] = useState<ExampleRun | null>(null)
@@ -101,8 +116,13 @@ function App() {
   const [findingError, setFindingError] = useState<string | null>(null)
   const [openMenu, setOpenMenu] = useState<MainMenu | null>(null)
   const [inspectorVisible, setInspectorVisible] = useState(true)
+  const [inspectorWidth, setInspectorWidth] = useState(readInspectorWidth)
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth)
+  const [inspectorResizing, setInspectorResizing] = useState(false)
   const [helpTopic, setHelpTopic] = useState<HelpTopic | null>(null)
   const menuBarRef = useRef<HTMLElement | null>(null)
+  const workbenchRef = useRef<HTMLDivElement | null>(null)
+  const inspectorPointer = useRef<number | null>(null)
   const directoryRef = useRef<HTMLInputElement | null>(null)
   const reviewInputRef = useRef<HTMLInputElement | null>(null)
   const findingInputRef = useRef<HTMLInputElement | null>(null)
@@ -178,6 +198,58 @@ function App() {
   const [runId, setRunId] = useState(syntheticRuns[0].id)
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(syntheticRuns[0])))
   const [selectedRef, setSelectedRef] = useState<string>(syntheticRuns[0].sections[1].records[2].ref)
+  // At compact widths the Inspector moves below the Trace; the vertical
+  // splitter only exists on three-column desktop layouts.
+  const maxInspectorWidth = Math.max(MIN_INSPECTOR_WIDTH,
+    Math.min(MAX_INSPECTOR_WIDTH, viewportWidth - 234 - MIN_TRACE_WIDTH))
+  const effectiveInspectorWidth = Math.min(inspectorWidth, maxInspectorWidth)
+  function resizeInspector(next: number) {
+    const bounded = Math.max(MIN_INSPECTOR_WIDTH, Math.min(maxInspectorWidth, Math.round(next)))
+    setInspectorWidth(bounded)
+    try {
+      window.localStorage.setItem('trace-viewer:inspector-width', String(bounded))
+    } catch {
+      // Dragging remains functional without persistence.
+    }
+  }
+  function onInspectorPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.button !== 0) return
+    event.preventDefault()
+    inspectorPointer.current = event.pointerId
+    event.currentTarget.setPointerCapture(event.pointerId)
+    setInspectorResizing(true)
+  }
+  function onInspectorPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (inspectorPointer.current !== event.pointerId) return
+    const edge = workbenchRef.current?.getBoundingClientRect().right
+    if (edge !== undefined) resizeInspector(edge - event.clientX)
+  }
+  function finishInspectorResize(event: React.PointerEvent<HTMLDivElement>) {
+    if (inspectorPointer.current !== event.pointerId) return
+    onInspectorPointerMove(event)
+    inspectorPointer.current = null
+    setInspectorResizing(false)
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }
+  function onInspectorResizeKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    let next: number
+    switch (event.key) {
+      case 'ArrowLeft': next = effectiveInspectorWidth + 16; break
+      case 'ArrowRight': next = effectiveInspectorWidth - 16; break
+      case 'Home': next = MIN_INSPECTOR_WIDTH; break
+      case 'End': next = maxInspectorWidth; break
+      default: return
+    }
+    event.preventDefault()
+    resizeInspector(next)
+  }
+  useEffect(() => {
+    const onResize = () => setViewportWidth(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
   useEffect(() => {
     if (directoryRef.current) directoryRef.current.webkitdirectory = true
   }, [])
@@ -548,7 +620,9 @@ function App() {
           aria-label="Import standalone diagnosis JSON" onChange={importFinding} />
       </div>
 
-      <div className={'workbench' + (inspectorVisible ? '' : ' inspector-hidden')}>
+      <div ref={workbenchRef}
+        className={'workbench' + (inspectorVisible ? '' : ' inspector-hidden') + (inspectorResizing ? ' resizing-inspector' : '')}
+        style={{'--inspector-width': effectiveInspectorWidth + 'px'} as React.CSSProperties}>
         <aside className="sidebar" aria-label="Run explorer">
           <div className="sidebar-heading">EXPLORER</div>
           <div className="sidebar-caption">LOCAL RUNS <span>{importedRuns.length}</span></div>
@@ -788,7 +862,22 @@ function App() {
             : 'Synthetic-only sample. Select a local TraceStore v2 folder or archived diagnostic JSONL.'}</div>
         </main>
 
-        <aside className="inspector" aria-label="Source record inspector">
+        {inspectorVisible && (
+          <div className="inspector-resizer" role="separator" tabIndex={0}
+            aria-label="Resize Inspector width" aria-controls="source-record-inspector"
+            aria-orientation="vertical" aria-valuemin={MIN_INSPECTOR_WIDTH}
+            aria-valuemax={maxInspectorWidth} aria-valuenow={effectiveInspectorWidth}
+            aria-valuetext={effectiveInspectorWidth + ' pixels'}
+            title="Drag to resize Inspector · Arrow keys adjust · Double-click resets"
+            onPointerDown={onInspectorPointerDown}
+            onPointerMove={onInspectorPointerMove}
+            onPointerUp={finishInspectorResize}
+            onPointerCancel={finishInspectorResize}
+            onLostPointerCapture={() => { inspectorPointer.current = null; setInspectorResizing(false) }}
+            onKeyDown={onInspectorResizeKeyDown}
+            onDoubleClick={() => resizeInspector(DEFAULT_INSPECTOR_WIDTH)} />
+        )}
+        <aside id="source-record-inspector" className="inspector" aria-label="Source record inspector">
           <div className="inspector-top">
             <span className="eyebrow">INSPECTOR</span>
             <span className="inspector-icon">ⓘ</span>
