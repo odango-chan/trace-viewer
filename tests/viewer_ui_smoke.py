@@ -33,19 +33,21 @@ def main():
                 ['.topbar', '.sidebar', '.canvas', '.inspector', '.turn-card', '.turn-header', '.turn-body']
                   .map(selector => [selector, getComputedStyle(document.querySelector(selector)).backgroundColor])
             )""")
-            assert surfaces[".sidebar"] == "rgb(44, 66, 86)"
-            assert surfaces[".canvas"] == "rgb(208, 219, 229)"
-            assert surfaces[".inspector"] == "rgb(203, 216, 227)"
-            assert surfaces[".turn-card"] == "rgb(236, 242, 247)"
-            assert surfaces[".turn-header"] == "rgb(213, 225, 235)"
-            assert len(set(surfaces.values())) >= 5
-            assert surfaces[".topbar"] == "rgb(36, 57, 76)"
+            assert surfaces[".sidebar"] == "rgb(255, 255, 255)"
+            assert surfaces[".canvas"] == "rgb(245, 247, 251)"
+            assert surfaces[".inspector"] == "rgb(255, 255, 255)"
+            assert surfaces[".turn-card"] == "rgb(255, 255, 255)"
+            assert surfaces[".turn-header"] == "rgb(251, 252, 254)"
+            assert len(set(surfaces.values())) >= 3
+            assert surfaces[".canvas"] != surfaces[".turn-card"]
+            assert surfaces[".turn-header"] != surfaces[".turn-body"]
+            assert surfaces[".topbar"] == "rgb(255, 255, 255)"
             assert page.locator(".brand-copy strong").evaluate(
-                "(node) => getComputedStyle(node).color") == "rgb(240, 247, 250)"
+                "(node) => getComputedStyle(node).color") == "rgb(35, 53, 80)"
             assert page.locator(".sidebar-caption").first.evaluate(
-                "(node) => getComputedStyle(node).color") == "rgb(196, 217, 230)"
+                "(node) => getComputedStyle(node).color") == "rgb(116, 139, 165)"
             assert surfaces[".turn-body"] == surfaces[".turn-card"]
-            checks.append("Dark slate navigation and toned reading surfaces preserve text legibility")
+            checks.append("Skill Studio light palette restored without breaking dense trace rows")
             assert page.get_by_text("Source records", exact=True).is_visible()
             assert page.get_by_text("Source authorities", exact=True).is_visible()
             assert page.locator(".metric").first.bounding_box()["height"] <= 58
