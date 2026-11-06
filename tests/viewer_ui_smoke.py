@@ -50,6 +50,53 @@ def main():
             nav_menu = page.get_by_role("menu", name="Navigate menu")
             nav_menu.get_by_role("menuitem", name="Expand all").click()
             assert page.locator(".timeline .trace-event").count() >= 2
+            page.set_viewport_size({"width": 1600, "height": 580})
+            layout = page.evaluate("""() => ({
+                pageScroll: window.scrollY,
+                bodyOverflow: getComputedStyle(document.body).overflow,
+                mainScrollable: document.querySelector('.canvas').scrollHeight > document.querySelector('.canvas').clientHeight,
+                sidebarScrollable: getComputedStyle(document.querySelector('.section-index')).overflowY,
+                headerTop: document.querySelector('.topbar').getBoundingClientRect().top,
+                footerBottom: document.querySelector('.app-statusbar').getBoundingClientRect().bottom,
+                viewportHeight: innerHeight
+            })""")
+            assert layout["bodyOverflow"] == "hidden"
+            assert layout["mainScrollable"]
+            assert layout["sidebarScrollable"] == "auto"
+            assert layout["headerTop"] == 0
+            assert abs(layout["footerBottom"] - layout["viewportHeight"]) <= 2
+            canvas_box = page.locator(".canvas").bounding_box()
+            page.mouse.move(canvas_box["x"] + canvas_box["width"] * .5,
+                            canvas_box["y"] + canvas_box["height"] * .5)
+            page.mouse.wheel(0, 780)
+            page.wait_for_function("document.querySelector('.canvas').scrollTop > 0")
+            assert page.evaluate("window.scrollY") == 0
+            assert page.locator(".topbar").bounding_box()["y"] == 0
+            assert abs(page.locator(".app-statusbar").bounding_box()["y"] +
+                       page.locator(".app-statusbar").bounding_box()["height"] - 580) <= 2
+            checks.append("Desktop wheel scrolls trace pane, not topbar or statusbar")
+
+            inspector = page.locator(".inspector")
+            assert inspector.evaluate("(el) => el.scrollHeight > el.clientHeight")
+            inspector_box = inspector.bounding_box()
+            page.mouse.move(inspector_box["x"] + inspector_box["width"] / 2,
+                            inspector_box["y"] + inspector_box["height"] / 2)
+            canvas_scroll = page.locator(".canvas").evaluate("(el) => el.scrollTop")
+            page.mouse.wheel(0, 540)
+            page.wait_for_function("document.querySelector('.inspector').scrollTop > 0")
+            assert page.locator(".canvas").evaluate("(el) => el.scrollTop") == canvas_scroll
+            assert page.evaluate("window.scrollY") == 0
+            checks.append("Inspector wheel scrolls separately from source ledger")
+
+            page.set_viewport_size({"width": 1024, "height": 580})
+            assert page.locator(".inspector").is_visible()
+            assert page.locator(".topbar").bounding_box()["y"] == 0
+            assert abs(page.locator(".app-statusbar").bounding_box()["y"] +
+                       page.locator(".app-statusbar").bounding_box()["height"] - 580) <= 2
+            assert page.locator(".canvas").evaluate("(el) => getComputedStyle(el).overflowY") == "auto"
+            assert page.evaluate("window.scrollY") == 0
+            checks.append("Narrow desktop keeps two independent panes inside viewport")
+            page.set_viewport_size({"width": 1600, "height": 1000})
             page.get_by_role("button", name="Navigate", exact=True).click()
             page.get_by_role("menuitem", name="Collapse all sections").click()
             assert page.locator(".timeline .trace-event").count() == 0
@@ -344,6 +391,8 @@ def main():
             page.set_viewport_size({"width": 680, "height": 860})
             assert picker.is_visible()
             assert page.locator(".sidebar-bottom").is_visible()
+            assert page.evaluate("getComputedStyle(document.body).overflow") == "visible"
+            assert page.locator(".canvas").evaluate("(el) => getComputedStyle(el).overflowY") == "visible"
             assert page.locator(".page-heading").bounding_box()["height"] <= 38
             assert page.locator(".page-heading h1").is_visible()
             assert page.locator(".page-heading p").is_visible()
