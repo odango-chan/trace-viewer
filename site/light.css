@@ -1096,3 +1096,50 @@ html,body,.app-shell,.workbench{background:var(--bg)}
   .ledger-event-main strong {font-size:12px}
   .ledger-event-main small {font-size:11px}
 }
+
+/* Resizable Inspector: the divider overlays the pane edge without occupying
+   layout width, so Trace remains dense and widths remain bounded. */
+.inspector-resizer {display:none}
+@media (min-width:1151px) {
+  .workbench:not(.inspector-hidden) {
+    grid-template-columns:234px minmax(0,1fr) var(--inspector-width,380px);
+  }
+  .workbench:not(.inspector-hidden) .canvas {
+    grid-column:2;grid-row:1;
+  }
+  .workbench:not(.inspector-hidden) .inspector {
+    grid-column:3;grid-row:1;
+  }
+  .inspector-resizer {
+    display:block;grid-column:3;grid-row:1;
+    position:relative;align-self:stretch;justify-self:start;
+    width:14px;transform:translateX(-50%);
+    height:100%;min-height:0;z-index:8;
+    cursor:col-resize;touch-action:none;outline-offset:-2px;
+  }
+  .inspector-resizer::before {
+    content:"";position:absolute;top:0;bottom:0;left:6px;
+    width:1px;background:#d4e1e8;
+    transition:background-color .12s,width .12s;
+  }
+  .inspector-resizer::after {
+    content:"";position:absolute;left:3px;top:50%;
+    transform:translateY(-50%);
+    width:7px;height:35px;border:1px solid #c8d9de;
+    border-radius:5px;background:#f7fbfa;
+    box-shadow:inset 2px 0 0 #d4e3e3,inset -2px 0 0 #d4e3e3;
+  }
+  .inspector-resizer:hover::before,
+  .inspector-resizer:focus-visible::before,
+  .resizing-inspector .inspector-resizer::before {
+    width:2px;background:#0c8e7b;
+  }
+  .inspector-resizer:hover::after,
+  .inspector-resizer:focus-visible::after,
+  .resizing-inspector .inspector-resizer::after {
+    border-color:#0c8e7b;background:#e6f6ef;
+  }
+  .resizing-inspector,.resizing-inspector * {
+    user-select:none!important;cursor:col-resize!important;
+  }
+}
