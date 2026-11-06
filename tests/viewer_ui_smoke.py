@@ -536,7 +536,7 @@ def main():
             assert page.locator(".page-heading p").is_visible()
             assert page.get_by_role("button", name="File", exact=True).is_visible()
             assert page.get_by_role("contentinfo", name="Workbench status").is_visible()
-            assert picker.locator("option").count() == 5
+            assert picker.locator("option").count() == 6
             page.set_viewport_size({"width": 1600, "height": 1000})
             checks.append("Built-in example picker remains accessible on narrow screens")
 
