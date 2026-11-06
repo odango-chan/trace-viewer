@@ -96,6 +96,7 @@ export function findPrimaryUnknown(run) {
   const records = run.sections.flatMap(item => item.records)
   return records.find(item => item.status === 'OUTCOME_UNKNOWN')
       ?? records.find(item => item.status === 'RESULT_UNKNOWN')
-      ?? records.find(item => ['UNRESOLVED', 'FAILED', 'BLOCKED'].includes(item.status))
+      ?? records.find(item => item.status === 'UNKNOWN')
+      ?? records.find(item => ['UNRESOLVED', 'FAIL', 'FAILED', 'BLOCKED'].includes(item.status))
       ?? null
 }

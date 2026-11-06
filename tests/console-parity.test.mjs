@@ -66,3 +66,21 @@ test('Model only excludes Runtime; All owners keeps four separate presentation l
   assert.equal(lanes.find(lane => lane.id === 'world').rows.length, 0)
   assert.throws(() => projectSectionRows(sample, sample.sections[0], 'invalid'), /Unknown/)
 })
+
+test('Focus unknown prioritizes Owner outcome uncertainty, then diagnostic Predicate UNKNOWN', () => {
+  const section = {
+    id:'review-1',title:'Review',subtitle:'Local report',kind:'review-export',
+    records:[
+      {ref:'review:1',sourceAuthority:'owner:review',ownerSequence:null,sourceLine:1,kind:'VERIFY_RESULT',status:'FAIL',causalRefs:[],stage:'RUNTIME'},
+      {ref:'review:2',sourceAuthority:'owner:review',ownerSequence:null,sourceLine:2,kind:'PREDICATE_EVALUATED',status:'UNKNOWN',causalRefs:[],stage:'RUNTIME'},
+    ],
+  }
+  const run={sourceKind:'REVIEW_DIAGNOSTIC',sections:[section]}
+  assert.equal(findPrimaryUnknown(run).ref,'review:2')
+  const other=structuredClone(run)
+  other.sections[0].records.push({...section.records[0],ref:'review:3',sourceLine:3,status:'OUTCOME_UNKNOWN'})
+  assert.equal(findPrimaryUnknown(other).ref,'review:3')
+  const certainty=structuredClone(run)
+  certainty.sections[0].records[1].status='PASS'
+  assert.equal(findPrimaryUnknown(certainty).ref,'review:1')
+})

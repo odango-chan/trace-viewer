@@ -1,12 +1,13 @@
 # Trace Viewer 当前状态
 
 **Updated: 2026-11-05**
-**当前规范基线：[统一 Trace v0.2 中文精简修订稿](specs/unified-trace-v0.2.md)，DRAFT。[独立复审已完成](reviews/unified-trace-v0.2-semantic-freeze-review.md)：架构/轻量化通过，4 项 P0 已与 C01–C10/C08a/C08b 的正负向样例关联，但仍是 OPEN，机器一致性测试未开始。 Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
-**Scope: 当前切回统一 Trace 规范设计；暂停 Producer/DSH/Runtime 代码工作，既有实现及验收记录不撤销。2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
+**当前规范基线：[统一 Trace v0.2 中文精简修订稿](specs/unified-trace-v0.2.md)，DRAFT。[独立复审已完成](reviews/unified-trace-v0.2-semantic-freeze-review.md)：架构/轻量化通过，4 项 P0 已与 C01–C10/C08a/C08b 的正负向样例关联，但仍是 OPEN，候选跨语言合成向量已在独立 [Draft PR #1](https://github.com/odango-chan/trace-viewer/pull/1) 进行；真实 Owner 跨 Producer Conformance 仍 NOT_RUN。 Earlier D1/DSH/Runtime/Phoenix validations below are historical implementation evidence.**
+**Scope: Viewer-first：先在本仓做真实来源记录阅读、按异常导航和来源分明的 Inspector；统一 Trace v0.2 保留 Draft、候选机器验证在 [PR #1](https://github.com/odango-chan/trace-viewer/pull/1)，不作为 Viewer 实现门禁。跨仓 Producer/DSH/Runtime 代码工作仍暂停，既有实现及验收记录不撤销。2026-11-05 增加 [排障可回答性审计](design/trace-debuggability-audit.md)：第一版由 Q1–Q6/S1–S3 的诊断能力及 Q7–Q9/S4 的 Agent 可复现能力共同驱动，R01–R16 是需求覆盖库存；OTLP Profile 仍候选，Producer 改造 NOT_STARTED。**
 
 | 范围 | 设计 | 实现 | 验收 |
 |---|---|---|---|
-| **统一 Trace v0.2（当前主线）** | **DRAFT / 复审整改已写入正文、尚未冻结**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **仅文档**：公共最小契约、条件能力、真实来源/材料、分离 Owner 结果；Producer 未改 | 四个最小场景通过文本复核；**4 项 P0 已有 Gate+正负例，仍 OPEN**：产品责任、能力范围/覆盖、复合交互阶段、基本类型。用户新增的身份/N/A、裁决、L0/L2、材料/投影、负例等要求亦已写入；机器 Schema/黑盒测试/OTLP 选型 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
+| **Viewer MVP（本轮主线）** | **真实来源先行**：以来源阅读、排障上下文和身份准确性为主线，规范 Draft 不作 Viewer 门禁 | 来源感知 Inspector、诊断 JSONL 按需安全下钻、Predicate UNKNOWN/FAIL、独立报告、物理文件前后行；新增 section 内上一条/下一条、返回上个来源、定位选中记录（自动展开并切 Raw），Inspector 在宽屏保持可见；展示顺序均非因果/Owner sequence | [Node 24 单测/typecheck/build PASS](https://github.com/odango-chan/trace-viewer/actions/runs/42144311390)；[公开合成 Chromium 16/16 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/42144311376)；私有 P8-D4 上一版真实 Chromium [7/7 PASS](https://github.com/odango-chan/ca-agent-demo/actions/runs/42142843307)，本次导航新版私有检查 [运行中](https://github.com/odango-chan/ca-agent-demo/actions/runs/42144410125)；真实业务 native Run、跨 Owner 因果和 Evidence closure **NOT_VERIFIED** |
+| **统一 Trace v0.2（候选规范，非 Viewer 主线）** | **DRAFT / 复审整改已写入正文、尚未冻结**：[当前唯一候选规范](specs/unified-trace-v0.2.md)；[语义冻结复审](reviews/unified-trace-v0.2-semantic-freeze-review.md) | **仅文档**：公共最小契约、条件能力、真实来源/材料、分离 Owner 结果；Producer 未改 | 四个最小场景通过文本复核；**4 项 P0 已有 Gate+正负例，仍 OPEN**：产品责任、能力范围/覆盖、复合交互阶段、基本类型。用户新增的身份/N/A、裁决、L0/L2、材料/投影、负例等要求亦已写入；机器 Schema/黑盒测试/OTLP 选型 **NOT_RUN/PENDING**，冻结 **BLOCKED** |
 | D0 文档治理 / 责任边界 | ACCEPTED | IMPLEMENTED | main 已核验；[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423) |
 | D0 浅色 Web 壳 / 合成 DSH 轨迹 | ACCEPTED (D0) | IMPLEMENTED | [CI 单测/类型检查/静态构建 PASS](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)；Browser NOT_RUN |
 | D0 Synthetic 异常、确定性对照样本 | ACCEPTED (D0) | IMPLEMENTED | 5 unit tests PASS（[CI](https://github.com/odango-chan/trace-viewer/actions/runs/41803355423)） |

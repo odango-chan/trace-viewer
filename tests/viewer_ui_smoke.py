@@ -39,8 +39,14 @@ def main():
             assert page.locator(".inspector-title").inner_text() == "Host delivery interrupted"
             assert "RESULT_UNKNOWN" in page.locator(".inspector").inner_text()
             page.get_by_role("button", name="All", exact=True).click()
+            page.get_by_role("button", name="Readable", exact=True).click()
             assert "Runtime SUCCEEDED" in page.locator(".timeline").inner_text()
             checks.append("Host RESULT_UNKNOWN distinct from Runtime SUCCEEDED")
+            page.get_by_role("button", name="Collapse normal").click()
+            page.get_by_role("button", name="Locate selected").click()
+            assert page.get_by_role("button", name="Raw records", exact=True).get_attribute("aria-pressed") == "true"
+            assert page.locator(".timeline .trace-event.selected").count() == 1
+            checks.append("Locate selected reveals collapsed source and selects its exact raw row")
 
             page.get_by_role("button", name="Parallel reads · out-of-order ToolResults").click()
             page.locator(".turn-card .turn-header").first.click()
@@ -57,6 +63,139 @@ def main():
             page.get_by_role("button", name="All owners", exact=True).click()
             assert page.locator(".timeline .turn-card").count() >= 2
             checks.append("Deterministic Run does not fabricate a Model interaction")
+
+            # Synthetic-only local diagnostic V1: no private Owner data enters this test.
+            examples = [
+                {
+                    "kind": "PREDICATE_EVALUATED",
+                    "data": {
+                        "predicate_identity": "ran_response_received",
+                        "verdict": "UNKNOWN",
+                        "reason": "Await selector did not match",
+                        "evidence_refs": ["synthetic-private-ref"],
+                        "subscriber": "imsi-synthetic-private",
+                    },
+                    "material": {"output": {"token": "synthetic-hidden-material"}},
+                    "summary": "synthetic-hidden-summary",
+                    "diag": "synthetic-hidden-diagnostic",
+                },
+                {
+                    "kind": "CALL_RESULT",
+                    "data": {
+                        "operation": "smf.create_context",
+                        "reported_outcome": "COMMITTED",
+                        "outcome": "COMMITTED",
+                        "bindings": {"token": "synthetic-hidden-binding"},
+                    },
+                    "material": None,
+                    "summary": "synthetic-hidden-call-summary",
+                    "diag": "synthetic-hidden-call-diagnostic",
+                },
+                {
+                    "kind": "VERIFY_RESULT",
+                    "data": {"scope": "ROOT", "verdict": "FAIL", "reason": None},
+                    "material": None,
+                    "summary": "synthetic-hidden-verify-summary",
+                    "diag": "synthetic-hidden-verify-diagnostic",
+                },
+            ]
+            payload = (chr(10).join(json.dumps(x) for x in examples) + chr(10)).encode("utf-8")
+            page.locator("#review-jsonl").set_input_files({
+                "name": "synthetic-v1-diagnostic.jsonl",
+                "mimeType": "application/x-ndjson",
+                "buffer": payload,
+            })
+            page.get_by_text("ARCHIVED DIAGNOSTIC · NOT OWNER NATIVE", exact=True).wait_for()
+            assert page.locator(".inspector-title").inner_text() == "PREDICATE_EVALUATED"
+            assert page.locator(".inspector .status.uncertain").inner_text() == "UNKNOWN"
+            page.get_by_role("button", name="Show allowed local fields").click()
+            page.get_by_text("Await selector did not match", exact=True).wait_for(timeout=10000)
+            detail = page.locator(".local-detail")
+            assert "Await selector did not match" in detail.inner_text()
+            for secret in ("imsi-synthetic-private", "synthetic-hidden-material",
+                           "synthetic-hidden-summary", "synthetic-private-ref"):
+                assert secret not in page.locator(".app-shell").inner_text()
+            checks.append("Explicit local detail reveals only allowed fields, no raw materials")
+
+            page.get_by_role("button", name="Focus unknown").click()
+            assert page.locator(".local-detail-fields").count() == 0
+            assert page.locator(".inspector .status.uncertain").inner_text() == "UNKNOWN"
+            checks.append("Focus unknown finds Predicate without treating it as terminal failure")
+
+            page.get_by_role("button", name="Source", exact=True).click()
+            assert '"sourceLine": 1' in page.locator(".source-preview").inner_text()
+            assert page.get_by_role("button", name="Previous line", exact=True).is_disabled()
+            page.get_by_role("button", name="Next line · 2", exact=True).click()
+            assert '"sourceLine": 2' in page.locator(".source-preview").inner_text()
+            page.get_by_role("button", name="Previous line · 1", exact=True).click()
+            assert '"sourceLine": 1' in page.locator(".source-preview").inner_text()
+            assert "does not establish causality" in page.locator(".review-line-context").inner_text()
+            checks.append("Source Inspector traverses physical file neighbors, never inferred causal refs")
+
+            page.get_by_role("button", name="Summary", exact=True).click()
+            context = page.get_by_role("region", name="Reading context")
+            assert "1 / 3 in section" in context.inner_text()
+            assert "not causal" in context.inner_text()
+            assert page.get_by_role("button", name="Previous record", exact=True).is_disabled()
+            page.get_by_role("button", name="Next record", exact=True).click()
+            assert page.locator(".inspector-title").inner_text() == "CALL_RESULT"
+            page.get_by_role("button", name="Back to prior source", exact=True).click()
+            assert page.locator(".inspector-title").inner_text() == "PREDICATE_EVALUATED"
+            assert page.get_by_role("button", name="Back to prior source", exact=True).is_disabled()
+            checks.append("Reading context navigates one section and returns to prior source")
+
+            page.get_by_role("button", name="All", exact=True).click()
+            page.locator(".timeline .trace-event").filter(has_text="CALL_RESULT").first.click()
+            assert page.locator(".local-detail-fields").count() == 0
+            page.get_by_role("button", name="Show allowed local fields").click()
+            page.get_by_text("smf.create_context", exact=True).wait_for(timeout=10000)
+            assert "smf.create_context" in page.locator(".local-detail").inner_text()
+            assert "synthetic-hidden-binding" not in page.locator(".app-shell").inner_text()
+            page.get_by_role("button", name="Frozen Procedure · without a model call").click()
+            assert page.locator(".local-detail").count() == 0
+            checks.append("Changing selected record or Run clears local diagnostic preview")
+
+            # Separate local finding is not a Run or synthetic timeline event.
+            standalone = {
+                "owner": "local-demo",
+                "outcome": "UNRESOLVED",
+                "firstFailureStage": "RAN Adoption",
+                "firstFailureNode": "await-result",
+                "predicate": "observation.received",
+                "ownerResult": {
+                    "reason": "WAIT_BUDGET_EXHAUSTED",
+                    "observationsUsed": 3,
+                },
+                "networkEffect": "NONE: network accepted; no mutation replayed",
+                "fix": {
+                    "waitScope": "Require exact attempt selector",
+                    "procedureBindings": "Bind an explicit attempt context",
+                },
+                "bindingsSupplied": {"purpose": "local", "operationContextRef": "fake-private"},
+                "rootCause": "Sensitive source note imsi-synthetic-secret",
+            }
+            before_runs = page.locator(".run-list .run-option").count()
+            page.locator("#review-finding-json").set_input_files({
+                "name": "synthetic-finding.json",
+                "mimeType": "application/json",
+                "buffer": json.dumps(standalone).encode("utf-8"),
+            })
+            report = page.get_by_role("region", name="Standalone diagnosis report")
+            report.wait_for(timeout=10000)
+            assert "WAIT_BUDGET_EXHAUSTED" in report.inner_text()
+            assert "RAN Adoption" in report.inner_text()
+            assert "NOT linked to the selected Run" in report.inner_text()
+            assert "imsi-synthetic-secret" not in page.locator(".app-shell").inner_text()
+            assert page.locator(".run-list .run-option").count() == before_runs
+            checks.append("Independent local finding is readable without fabricating owner events or Run linkage")
+
+            page.get_by_role("button", name="Delivery failure · Host RESULT_UNKNOWN").click()
+            assert report.count() == 0
+            page.get_by_role("button", name="View standalone finding").click()
+            report.wait_for(timeout=10000)
+            assert "NOT linked to the selected Run" in report.inner_text()
+            checks.append("Switching Run hides unrelated report; explicit re-open keeps source warning")
+
             page.screenshot(path=str(OUT / "trace-viewer-console-parity.png"), full_page=True)
             assert not errors, f"Browser JavaScript errors: {errors}"
             checks.append("No browser JavaScript exceptions")

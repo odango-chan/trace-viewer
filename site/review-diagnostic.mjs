@@ -28,6 +28,11 @@ function shortName(v) {
   return v.length <= 140 && !/[\r\n\u0000-\u001f]/.test(v) ? v : ''
 }
 function diagnosticStatus(record) {
+  // Predicate/verification verdicts are observations, never Runtime terminal states.
+  if (record.kind === 'PREDICATE_EVALUATED' || record.kind === 'VERIFY_RESULT') {
+    const verdict = record.data?.verdict
+    if (verdict === 'PASS' || verdict === 'FAIL' || verdict === 'UNKNOWN') return verdict
+  }
   if (record.kind === 'span') {
     const status = String(record.status).replace(/^SpanStatus\./,'')
     return STATUS_ALLOWED.has(status) ? status : status === 'COMPLETED' ? 'COMPLETED' : 'RECORDED'

@@ -4,12 +4,18 @@
 
 > 当前状态：**D1 原生 TraceStore v2 合成 Golden PASS；D1.1 真实 P8-D4 诊断 JSONL 的独立只读导入与私有 Chromium PASS；完整真实业务 TraceStore v2 仍未验收**。默认示例均为合成数据；额外可手动导入经验证的本地真实诊断文件，但不能把诊断导出当作原生全量执行证据。接口仍在演进；请以 [WORK](docs/WORK.md) 为准。
 
-## 统一 Trace 规范设计（当前主线）
+## 本地只读 Viewer 使用方式
 
-**当前优先工作是规范设计，不是 DSH / Agent Demo / Runtime 的实现验收。**
+页面左侧可以导入现有原生 TraceStore v2 目录、归档诊断 JSONL，或一份单独的诊断报告 JSON。诊断 JSONL 的有限字段需在 Inspector 中明确点击 **Show allowed local fields** 才展示；在 **Source** 页签还可查看前后物理文件行，**不推断因果关系**。 现在 Inspector 还支持当前 section 内的 **Previous / Next record**、**Back to prior source** 和工具栏 **Locate selected**（展开并定位精确来源）；这里的前后关系仅是展示顺序，既不是 Owner-local sequence，也不是跨 Owner 因果关系。独立诊断报告只显示来源允许的安全摘要，**不是同一 Run 的轨迹或已经关联的 Owner 证据**；切换 Run 后会隐藏，需要手动再次打开。
+
+真实 P8-D4 attempt 2 JSONL（106 行）与独立 attempt 1 诊断报告的安全投影，均已在授权私有 Chromium 环境验收；公开合成浏览器交互 **14/14 PASS**。只有诊断来源中的物理行邻接可导航，**跨 Owner 因果关联、真实原生 Run 与材料闭包仍未验证**。详见 [V1 归档实验](docs/experiments/real-p8d4-review-import.md) 与 [PR #2](https://github.com/odango-chan/trace-viewer/pull/2)。
+
+## Viewer 当前主线与 Trace 规范状态
+
+**当前优先工作是 Viewer 的真实来源阅读、异常定位和 Inspector 下钻，而不是继续扩大 Trace 规范工作。** 先复用已实现的 TraceStore v2 和真实诊断 JSONL 本地导入，用真实故障故事验收 Q1–Q6；不要求等统一机器 Schema 冻结才改善 Viewer。
 已形成 [**Unified Trace Specification v0.2（DRAFT，当前唯一候选）**](docs/specs/unified-trace-v0.2.md)，针对 [v0.1 评审指出的六项 P0](docs/reviews/unified-trace-v0.1-architecture-review.md) 完成了语义层修订；[**v0.2 独立反例评审**](docs/reviews/unified-trace-v0.2-minimality-review.md) 指出的六项减重问题已按正文修订；[**语义冻结复审**](docs/reviews/unified-trace-v0.2-semantic-freeze-review.md) 认为架构/轻量化基本通过，但四项关键条款现已补入候选语义，仍需机器 Schema/一致性验收，以**可诊断、可复现、可学习**为目标，覆盖执行身份、Activity/Fact、因果关系、诊断与模型可见材料、完整性和一致性门禁。现有多个 Viewer Adapter、DSH Session 测试与 Phoenix PoC 是**历史现状/选型证据**，不是规范标准；在 v0.2 评审定型前**暂停继续修改各 Producer**。v0.1 仅保留为[历史草案](docs/specs/unified-trace-v0.1.md)。
 
-## 统一 Trace 目标（规范先行）
+## 统一 Trace 长期目标（非 Viewer MVP 前置）
 
 目标是**一套对外 Trace 契约**，覆盖 Agent、Harness、Runtime 诊断、确定性/LLM/混合执行；当前多格式仅服务存量兼容。**第一版同时验收可诊断与 Agent 可复现**：既能定位步骤、解释原因、核验证据，也能让宣称 AGENT_L0 的 Agent 在授权范围内重建当时实际外发模型请求及 ToolResult；隔离重演为后续独立能力，训练/自学习只要求合格数据来源，不自动训练。优先阅读 [诊断审计 Q1–Q6/S1–S3](docs/design/trace-debuggability-audit.md) 与 [Agent Replay/可学习审计 Q7–Q9/S4](docs/design/trace-reproducibility-learning-audit.md) 和 [真实 Model→Tool→Model 的摘要/ToolCatalog/Observation Stub 复核](docs/experiments/agent-replay-archive-audit.md)，再看 [需求库存 R01–R16](docs/design/trace-requirements-audit.md) 和 [候选 OTel/OTLP 评估](docs/design/trace-unification-assessment.md)。**OTLP 尚未冻结为最终方案，Producer 未改。**
 
