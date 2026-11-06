@@ -126,7 +126,7 @@ def main():
             assert page.locator(".timeline .trace-event").count() == 106
             checks.append("Real attempt-1 finding remains independent of attempt-2 Run")
 
-            page.get_by_role("button", name="Frozen Procedure · without a model call").click()
+            page.get_by_role("combobox", name="Choose demo example").select_option(label="Frozen Procedure · without a model call")
             assert panel.count() == 0
             page.get_by_role("button", name="View standalone finding").click()
             panel.wait_for(timeout=10000)
