@@ -61,6 +61,8 @@ type ReviewFinding = {
 type ReturnSelection = {ref: string; tab: InspectorTab}
 type ViewMode = 'readable' | 'model' | 'owners' | 'raw'
 type InspectorTab = 'summary' | 'source' | 'links'
+type MainMenu = 'file' | 'view' | 'navigate' | 'help'
+type HelpTopic = 'quick' | 'semantics' | 'about'
 type ExampleRun = {
   id: string
   sourceKind: 'SYNTHETIC' | 'NATIVE_LOCAL' | 'REVIEW_DIAGNOSTIC'
@@ -97,7 +99,13 @@ function App() {
   const [finding, setFinding] = useState<ReviewFinding | null>(null)
   const [findingVisible, setFindingVisible] = useState(false)
   const [findingError, setFindingError] = useState<string | null>(null)
+  const [openMenu, setOpenMenu] = useState<MainMenu | null>(null)
+  const [inspectorVisible, setInspectorVisible] = useState(true)
+  const [helpTopic, setHelpTopic] = useState<HelpTopic | null>(null)
+  const menuBarRef = useRef<HTMLElement | null>(null)
   const directoryRef = useRef<HTMLInputElement | null>(null)
+  const reviewInputRef = useRef<HTMLInputElement | null>(null)
+  const findingInputRef = useRef<HTMLInputElement | null>(null)
   const canvasRef = useRef<HTMLElement | null>(null)
   const locateCounter = useRef(0)
   const [locateRequest, setLocateRequest] = useState<{ref:string; request:number} | null>(null)
@@ -168,6 +176,23 @@ function App() {
   const [selectedRef, setSelectedRef] = useState<string>(syntheticRuns[0].sections[1].records[2].ref)
   useEffect(() => {
     if (directoryRef.current) directoryRef.current.webkitdirectory = true
+  }, [])
+  useEffect(() => {
+    const dismissOnOutsideClick = (event: MouseEvent) => {
+      if (!menuBarRef.current?.contains(event.target as Node)) setOpenMenu(null)
+    }
+    const dismissOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpenMenu(null)
+        setHelpTopic(null)
+      }
+    }
+    document.addEventListener('pointerdown', dismissOnOutsideClick)
+    document.addEventListener('keydown', dismissOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', dismissOnOutsideClick)
+      document.removeEventListener('keydown', dismissOnEscape)
+    }
   }, [])
 
   async function importDirectory(event: React.ChangeEvent<HTMLInputElement>) {
@@ -376,6 +401,29 @@ function App() {
     setSelectedRef((recordsForRun.find(isException) ?? recordsForRun[0])?.ref ?? '')
   }
 
+  function applyViewMode(mode: ViewMode) {
+    setViewMode(mode)
+    setFilter('all')
+    setOpenMenu(null)
+  }
+  function runMenuAction(action: () => void) {
+    setOpenMenu(null)
+    action()
+  }
+  function toggleMenu(menu: MainMenu) {
+    setOpenMenu(previous => previous === menu ? null : menu)
+  }
+  function menuKeyboardNavigation(event: React.KeyboardEvent<HTMLElement>) {
+    if (!openMenu || !['ArrowDown', 'ArrowUp'].includes(event.key)) return
+    const buttons = Array.from(menuBarRef.current?.querySelectorAll<HTMLButtonElement>('[role="menu"] button:not(:disabled)') ?? [])
+    if (!buttons.length) return
+    const index = buttons.indexOf(document.activeElement as HTMLButtonElement)
+    const next = event.key === 'ArrowDown'
+      ? (index + 1) % buttons.length
+      : (index <= 0 ? buttons.length - 1 : index - 1)
+    buttons[next].focus()
+    event.preventDefault()
+  }
   function toggleSection(id: string) {
     setExpanded(previous => {
       const next = new Set(previous)
@@ -393,42 +441,99 @@ function App() {
           <strong>Trace Viewer</strong>
           <small>ConnectionAgent / Developer Tools</small>
         </div>
-        <span className="header-divider" />
-        <span className="header-context">Execution observability</span>
+        <nav className="app-menus" aria-label="Application menus" ref={menuBarRef} onKeyDown={menuKeyboardNavigation}>
+          <div className="app-menu">
+            <button type="button" className={'app-menu-trigger ' + (openMenu === 'file' ? 'active' : '')}
+              aria-haspopup="menu" aria-expanded={openMenu === 'file'} onClick={() => toggleMenu('file')}>File</button>
+            {openMenu === 'file' && (
+              <div className="app-menu-panel" role="menu" aria-label="File menu">
+                <button type="button" role="menuitem" onClick={() => runMenuAction(() => directoryRef.current?.click())}>Open TraceStore v2 folder</button>
+                <button type="button" role="menuitem" onClick={() => runMenuAction(() => reviewInputRef.current?.click())}>Open archived diagnostic JSONL</button>
+                <button type="button" role="menuitem" onClick={() => runMenuAction(() => findingInputRef.current?.click())}>Open standalone diagnosis JSON</button>
+                <div className="app-menu-note">Read-only · files stay in this browser</div>
+              </div>
+            )}
+          </div>
+          <div className="app-menu">
+            <button type="button" className={'app-menu-trigger ' + (openMenu === 'view' ? 'active' : '')}
+              aria-haspopup="menu" aria-expanded={openMenu === 'view'} onClick={() => toggleMenu('view')}>View</button>
+            {openMenu === 'view' && (
+              <div className="app-menu-panel" role="menu" aria-label="View menu">
+                {([
+                  ['readable', 'Readable ledger'], ['owners', 'All owners'],
+                  ['model', 'Model only'], ['raw', 'Raw records'],
+                ] as [ViewMode, string][]).map(([mode, label]) => (
+                  <button key={mode} type="button" role="menuitemradio" aria-checked={viewMode === mode}
+                    onClick={() => applyViewMode(mode)}><span>{label}</span><span className="menu-check" aria-hidden="true">{viewMode === mode ? '✓' : ''}</span></button>
+                ))}
+                <div className="app-menu-separator" />
+                <button type="button" role="menuitemcheckbox" aria-checked={inspectorVisible}
+                  onClick={() => runMenuAction(() => setInspectorVisible(value => !value))}>
+                  <span>Show Inspector</span><span className="menu-check" aria-hidden="true">{inspectorVisible ? '✓' : ''}</span>
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="app-menu">
+            <button type="button" className={'app-menu-trigger ' + (openMenu === 'navigate' ? 'active' : '')}
+              aria-haspopup="menu" aria-expanded={openMenu === 'navigate'} onClick={() => toggleMenu('navigate')}>Navigate</button>
+            {openMenu === 'navigate' && (
+              <div className="app-menu-panel" role="menu" aria-label="Navigate menu">
+                <button type="button" role="menuitem" disabled={!findPrimaryUnknown(run)}
+                  onClick={() => runMenuAction(focusUnknown)}>Focus unknown</button>
+                <button type="button" role="menuitem" disabled={!activeRecord}
+                  onClick={() => runMenuAction(locateSelected)}>Locate selected</button>
+                <div className="app-menu-separator" />
+                <button type="button" role="menuitem"
+                  onClick={() => runMenuAction(() => setExpanded(new Set(run.sections.map(item => item.id))))}>Expand all</button>
+                <button type="button" role="menuitem"
+                  onClick={() => runMenuAction(() => setExpanded(new Set()))}>Collapse all sections</button>
+              </div>
+            )}
+          </div>
+          <div className="app-menu">
+            <button type="button" className={'app-menu-trigger ' + (openMenu === 'help' ? 'active' : '')}
+              aria-haspopup="menu" aria-expanded={openMenu === 'help'} onClick={() => toggleMenu('help')}>Help</button>
+            {openMenu === 'help' && (
+              <div className="app-menu-panel" role="menu" aria-label="Help menu">
+                <button type="button" role="menuitem" onClick={() => runMenuAction(() => setHelpTopic('quick'))}>Quick start</button>
+                <button type="button" role="menuitem" onClick={() => runMenuAction(() => setHelpTopic('semantics'))}>Trace semantics</button>
+                <button type="button" role="menuitem" onClick={() => runMenuAction(() => setHelpTopic('about'))}>About Trace Viewer</button>
+              </div>
+            )}
+          </div>
+        </nav>
         <div className="topbar-spacer" />
-        <span className="build-badge">D1 · LOCAL PREVIEW</span>
+        <span className="build-badge">LOCAL WORKBENCH · DEMO</span>
         <span className="synthetic-badge">{run.sourceKind === 'SYNTHETIC' ? 'SYNTHETIC DATA'
           : run.sourceKind === 'NATIVE_LOCAL' ? 'LOCAL NATIVE · NOT OWNER VERIFIED'
           : 'ARCHIVED DIAGNOSTIC · NOT OWNER NATIVE'}</span>
       </header>
+      <div className="file-inputs" aria-label="Local file inputs">
+        <input ref={directoryRef} id="native-directory" type="file" multiple
+          aria-label="Import TraceStore v2 directory" onChange={importDirectory} />
+        <input ref={reviewInputRef} id="review-jsonl" type="file" accept=".jsonl"
+          aria-label="Import archived diagnostic JSONL" onChange={importReview} />
+        <input ref={findingInputRef} id="review-finding-json" type="file" accept=".json"
+          aria-label="Import standalone diagnosis JSON" onChange={importFinding} />
+      </div>
 
-      <div className="workbench">
+      <div className={'workbench' + (inspectorVisible ? '' : ' inspector-hidden')}>
         <aside className="sidebar" aria-label="Run explorer">
           <div className="sidebar-heading">EXPLORER</div>
           <div className="sidebar-caption">LOCAL RUNS <span>{importedRuns.length}</span></div>
-          <div className="import-block">
-            <label htmlFor="native-directory">Import TraceStore v2 folder</label>
-            <input ref={directoryRef} id="native-directory" type="file" multiple
-              aria-label="Import TraceStore v2 directory" onChange={importDirectory} />
-            <small>{importing ? 'Checking local files…' : 'Browser-only · no upload · run.json + trace.jsonl + materials'}</small>
-            <label htmlFor="review-jsonl">Import archived diagnostic JSONL</label>
-            <input id="review-jsonl" type="file" accept=".jsonl" aria-label="Import archived diagnostic JSONL"
-              onChange={importReview} />
-            <small>Separate unversioned review export; NOT TraceStore v2.</small>
-            <label htmlFor="review-finding-json">Import standalone diagnosis JSON</label>
-            <input id="review-finding-json" type="file" accept=".json"
-              aria-label="Import standalone diagnosis JSON" onChange={importFinding} />
-            <small>Independent review note · never attached to the selected Run or timeline.</small>
+          <div className="import-feedback" aria-live="polite">
+            {importing && <p className="import-progress">Reading local files…</p>}
             {finding && <button type="button" className="finding-open-control"
               onClick={() => setFindingVisible(value => !value)}>
               {findingVisible ? 'Hide standalone finding' : 'View standalone finding'}
             </button>}
             {findingError && <p role="alert" className="import-error">{findingError}</p>}
-            {importError && <p className="import-error" role="alert">{importError}</p>}
+            {importError && <p role="alert" className="import-error">{importError}</p>}
           </div>
           <div className="run-list">
             {importedRuns.length === 0 && (
-              <p className="run-empty">No local trace loaded. Import a file above, or choose a built-in example below.</p>
+              <p className="run-empty">No local runs. Use File → Open to inspect local traces, or choose an example below.</p>
             )}
             {importedRuns.map(item => (
               <button key={item.id} type="button" className={'run-option ' + (item.id === run.id ? 'active' : '')} onClick={() => selectRun(item)} aria-pressed={item.id === run.id}>
@@ -530,8 +635,7 @@ function App() {
               <button type="button" className={filter === 'exceptions' ? 'tool active' : 'tool'} onClick={() => setFilter('exceptions')}>Exceptions</button>
               <button type="button" className="tool border-left" onClick={focusUnknown}>Focus unknown</button>
               <button type="button" className="tool" onClick={locateSelected} disabled={!activeRecord}>Locate selected</button>
-              <button type="button" className="tool" onClick={() => setExpanded(new Set(run.sections.map(item => item.id)))}>Expand all</button>
-              <button type="button" className="tool" onClick={() => setExpanded(new Set())}>Collapse normal</button>
+
             </div>
           </div>
           <div className="view-selector" role="group" aria-label="Console-inspired trace reading mode">
@@ -752,6 +856,44 @@ function App() {
           <div className="inspector-bottom">SOURCE-FIRST · NO EXECUTION CONTROLS</div>
         </aside>
       </div>
+      <footer className="app-statusbar" aria-label="Workbench status">
+        <span className="statusbar-source"><span className="statusbar-dot" />{run.sourceKind === 'SYNTHETIC' ? 'SYNTHETIC EXAMPLE' : run.sourceKind === 'NATIVE_LOCAL' ? 'LOCAL NATIVE · UNVERIFIED' : 'ARCHIVED DIAGNOSTIC'}</span>
+        <span className="statusbar-privacy">READ ONLY · BROWSER LOCAL</span>
+        <span className="statusbar-selected" title={activeRecord ? activeRecord.ref : 'No selected record'}>
+          {activeRecord ? activeRecord.kind + ' · ' + activeRecord.sourceAuthority + ' · ' + recordPosition(activeRecord) : 'NO SOURCE SELECTED'}
+        </span>
+        <span className="statusbar-count">{summary.events} records · {summary.exceptions} flagged</span>
+      </footer>
+      {helpTopic && (
+        <div className="help-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) setHelpTopic(null) }}>
+          <section className="help-dialog" role="dialog" aria-modal="true" aria-labelledby="help-dialog-title">
+            <header>
+              <h2 id="help-dialog-title">{helpTopic === 'quick' ? 'Quick start' : helpTopic === 'semantics' ? 'Trace semantics' : 'About Trace Viewer'}</h2>
+              <button type="button" aria-label="Close help" onClick={() => setHelpTopic(null)} autoFocus>×</button>
+            </header>
+            {helpTopic === 'quick' && (
+              <div className="help-content">
+                <p>Use <strong>File</strong> to open a local TraceStore v2 folder, archived diagnostic JSONL, or a standalone diagnosis JSON. Files remain in your browser; this Demo has no server upload.</p>
+                <p>Pick a local Run in the Explorer or a synthetic example at the bottom. Use <strong>View</strong> to switch between the compact Readable ledger, separated owner lanes, Model-only records, and raw source rows.</p>
+                <p>Select any record to inspect provenance, source identity, and explicitly declared links. Use <strong>Navigate</strong> to find unknown outcomes and jump to the exact source.</p>
+              </div>
+            )}
+            {helpTopic === 'semantics' && (
+              <div className="help-content">
+                <p><strong>Source-first, not inferred causality.</strong> Rows can be projected or folded for reading, but only explicit source references establish declared links. Display order never implies cross-owner execution order.</p>
+                <p>Native local sources are not Owner-certified by this browser; archived JSONL file lines are not Owner-local sequences. Synthetic examples are illustrations only, not execution evidence.</p>
+                <p>Materials, private payloads and raw diagnostic bodies are not displayed automatically. Use the Inspector to see the supported source and evidence subset.</p>
+              </div>
+            )}
+            {helpTopic === 'about' && (
+              <div className="help-content">
+                <p>Trace Viewer is a read-only ConnectionAgent execution-trace inspection Demo using React, TypeScript and a static Web build.</p>
+                <p>It currently works with browser-local imports and built-in synthetic examples. A local server or native desktop shell is not part of this version.</p>
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   )
 }

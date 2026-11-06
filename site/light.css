@@ -627,3 +627,125 @@ html,body,.app-shell,.workbench{background:var(--bg)}
   .ledger-event .event-side{grid-area:side}
   .ledger-event-main strong{max-width:75%}
 }
+
+/* Local-workbench shell: use Studio's light surfaces and keep existing trace density.
+   These are navigation and information-placement changes, not a new trace theme. */
+.topbar{position:relative;z-index:10;gap:9px;padding-inline:14px}
+.brand-copy{flex:none}
+.brand-copy strong{font-size:13px}
+.brand-copy small{font-size:9px}
+.app-menus{
+  display:flex;align-items:center;gap:2px;
+  margin-left:12px;min-width:0;
+}
+.app-menu{position:relative;flex:none}
+.app-menu-trigger{
+  border:1px solid transparent;background:transparent;
+  border-radius:6px;padding:7px 11px;
+  font-size:11px;font-weight:600;color:#405a73;
+}
+.app-menu-trigger:hover,.app-menu-trigger.active{
+  background:#eaf6f1;color:#0b7668;border-color:#c7e4da;
+}
+.app-menu-panel{
+  position:absolute;top:calc(100% + 5px);left:0;
+  min-width:238px;max-width:min(320px,90vw);
+  padding:5px;border:1px solid #d9e3ed;
+  border-radius:9px;background:#fff;
+  box-shadow:0 10px 30px #1b355124;
+  display:grid;gap:1px;z-index:30;
+}
+.app-menu:last-child .app-menu-panel{left:auto;right:0}
+.app-menu-panel button{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;padding:9px 10px;border:0;border-radius:6px;
+  background:transparent;text-align:left;
+  color:#314c65;font-size:11px;line-height:1.4;white-space:nowrap;
+}
+.app-menu-panel button:not(:disabled):hover,
+.app-menu-panel button:not(:disabled):focus-visible{
+  background:#eef7f4;color:#0a7366;
+}
+.app-menu-panel button:disabled{color:#a0aebd;cursor:default}
+.menu-check{margin-left:16px;color:#0c8e7b;font-size:12px;font-weight:850}
+.app-menu-separator{height:1px;margin:5px 7px;background:#e7edf3}
+.app-menu-note{
+  border-top:1px solid #e7edf3;margin:4px 5px 1px;
+  padding:8px 5px 4px;font-size:10px;line-height:1.5;color:#7d91a4;
+}
+.file-inputs{display:none}
+.import-feedback{margin:0 4px 7px;display:grid;gap:6px}
+.import-feedback:empty{display:none}
+.import-progress{
+  margin:0;padding:7px 9px;border:1px solid #cfe7e0;
+  border-radius:6px;background:#f2faf7;color:#31786d;font-size:10px;
+}
+.import-feedback .finding-open-control{width:100%;font-size:10px}
+.sidebar-heading{padding-bottom:12px}
+.run-empty{padding-top:5px;padding-bottom:13px}
+.sidebar-bottom{margin-top:auto}
+.workbench.inspector-hidden{grid-template-columns:234px minmax(0,1fr)}
+.workbench.inspector-hidden .inspector{display:none}
+.app-statusbar{
+  position:sticky;bottom:0;z-index:9;
+  min-height:29px;padding:5px 14px;
+  border-top:1px solid #dfe7ef;
+  background:#f8fafc;color:#61798f;
+  display:flex;align-items:center;gap:15px;
+  font-size:9px;line-height:1.4;
+  box-shadow:0 -1px 4px #20354f09;
+}
+.statusbar-source,.statusbar-privacy,.statusbar-count{flex:none;white-space:nowrap}
+.statusbar-source{display:flex;align-items:center;gap:6px;color:#42647a;font-weight:750}
+.statusbar-dot{width:6px;height:6px;border-radius:50%;background:#0c8e7b}
+.statusbar-privacy{border-left:1px solid #dce5ee;padding-left:12px}
+.statusbar-selected{
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;font:9px/1.4 ui-monospace,Consolas,monospace;
+  color:#647c91;
+}
+.statusbar-count{margin-left:auto;color:#375b73;font-variant-numeric:tabular-nums}
+.help-backdrop{
+  position:fixed;inset:0;z-index:60;background:#172d425e;
+  display:grid;place-items:center;padding:24px;
+}
+.help-dialog{
+  width:min(560px,100%);max-height:min(85vh,700px);
+  overflow:auto;border:1px solid #d9e5ee;
+  border-radius:12px;background:#fff;
+  box-shadow:0 22px 55px #122e4450;
+}
+.help-dialog header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:15px 18px;border-bottom:1px solid #e6ecf2;
+}
+.help-dialog h2{font-size:15px;color:#243b53;margin:0}
+.help-dialog header button{
+  width:27px;height:27px;border:1px solid #dbe4eb;
+  background:#f8fafc;border-radius:6px;color:#71899e;
+}
+.help-content{padding:16px 20px 22px}
+.help-content p{font-size:12px;line-height:1.7;color:#526b81;margin:0 0 12px}
+.help-content strong{color:#1a7166}
+@media(max-width:1150px){
+  .workbench.inspector-hidden{grid-template-columns:210px minmax(0,1fr)}
+  .topbar{gap:6px}
+  .brand-copy small{display:none}
+  .app-menus{margin-left:5px}
+  .app-menu-trigger{padding:7px 9px}
+}
+@media(max-width:750px){
+  .workbench.inspector-hidden{display:block}
+  .topbar{padding:0 8px;gap:5px}
+  .brand-mark{width:25px;height:25px}
+  .brand-copy strong{font-size:11px}
+  .app-menus{margin-left:auto;gap:0}
+  .app-menu-trigger{padding:7px 6px;font-size:10px}
+  .synthetic-badge{display:none}
+  .app-menu-panel{min-width:min(235px,90vw)}
+  .app-menu:nth-last-child(1) .app-menu-panel{right:0}
+  .app-statusbar{gap:8px;padding:6px 10px;flex-wrap:wrap}
+  .statusbar-privacy{display:none}
+  .statusbar-selected{flex:1 1 100px}
+  .statusbar-count{margin-left:0}
+}

@@ -6,15 +6,17 @@
 
 ## 本地只读 Viewer 使用方式
 
-页面左侧可以导入现有原生 TraceStore v2 目录、归档诊断 JSONL，或一份单独的诊断报告 JSON。诊断 JSONL 的有限字段需在 Inspector 中明确点击 **Show allowed local fields** 才展示；在 **Source** 页签还可查看前后物理文件行，**不推断因果关系**。 现在 Inspector 还支持当前 section 内的 **Previous / Next record**、**Back to prior source** 和工具栏 **Locate selected**（展开并定位精确来源）；这里的前后关系仅是展示顺序，既不是 Owner-local sequence，也不是跨 Owner 因果关系。独立诊断报告只显示来源允许的安全摘要，**不是同一 Run 的轨迹或已经关联的 Owner 证据**；切换 Run 后会隐藏，需要手动再次打开。
+顶部 **File** 菜单支持在浏览器中打开原生 TraceStore v2 目录、归档诊断 JSONL 或单独的诊断报告 JSON；左侧 Explorer 只显示本地已打开的 Runs 和当前 Run 的章节。导入文件始终只在浏览器内处理，没有上传服务。诊断 JSONL 的有限字段需在 Inspector 中明确点击 **Show allowed local fields** 才展示；在 **Source** 页签还可查看前后物理文件行，**不推断因果关系**。 现在 Inspector 还支持当前 section 内的 **Previous / Next record**、**Back to prior source** 和工具栏 **Locate selected**（展开并定位精确来源）；这里的前后关系仅是展示顺序，既不是 Owner-local sequence，也不是跨 Owner 因果关系。独立诊断报告只显示来源允许的安全摘要，**不是同一 Run 的轨迹或已经关联的 Owner 证据**；切换 Run 后会隐藏，需要手动再次打开。
 
-真实 P8-D4 attempt 2 JSONL（106 行）与独立 attempt 1 诊断报告的安全投影，均已在授权私有 Chromium 环境验收；公开合成浏览器交互 **14/14 PASS**。只有诊断来源中的物理行邻接可导航，**跨 Owner 因果关联、真实原生 Run 与材料闭包仍未验证**。详见 [V1 归档实验](docs/experiments/real-p8d4-review-import.md) 与 [PR #2](https://github.com/odango-chan/trace-viewer/pull/2)。
+真实 P8-D4 attempt 2 JSONL（106 行）与独立 attempt 1 诊断报告的安全投影，曾在授权私有 Chromium 环境验收；公开合成浏览器交互以最新 Actions 工作流为准。只有诊断来源中的物理行邻接可导航，**跨 Owner 因果关联、真实原生 Run 与材料闭包仍未验证**。详见 [V1 归档实验](docs/experiments/real-p8d4-review-import.md) 与 [PR #2](https://github.com/odango-chan/trace-viewer/pull/2)。
 
 ## 界面选型与示例体验
 
 Viewer 采用 React 19 + TypeScript + esbuild 的浏览器只读架构，静态部署于 GitHub Pages。与 Skill Studio 共用浅色视觉语言（`#f5f7fb` 背景、`#0c8e7b` 青绿交互强调色），但不引入 Studio 专用的 React Flow/ELK/Monaco：这里阅读的是真实来源记录，而非编辑流程图。
 
-默认内置四个**合成**示例，通过左侧栏底部 **Built-in examples** 下拉框切换。左侧上方 **Local runs** 仅列出用户在浏览器中手动导入的轨迹。真实诊断、材料或 Owner 证据不会作为公开示例打包上传。
+默认内置四个**合成**示例，通过左侧栏底部 **Built-in examples** 下拉框切换。左侧上方 **Local runs** 仅列出用户在浏览器中手动导入的轨迹。顶部 **View** 菜单可切换四种阅读模式与 Inspector 可见性；**Navigate** 提供异常定位、来源定位和章节展开/折叠；**Help** 提供入门、来源语义说明与版本范围。底部状态栏显示来源类别、当前记录和 Source record 数，所有操作均只读。真实诊断、材料或 Owner 证据不会作为公开示例打包上传。
+
+这是为未来可选 localhost 服务预留的**应用式 Web UI 外壳**，当前仍然是 React + TypeScript + 静态页面，未实现本地服务、文件监控、桌面系统集成或原生文件系统访问。
 
 ## Viewer 当前主线与 Trace 规范状态
 
