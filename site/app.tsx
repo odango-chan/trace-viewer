@@ -113,7 +113,8 @@ function App() {
     setDetailBusy(false)
     setDetailError(null)
   }
-  const runs = [reviewRun, nativeRun, ...syntheticRuns].filter(Boolean) as ExampleRun[]
+  const importedRuns = [reviewRun, nativeRun].filter(Boolean) as ExampleRun[]
+  const runs = [...importedRuns, ...syntheticRuns]
   async function importReview(event: React.ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget
     const file = input.files?.[0]
@@ -386,7 +387,7 @@ function App() {
       <div className="workbench">
         <aside className="sidebar" aria-label="Run explorer">
           <div className="sidebar-heading">EXPLORER</div>
-          <div className="sidebar-caption">RUNS & LOCAL INPUT <span>{runs.length}</span></div>
+          <div className="sidebar-caption">LOCAL RUNS <span>{importedRuns.length}</span></div>
           <div className="import-block">
             <label htmlFor="native-directory">Import TraceStore v2 folder</label>
             <input ref={directoryRef} id="native-directory" type="file" multiple
@@ -408,12 +409,15 @@ function App() {
             {importError && <p className="import-error" role="alert">{importError}</p>}
           </div>
           <div className="run-list">
-            {runs.map(item => (
+            {importedRuns.length === 0 && (
+              <p className="run-empty">No local trace loaded. Import a file above, or choose a built-in example below.</p>
+            )}
+            {importedRuns.map(item => (
               <button key={item.id} type="button" className={'run-option ' + (item.id === run.id ? 'active' : '')} onClick={() => selectRun(item)} aria-pressed={item.id === run.id}>
-                <span className="run-option-icon">{item.mode === 'DETERMINISTIC' ? '◇' : '◆'}</span>
+                <span className="run-option-icon">◇</span>
                 <span className="run-option-copy">
                   <strong>{item.title}</strong>
-                  <small>{item.sourceKind === 'SYNTHETIC' ? (item.mode === 'DETERMINISTIC' ? 'Deterministic · Synthetic' : 'Agent / Model · Synthetic') : sourceOverviewLabel(item) + ' · Local only'}</small>
+                  <small>{sourceOverviewLabel(item)} · Local only</small>
                 </span>
               </button>
             ))}
@@ -429,8 +433,22 @@ function App() {
             ))}
           </div>
           <div className="sidebar-bottom">
-            <span className="indicator" />
-            <span>Read-only • local examples</span>
+            <div className="example-picker">
+              <label htmlFor="demo-example">BUILT-IN EXAMPLES <span>{syntheticRuns.length}</span></label>
+              <select id="demo-example" aria-label="Choose demo example"
+                value={run.sourceKind === 'SYNTHETIC' ? run.id : ''}
+                onChange={event => {
+                  const example = syntheticRuns.find(item => item.id === event.currentTarget.value)
+                  if (example) selectRun(example)
+                }}>
+                <option value="" disabled>Choose a sample…</option>
+                {syntheticRuns.map(item => (
+                  <option key={item.id} value={item.id}>{item.title}</option>
+                ))}
+              </select>
+              <small>Illustrative data only · not a real execution</small>
+            </div>
+            <div className="sidebar-privacy"><span className="indicator" /> Read-only · browser-local imports</div>
           </div>
         </aside>
 
