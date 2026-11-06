@@ -64,6 +64,32 @@ def main():
             checks.append("Help explains source semantics and closes with Escape")
             page.reload(wait_until="domcontentloaded")
             page.get_by_text("SYNTHETIC DATA", exact=True).wait_for(timeout=15000)
+            explorer = page.get_by_role("navigation", name="Current run records")
+            assert explorer.is_visible()
+            assert page.locator(".sidebar-run-summary").is_visible()
+            assert "source records" in page.locator(".sidebar-run-summary").inner_text()
+            assert explorer.locator(".sidebar-section").count() >= 2
+            assert explorer.locator(".sidebar-section-active .sidebar-record.active").count() == 1
+            assert explorer.locator(".sidebar-record").count() >= 1
+            current_section = explorer.locator(".sidebar-section-active")
+            section_toggle = current_section.locator(".sidebar-section-toggle")
+            assert section_toggle.get_attribute("aria-expanded") == "true"
+            section_toggle.click()
+            assert section_toggle.get_attribute("aria-expanded") == "false"
+            assert current_section.locator(".sidebar-record").count() == 0
+            section_toggle.click()
+            assert section_toggle.get_attribute("aria-expanded") == "true"
+            assert current_section.locator(".sidebar-record").count() >= 1
+            first_record = current_section.locator(".sidebar-record").first
+            record_title = first_record.get_attribute("title")
+            first_record.click()
+            assert page.get_by_role("button", name="Raw records", exact=True).get_attribute("aria-pressed") == "true"
+            assert page.locator(".timeline .trace-event.selected").count() == 1
+            assert explorer.locator(".sidebar-record.active").count() == 1
+            assert page.locator(".inspector-title").is_visible()
+            checks.append("Explorer expands real chapter records and navigates exact sources")
+            page.reload(wait_until="domcontentloaded")
+            page.get_by_text("SYNTHETIC DATA", exact=True).wait_for(timeout=15000)
             picker = page.get_by_role("combobox", name="Choose demo example")
             assert picker.is_visible()
             assert picker.input_value() == "synthetic-agent-recovery"
