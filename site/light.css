@@ -447,3 +447,97 @@ html,body,.app-shell,.workbench{background:var(--bg)}
   .canvas{background:#f5f7fb}
   .turn-header{background:#fbfcfe}
 }
+
+/* Dense, source-first Readable view.
+   A source ledger, not a time sequence. Explicit causal links remain Inspector-owned. */
+.ledger-body{padding:0;background:#fff}
+.ledger-view{width:100%;min-width:0}
+.ledger-head,.ledger-event{
+  display:grid;
+  grid-template-columns:22px minmax(0,1.4fr) minmax(0,1fr) 110px;
+  gap:9px;
+  align-items:center;
+}
+.ledger-head{
+  padding:7px 10px;
+  border-bottom:1px solid #e2e9f1;
+  background:#f7fafc;
+  color:#73869b;
+  font-size:9px;font-weight:750;letter-spacing:.5px;
+}
+.ledger-head span:last-child{text-align:right}
+.ledger-event{
+  padding:7px 10px;
+  border-radius:0;
+  border:0;
+  border-bottom:1px solid #e7ecf3;
+  min-width:0;
+}
+.ledger-event:last-child{border-bottom:0}
+.ledger-event:nth-child(odd){background:#fcfdff}
+.ledger-event:hover{background:#f0f8f5}
+.ledger-event.selected,.ledger-event.selected:nth-child(odd){
+  background:#e5f6ef;
+  box-shadow:inset 3px 0 #0c8e7b;
+  border-bottom-color:#b8dfd2;
+}
+.ledger-event .event-glyph{grid-column:1}
+.ledger-event .event-detail{grid-column:2;min-width:0;gap:4px}
+.ledger-event .event-detail strong{
+  font-size:11px;line-height:1.4;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-event .event-detail small{
+  font-size:10px;line-height:1.35;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:#6e8297;
+}
+.ledger-source{
+  grid-column:3;display:flex;flex-direction:column;
+  min-width:0;gap:3px;text-align:left;
+  font-size:9px;line-height:1.3;
+}
+.ledger-kind{
+  color:#1d665f;font-weight:750;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-authority{
+  color:#42617b;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-ref{
+  color:#8292a4;
+  font:9px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.ledger-ref-count{color:#577d78;font-size:9px}
+.ledger-event .event-side{
+  grid-column:4;min-width:0;
+  align-items:flex-end;
+  gap:5px;
+}
+.ledger-event .event-side small{
+  text-align:right;overflow-wrap:anywhere;
+}
+.ledger-event .status{font-size:9px}
+@media(max-width:960px){
+  .ledger-head{display:none}
+  .ledger-event{
+    grid-template-columns:22px minmax(0,1fr) 90px;
+    grid-template-areas:
+      "glyph detail side"
+      ". provenance side";
+    column-gap:9px;row-gap:3px
+  }
+  .ledger-event .event-glyph{grid-area:glyph}
+  .ledger-event .event-detail{grid-area:detail}
+  .ledger-event .ledger-source{
+    grid-area:provenance;
+    display:flex;flex-direction:row;flex-wrap:wrap;
+    gap:2px 8px
+  }
+  .ledger-event .event-side{grid-area:side}
+  .ledger-source .ledger-kind{flex:none;max-width:100%}
+  .ledger-source .ledger-authority{max-width:100%}
+  .ledger-source .ledger-ref{max-width:100%}
+}
