@@ -53,8 +53,8 @@ def main():
             assert page.locator(".metric").first.bounding_box()["height"] <= 58
             assert page.locator(".timeline").bounding_box()["y"] < 450
             page.locator(".turn-card .turn-header").first.click()
-            assert page.locator(".timeline .event-kind").first.is_visible()
-            assert "MODEL_" in page.locator(".timeline .event-kind").first.inner_text()
+            assert page.locator(".timeline .ledger-kind").first.is_visible()
+            assert "MODEL_" in page.locator(".timeline .ledger-kind").first.inner_text()
             checks.append("Compact above-fold trajectory retains explicit source kinds and accurate totals")
             assert page.locator(".ledger-view").count() >= 1
             assert page.locator(".owner-lane").count() == 0
