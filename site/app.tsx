@@ -656,13 +656,11 @@ function App() {
         </aside>
 
         <main ref={canvasRef} className="canvas">
-          <div className="breadcrumb">WORKSPACE <span>/</span> TRACE <span>/</span> {run.mode}</div>
-          <div className="page-heading">
-            <div>
-              <div className="eyebrow">RUN OVERVIEW</div>
-              <h1>{run.title}</h1>
-              <p>{run.subtitle}</p>
-            </div>
+          <div className="page-heading" aria-label="Run overview">
+            <span className="eyebrow" title={'Run mode: ' + run.mode}>RUN OVERVIEW</span>
+            <h1 title={run.title}>{run.title}</h1>
+            <span className="page-heading-separator" aria-hidden="true">·</span>
+            <p title={run.subtitle}>{run.subtitle}</p>
           </div>
 
           <div className="metric-row">
