@@ -138,6 +138,8 @@ function App() {
       reviewFileRef.current = {file, runId: imported.id}
       setReviewRun(imported)
       setRunId(imported.id)
+      setSidebarOpen(new Set(imported.sections.slice(0,1).map(s => s.id)))
+      setSidebarShowAll(new Set())
       setExpanded(new Set(imported.sections.map(s => s.id)))
       const reviewRecords = imported.sections.flatMap(section => section.records)
       setSelectedRef((reviewRecords.find(record => isException(record) && reviewDetailAvailable(record.kind))
@@ -171,6 +173,8 @@ function App() {
     }
   }
 
+  const [sidebarOpen, setSidebarOpen] = useState<Set<string>>(() => new Set([syntheticRuns[0].sections[1]?.id].filter(Boolean) as string[]))
+  const [sidebarShowAll, setSidebarShowAll] = useState<Set<string>>(() => new Set())
   const [runId, setRunId] = useState(syntheticRuns[0].id)
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(syntheticRuns[0])))
   const [selectedRef, setSelectedRef] = useState<string>(syntheticRuns[0].sections[1].records[2].ref)
@@ -209,6 +213,8 @@ function App() {
       const imported = await importTraceStoreFiles(selectedFiles) as ExampleRun
       setNativeRun(imported)
       setRunId(imported.id)
+      setSidebarOpen(new Set(imported.sections.slice(0,1).map(section => section.id)))
+      setSidebarShowAll(new Set())
       setExpanded(new Set(imported.sections.map(section => section.id)))
       setSelectedRef(imported.sections.flatMap(section => section.records)[0]?.ref ?? '')
       setFilter('all')
@@ -227,6 +233,10 @@ function App() {
   const run = runs.find(item => item.id === runId) ?? runs[0]
   const records = allRecords(run) as TraceRecord[]
   const activeRecord = records.find(record => record.ref === selectedRef) ?? null
+  useEffect(() => {
+    const section = run.sections.find(section => section.records.some(record => record.ref === selectedRef))
+    if (section) setSidebarOpen(previous => previous.has(section.id) ? previous : new Set(previous).add(section.id))
+  }, [runId, selectedRef])
   const evidenceStatus = inspectorEvidenceStatus(run, activeRecord)
   const neighbors = reviewFileNeighbors(run, activeRecord)
   const readingContext = recordReadingContext(run, activeRecord)
@@ -393,6 +403,10 @@ function App() {
     setLocateRequest(null)
     setFindingVisible(false)
     setRunId(next.id)
+    setSidebarOpen(new Set((next.sections.filter(section => section.records.some(isException)).slice(0,1).length
+      ? next.sections.filter(section => section.records.some(isException)).slice(0,1)
+      : next.sections.slice(0,1)).map(section => section.id)))
+    setSidebarShowAll(new Set())
     setExpanded(new Set(defaultOpenSections(next)))
     setFilter('all')
     setViewMode('readable')
@@ -423,6 +437,22 @@ function App() {
       : (index <= 0 ? buttons.length - 1 : index - 1)
     buttons[next].focus()
     event.preventDefault()
+  }
+  function toggleSidebarSection(id: string) {
+    setSidebarOpen(previous => {
+      const next = new Set(previous)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+  function toggleSidebarShowAll(id: string) {
+    setSidebarShowAll(previous => {
+      const next = new Set(previous)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
   }
   function toggleSection(id: string) {
     setExpanded(previous => {
@@ -546,15 +576,65 @@ function App() {
             ))}
           </div>
           <div className="sidebar-divider" />
-          <div className="sidebar-caption">THIS RUN</div>
-          <div className="section-index">
-            {run.sections.map((section, i) => (
-              <button key={section.id} type="button" onClick={() => navigateToRecord(section.records[0] ?? null)}>
-                <span className="section-index-num">{String(i + 1).padStart(2, '0')}</span>
-                <span>{section.title.replace(/^TURN \d+ · |^STEP \d+ · |^ENTRY · |^EXECUTION · |^EXTERNAL · /, '')}</span>
-              </button>
-            ))}
+          <div className="sidebar-caption">THIS RUN <span>{run.sections.length} SECTIONS</span></div>
+          <div className="sidebar-run-summary">
+            <strong title={run.title}>{run.title}</strong>
+            <span>{summary.events} source records <span className="sidebar-summary-dot">·</span> {summary.exceptions} flagged</span>
           </div>
+          <nav className="section-index" aria-label="Current run records">
+            {run.sections.map((section, i) => {
+              const isOpen = sidebarOpen.has(section.id)
+              const isActive = section.records.some(record => record.ref === selectedRef)
+              const exceptionCount = section.records.filter(isException).length
+              const showAll = sidebarShowAll.has(section.id)
+              const shownRecords = showAll ? section.records : [
+                ...section.records.slice(0, 8),
+                ...section.records.slice(8).filter(record => record.ref === selectedRef),
+              ]
+              return (
+                <div key={section.id} className={'sidebar-section ' + (isActive ? 'sidebar-section-active' : '')}>
+                  <div className="sidebar-section-row">
+                    <button type="button" className="sidebar-section-toggle"
+                      aria-label={(isOpen ? 'Collapse ' : 'Expand ') + section.title}
+                      aria-expanded={isOpen} onClick={() => toggleSidebarSection(section.id)}>
+                      {isOpen ? '⌄' : '›'}
+                    </button>
+                    <button type="button" className="sidebar-section-link"
+                      onClick={() => navigateToRecord(section.records[0] ?? null)}
+                      title={section.title}>
+                      <span className="section-index-num">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="sidebar-section-title">{section.title.replace(/^TURN \d+ · |^STEP \d+ · |^ENTRY · |^EXECUTION · |^EXTERNAL · /, '')}</span>
+                      <span className={'sidebar-section-count ' + (exceptionCount ? 'has-exceptions' : '')}
+                        title={exceptionCount ? exceptionCount + ' flagged in ' + section.records.length + ' records' : section.records.length + ' records'}>
+                        {section.records.length}{exceptionCount ? ' !' + exceptionCount : ''}
+                      </span>
+                    </button>
+                  </div>
+                  {isOpen && (
+                    <div className="sidebar-record-tree">
+                      {shownRecords.map(record => (
+                        <button key={record.ref} type="button"
+                          className={'sidebar-record ' + (record.ref === selectedRef ? 'active' : '')}
+                          onClick={() => navigateToRecord(record)}
+                          aria-current={record.ref === selectedRef ? 'true' : undefined}
+                          title={record.kind + ' · ' + record.title + ' · ' + record.ref}>
+                          <span className={'sidebar-record-glyph ' + (isException(record) ? 'warning' : '')}>{kindSymbol(record.kind)}</span>
+                          <span className="sidebar-record-title">{record.title || record.kind}</span>
+                          <span className={'sidebar-record-status ' + (isException(record) ? 'warning' : '')}>{record.status}</span>
+                        </button>
+                      ))}
+                      {section.records.length > 8 && (
+                        <button type="button" className="sidebar-record-more"
+                          onClick={() => toggleSidebarShowAll(section.id)}>
+                          {showAll ? 'Show fewer' : 'Show ' + (section.records.length - 8) + ' more records'}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </nav>
           <div className="sidebar-bottom">
             <div className="example-picker">
               <label htmlFor="demo-example">BUILT-IN EXAMPLES <span>{syntheticRuns.length}</span></label>
