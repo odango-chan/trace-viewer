@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { samples } from '../site/fixtures.mjs'
-import { validateSyntheticRun, allRecords, getSourceLinks, runSummary, defaultOpenSections, inspectorEvidenceStatus, sourceOverviewLabel } from '../site/projection.mjs'
+import { validateSyntheticRun, allRecords, getSourceLinks, runSummary, defaultOpenSections, inspectorEvidenceStatus, reviewFileNeighbors, sourceOverviewLabel } from '../site/projection.mjs'
 
 test('synthetic cases are explicitly labeled; DSH and deterministic modes remain separate', () => {
   assert.equal(samples.length, 4)
@@ -66,4 +66,34 @@ test('Missing record selection never implies an execution outcome', () => {
   const status = inspectorEvidenceStatus({sourceKind:'NATIVE_LOCAL'}, null)
   assert.equal(status.label, 'NO SOURCE SELECTED')
   assert.doesNotMatch(status.detail, /FAILED|SUCCEEDED/)
+})
+
+test('review context gives adjacent physical JSONL lines, never a causal edge',()=>{
+  const base = {sourceAuthority:'review-export',ownerSequence:null,kind:'CALL_RESULT',
+    title:'source only',summary:'redacted',status:'RECORDED',causalRefs:[]}
+  const records = [1,2,3].map(line=>({
+    ...base,sourceLine:line,sourceLocator:'test.jsonl#line='+line,
+    ref:'review:test.jsonl:line='+line,
+  }))
+  const run={sourceKind:'REVIEW_DIAGNOSTIC',sections:[
+    {id:'part',title:'Physical',subtitle:'Not an Owner sequence',kind:'review-export',records},
+  ]}
+  assert.equal(reviewFileNeighbors(run,records[0]).previous,null)
+  assert.equal(reviewFileNeighbors(run,records[0]).next.ref,records[1].ref)
+  assert.equal(reviewFileNeighbors(run,records[1]).previous.ref,records[0].ref)
+  assert.equal(reviewFileNeighbors(run,records[2]).next,null)
+  assert.equal(reviewFileNeighbors(run,{...records[1],ref:'foreign:ref'}).next,null)
+  assert.deepEqual(records.map(x=>x.causalRefs),[[],[],[]])
+  assert.deepEqual(reviewFileNeighbors(samples[0],samples[0].sections[0].records[0]),{previous:null,next:null})
+})
+test('review context never jumps over missing lines or to unrelated local files',()=>{
+  const first={ref:'review:a.jsonl:line=1',sourceAuthority:'review',
+    sourceLine:1,ownerSequence:null,kind:'CALL_RESULT',status:'RECORDED',causalRefs:[]}
+  const third={...first,ref:'review:a.jsonl:line=3',sourceLine:3}
+  const other={...first,ref:'review:b.jsonl:line=2',sourceLine:2}
+  const run={sourceKind:'REVIEW_DIAGNOSTIC',sections:[
+    {id:'block',records:[first,other,third]},
+  ]}
+  assert.equal(reviewFileNeighbors(run,first).next,null)
+  assert.equal(reviewFileNeighbors(run,third).previous,null)
 })
