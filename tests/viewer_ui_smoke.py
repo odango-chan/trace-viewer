@@ -64,6 +64,25 @@ def main():
             assert "synthetic:model-req-1" in page.locator(".ledger-event .ledger-ref").first.inner_text()
             assert page.locator(".ledger-event .event-side").first.is_visible()
             checks.append("Readable source ledger shows folded interaction, authority, exact ref, status and position")
+            row = page.locator(".ledger-event").first
+            assert row.locator(".ledger-event-main strong").is_visible()
+            assert row.locator(".ledger-event-main small").is_visible()
+            assert row.bounding_box()["height"] <= 44
+            assert row.locator(".ledger-event-main").evaluate("(el) => getComputedStyle(el).whiteSpace") == "nowrap"
+            assert row.locator(".event-side").evaluate("(el) => getComputedStyle(el).flexDirection") == "row"
+            assert "synthetic:model-req-1" in row.locator(".ledger-source").get_attribute("title")
+            assert "snapshot" in row.locator(".ledger-event-main").get_attribute("title").lower()
+            page.set_viewport_size({"width": 1180, "height": 900})
+            assert row.bounding_box()["height"] <= 44
+            page.set_viewport_size({"width": 1600, "height": 1000})
+            checks.append("Readable records use one physical line at desktop and laptop widths")
+            harness = page.locator(".ledger-event").filter(has_text="Harness · Admission").first
+            assert harness.is_visible()
+            assert harness.bounding_box()["height"] <= 44
+            assert "HARNESS_ADMISSION" in harness.locator(".ledger-kind").inner_text()
+            assert "synthetic:runtime" in harness.locator(".ledger-authority").inner_text()
+            assert harness.locator(".ledger-ref-count").inner_text() == "↳1"
+            checks.append("Harness Admission remains one line with explicit source and causal-ref count")
             page.get_by_role("button", name="All owners", exact=True).click()
             assert page.locator(".owner-lane").count() >= 4
             assert page.locator(".ledger-view").count() == 0
