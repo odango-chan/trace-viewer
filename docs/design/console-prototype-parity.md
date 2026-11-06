@@ -46,6 +46,8 @@
 
 右侧 Inspector 保留来源身份、原始记录 Ref 和显式 lineage，并仅对带有 **synthetic-only `illustration`** 的内置来源记录开放 **Scenario** 详情。包括模拟的 System / Context / Skill / Tools / Response、Tool Call/Schema/Delivery 与 Runtime 判据/诊断。字段与解释是独立重新编写的公开教学文本；即使与 Console 原型故事相似，也**不得**称为采集到的真实 Model input、Evidence、Runtime/Host 状态、网络事实或材料闭包。真实本地导入不能使用该 synthetic-only 面板；未提供真实材料时仍显示 UNAVAILABLE / WITHHELD。
 
+**展示时间边界补充：** 即使所有数据均为人工编写，`MODEL_REQUEST` 也只能展示当次请求可见的模拟 System、Context、Skill 和 Tools；模型生成的选项或文本必须位于后续 `MODEL_RESPONSE`。同理 `TOOL_CALL` 只能显示调用参数、Schema 和尚未确定的结果状态，不能提前泄漏 `TOOL_RESULT` 的 Outcome / Delivery；结果放在具有精确 call/ref 关系的 `TOOL_RESULT` 来源记录。页面中的折叠交互可同时关联两端，但点击来源后的 Inspector 必须保持两端知识边界。
+
 本次只做**一个完整的示例故事**；原 Console 异常库的其他场景仍未迁入，更不代表 Runtime 六阶段已经由所有真实 Producer 发布。现有投影仍以明确 ref 配对，不按卡片邻接推断跨 Owner 关系。
 
 ## 产品交互守则
