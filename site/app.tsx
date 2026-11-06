@@ -331,18 +331,27 @@ function App() {
         data-source-ref={source.ref}
         onClick={() => selectRecord(source.ref)} aria-pressed={active}>
         <span className={'event-glyph ' + (warning ? 'glyph-warning' : '')}>{kindSymbol(source.kind)}</span>
-        <span className="event-detail">
-          {!isLedger && <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}{viewMode !== 'raw' && <span className="event-kind"> · {source.kind}</span>}</span>}
-          <strong>{viewMode === 'raw' ? source.kind : source.title}</strong>
-          <small>{viewMode === 'raw' ? source.ref : source.summary}</small>
-          {row.isFolded && !isLedger && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · ' + recordPosition(member)).join('  →  ')}</span>}
-        </span>
-        {isLedger && (
-          <span className="ledger-source">
-            <span className="ledger-kind">{row.isFolded ? row.label + ' · ' + source.kind : source.kind}</span>
-            <span className="ledger-authority" title={source.sourceAuthority}>{source.sourceAuthority}{source.stage ? ' · ' + source.stage : ''}</span>
-            <span className="ledger-ref" title={source.ref}>{source.ref}</span>
-            {(source.causalRefs?.length ?? 0) > 0 && <span className="ledger-ref-count">{source.causalRefs.length} declared causal ref{source.causalRefs.length === 1 ? '' : 's'}</span>}
+        {isLedger ? (
+          <>
+            <span className="ledger-event-main" title={source.title + ' · ' + source.summary}>
+              <strong>{source.title}</strong>
+              <small>{source.summary}</small>
+            </span>
+            <span className="ledger-kind" title={row.isFolded ? row.label + ' · ' + source.kind : source.kind}>
+              {row.isFolded ? row.label + ' · ' + source.kind : source.kind}
+            </span>
+            <span className="ledger-source" title={source.sourceAuthority + ' · ' + source.ref}>
+              <span className="ledger-authority">{source.sourceAuthority}{source.stage ? ' · ' + source.stage : ''}</span>
+              <span className="ledger-ref">{source.ref}</span>
+              {(source.causalRefs?.length ?? 0) > 0 && <span className="ledger-ref-count" title={source.causalRefs.length + ' declared causal refs'}>↳{source.causalRefs.length}</span>}
+            </span>
+          </>
+        ) : (
+          <span className="event-detail">
+            <span className="event-meta">{viewMode === 'raw' ? 'SOURCE RECORD' : row.label} <span>·</span> {source.sourceAuthority}{viewMode !== 'raw' && <span className="event-kind"> · {source.kind}</span>}</span>
+            <strong>{viewMode === 'raw' ? source.kind : source.title}</strong>
+            <small>{viewMode === 'raw' ? source.ref : source.summary}</small>
+            {row.isFolded && <span className="fold-source-refs">{row.members.map(member => member.kind + ' · ' + recordPosition(member)).join('  →  ')}</span>}
           </span>
         )}
         <span className="event-side">
@@ -565,7 +574,7 @@ function App() {
                       {viewMode === 'readable' ? (
                         <div className="ledger-view" aria-label="Compact source ledger">
                           <div className="ledger-head" aria-hidden="true">
-                            <span></span><span>EVENT</span><span>SOURCE / RECORD KIND</span><span>STATUS / POSITION</span>
+                            <span></span><span>EVENT · SUMMARY</span><span>KIND</span><span>SOURCE / REF</span><span>STATUS · POSITION</span>
                           </div>
                           {shown.map(row => renderRecordRow(row))}
                         </div>
