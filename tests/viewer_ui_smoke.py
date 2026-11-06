@@ -181,7 +181,7 @@ def main():
             page.get_by_role("combobox", name="Choose demo example").select_option(label="Parallel reads · out-of-order ToolResults")
             page.locator(".turn-card .turn-header").first.click()
             assert page.locator(".ledger-event .ledger-kind").filter(has_text="Tool Interaction").count() == 2
-            page.get_by_text("query_session (A)", exact=True).click()
+            page.locator(".timeline").get_by_text("query_session (A)", exact=True).click()
             assert page.locator(".paired-sources button").count() == 2
             page.locator(".paired-sources button").nth(1).click()
             assert "synthetic:parallel-result-a" in page.locator(".source-preview").inner_text()
