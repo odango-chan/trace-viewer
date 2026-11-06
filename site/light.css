@@ -958,3 +958,141 @@ html,body,.app-shell,.workbench{background:var(--bg)}
   }
   .app-statusbar{position:static;bottom:auto}
 }
+
+/* Type hierarchy / readability pass (Studio light palette unchanged).
+   The old 8–10px blue-grey text made every fact look like a placeholder.
+   Use three contrast roles, not a new layer of tinted surfaces:
+   strong = event/value, body = descriptive content, metadata = coordinates. */
+:root {
+  --type-strong: #20314a;
+  --type-body: #41586d;
+  --type-meta: #526a7d;
+  --type-accent: #0c7668;
+}
+.page-heading h1,
+.trace-heading h2,
+.turn-title strong,
+.ledger-event-main strong,
+.event-detail strong,
+.inspector-title,
+.sidebar-run-summary strong,
+.sidebar-section-title {
+  color:var(--type-strong);
+}
+.page-heading p,
+.trace-heading p,
+.turn-title small,
+.ledger-event-main small,
+.event-detail small,
+.inspector-description,
+.view-hint,
+.info-note,
+.help-content p {
+  color:var(--type-body);
+}
+.sidebar-caption,
+.sidebar-heading,
+.inspector-label,
+.metric span,
+.turn-count,
+.turn-number,
+.ledger-head,
+.ledger-event .event-side small,
+.event-side small,
+.ledger-ref,
+.sidebar-section-count,
+.sidebar-run-summary>span,
+.sidebar-record-status,
+.sidebar-record-more,
+.section-index-num,
+.reading-context-top,
+.inspector-bottom,
+.statusbar-selected,
+.app-statusbar,
+.canvas-footer {
+  color:var(--type-meta);
+}
+/* The compact ledger must remain one physical line at desktop widths. */
+.ledger-event-main strong {font-size:12px;line-height:1.35;font-weight:750}
+.ledger-event-main small {font-size:11px;line-height:1.35}
+.ledger-event>.ledger-kind {font-size:10px;line-height:1.35;color:var(--type-accent);font-weight:750}
+.ledger-event .ledger-authority {font-size:10px;color:var(--type-body);font-weight:600}
+.ledger-event .ledger-ref {
+  font-size:10px;line-height:1.35;color:var(--type-meta);
+}
+.ledger-event .ledger-ref-count {font-size:10px;color:var(--type-accent)}
+.ledger-event .event-side small {font-size:10px}
+.ledger-event .status {font-size:10px}
+.ledger-head {font-size:10px;letter-spacing:.25px}
+.event-kind {color:var(--type-accent);font-size:10px}
+.event-meta {color:var(--type-meta);font-size:10px}
+.event-detail strong {font-size:12px}
+.event-detail small {font-size:11px;line-height:1.4}
+.event-side small {font-size:10px}
+.turn-title strong {font-size:12px}
+.turn-title small {font-size:11px}
+.turn-count {font-size:10px}
+.lane-heading {color:var(--type-body);font-size:10px}
+.owner-lane .event-meta {font-size:9px;color:var(--type-meta)}
+.owner-lane .event-detail strong {font-size:11px}
+.owner-lane .event-detail small {font-size:10px}
+.owner-lane .event-side small {font-size:10px}
+.lane-empty {color:var(--type-meta);font-size:10px}
+.fold-source-refs {color:var(--type-meta);font-size:10px}
+/* Navigation text: headings and record titles lead, counters and codes follow. */
+.sidebar-heading,.sidebar-caption {font-size:10px}
+.sidebar-run-summary strong {font-size:11px}
+.sidebar-run-summary>span {font-size:10px}
+.section-index .sidebar-section-link {font-size:11px}
+.sidebar-section-link>.section-index-num {font-size:10px}
+.sidebar-section-count {font-size:10px}
+.section-index .sidebar-record {color:var(--type-body);font-size:11px}
+.sidebar-record-title {font-weight:550}
+.sidebar-record-status {font-size:9px}
+.section-index .sidebar-record-more {color:var(--type-accent);font-size:10px}
+.run-option-copy small,.run-empty,.example-picker small,.sidebar-privacy {
+  color:var(--type-meta);font-size:10px;
+}
+.example-picker label {color:var(--type-body)}
+/* Inspector: legible labels, high-contrast values, concise provenance hints. */
+.inspector-description {font-size:12px;line-height:1.5}
+.inspector-label {font-size:10px;letter-spacing:.5px}
+.properties {font-size:12px;line-height:1.4}
+.properties dt {font-size:11px;color:var(--type-body);font-weight:500}
+.properties dd {font-size:12px;color:var(--type-strong);font-weight:650}
+.inspector-tab {font-size:11px;color:var(--type-body)}
+.inspector-tab.active {color:var(--type-accent)}
+.reading-context-top {font-size:10px}
+.reading-context>strong {font-size:12px}
+.reading-context p,.paired-sources p,.review-line-context p,.local-detail p {
+  color:var(--type-body);font-size:11px;line-height:1.45;
+}
+.reading-actions button small,.ref-item small {font-size:10px;color:var(--type-meta)}
+.raw-placeholder,.unavailable {color:var(--type-body);font-size:11px;line-height:1.45}
+.raw-placeholder strong {color:var(--type-strong);font-size:11px}
+.source-preview {color:var(--type-body);font-size:11px}
+.ref-item,.paired-sources button {color:var(--type-body)}
+/* Information chrome: still secondary, but not washed out. */
+.page-heading p {font-size:11px}
+.page-heading .eyebrow {color:var(--type-meta);font-size:10px}
+.metric span {font-size:11px}
+.trace-heading p,.trajectory-count,.view-hint {font-size:11px;color:var(--type-body)}
+.info-note {font-size:11px}
+.tool,.view-mode {font-size:11px;color:var(--type-body)}
+.app-menu-trigger {font-size:12px;color:var(--type-body)}
+.app-menu-panel button {font-size:12px;color:var(--type-body)}
+.app-menu-note {font-size:10px;color:var(--type-meta)}
+.app-statusbar {font-size:10px}
+.statusbar-selected {font-size:10px;color:var(--type-meta)}
+/* Status retains semantic colors; neutral is not an almost-invisible badge. */
+.status.good {color:#216945}
+.status.danger {color:#8c501b}
+.status.uncertain {color:#87571a}
+.status.pending {color:#315d87}
+.status.neutral {color:var(--type-body)}
+.sidebar-record-status.warning {color:#98611f}
+@media(max-width:750px){
+  .page-heading p {font-size:11px}
+  .ledger-event-main strong {font-size:12px}
+  .ledger-event-main small {font-size:11px}
+}
