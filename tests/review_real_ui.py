@@ -104,6 +104,10 @@ def main():
             page.get_by_role("button", name="Source", exact=True).click()
             assert '"sourceLine": 27' in page.locator(".source-preview").inner_text()
             page.get_by_role("button", name="Back to prior source", exact=True).click()
+            # Back restores the original inspector tab (Summary), not Source.
+            assert page.get_by_role("button", name="Summary", exact=True).get_attribute("aria-pressed") == "true"
+            assert "1 / 25 in section" in context.inner_text()
+            page.get_by_role("button", name="Source", exact=True).click()
             assert '"sourceLine": 26' in page.locator(".source-preview").inner_text()
             page.get_by_role("button", name="Locate selected", exact=True).click()
             assert page.locator(".timeline .trace-event.selected").count() == 1
