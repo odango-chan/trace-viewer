@@ -58,6 +58,31 @@ export function getSourceLinks(run, record) {
   }))
 }
 
+/**
+ * Strictly physical adjacency of an unversioned review JSONL file.
+ * NEVER an Owner sequence, happens-before edge, or causal assertion.
+ * Ambiguous or foreign selections are treated as unavailable.
+ */
+export function reviewFileNeighbors(run, record) {
+  const absent = {previous:null, next:null}
+  if (run?.sourceKind !== 'REVIEW_DIAGNOSTIC' || !record ||
+      !Number.isSafeInteger(record.sourceLine)) return absent
+  const records = allRecords(run)
+  const selected = records.find(item=>item.ref===record.ref &&
+    item.sourceLine===record.sourceLine &&
+    item.sourceAuthority===record.sourceAuthority)
+  if (!selected) return absent
+  const filePrefix = selected.ref.replace(/:line=[0-9]+$/, '')
+  function at(line) {
+    if(line<1) return null
+    const candidates = records.filter(item=>
+      item.sourceLine===line && item.sourceAuthority===selected.sourceAuthority &&
+      item.ref.replace(/:line=[0-9]+$/, '')===filePrefix)
+    return candidates.length===1 ? candidates[0] : null
+  }
+  return {previous:at(selected.sourceLine-1),next:at(selected.sourceLine+1)}
+}
+
 export function runSummary(run) {
   const records = allRecords(run)
   const statuses = records.filter(item => EXCEPTION_STATUSES.has(item.status))
