@@ -33,13 +33,19 @@ def main():
                 ['.topbar', '.sidebar', '.canvas', '.inspector', '.turn-card', '.turn-header', '.turn-body']
                   .map(selector => [selector, getComputedStyle(document.querySelector(selector)).backgroundColor])
             )""")
-            assert surfaces[".sidebar"] == "rgb(229, 237, 244)"
-            assert surfaces[".canvas"] == "rgb(234, 240, 246)"
-            assert surfaces[".inspector"] == "rgb(241, 245, 249)"
-            assert surfaces[".turn-card"] == "rgb(255, 255, 255)"
-            assert surfaces[".turn-header"] == "rgb(243, 247, 250)"
+            assert surfaces[".sidebar"] == "rgb(44, 66, 86)"
+            assert surfaces[".canvas"] == "rgb(208, 219, 229)"
+            assert surfaces[".inspector"] == "rgb(203, 216, 227)"
+            assert surfaces[".turn-card"] == "rgb(236, 242, 247)"
+            assert surfaces[".turn-header"] == "rgb(213, 225, 235)"
             assert len(set(surfaces.values())) >= 5
-            checks.append("Distinct slate explorer, canvas, inspector and white trajectory surfaces")
+            assert surfaces[".topbar"] == "rgb(36, 57, 76)"
+            assert page.locator(".brand-copy strong").evaluate(
+                "(node) => getComputedStyle(node).color") == "rgb(240, 247, 250)"
+            assert page.locator(".sidebar-caption").first.evaluate(
+                "(node) => getComputedStyle(node).color") == "rgb(196, 217, 230)"
+            assert surfaces[".turn-body"] == surfaces[".turn-card"]
+            checks.append("Dark slate navigation and toned reading surfaces preserve text legibility")
             assert page.get_by_text("Source records", exact=True).is_visible()
             assert page.get_by_text("Source authorities", exact=True).is_visible()
             assert page.locator(".metric").first.bounding_box()["height"] <= 58
