@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { samples } from './fixtures.mjs'
-import { allRecords, defaultOpenSections, getSourceLinks, inspectorEvidenceStatus, isException, runSummary, sourceOverviewLabel } from './projection.mjs'
+import { allRecords, defaultOpenSections, getSourceLinks, inspectorEvidenceStatus, isException, reviewFileNeighbors, runSummary, sourceOverviewLabel } from './projection.mjs'
 import { findPrimaryUnknown, projectLanes, projectSectionRows } from './console-parity.mjs'
 import { importTraceStoreFiles } from './native-import.mjs'
 import { importReviewDiagnosticFile } from './review-diagnostic.mjs'
@@ -193,6 +193,7 @@ function App() {
   const records = allRecords(run) as TraceRecord[]
   const activeRecord = records.find(record => record.ref === selectedRef) ?? null
   const evidenceStatus = inspectorEvidenceStatus(run, activeRecord)
+  const neighbors = reviewFileNeighbors(run, activeRecord)
   const shownDetail = localDetail?.runId === run.id && localDetail?.recordRef === activeRecord?.ref ? localDetail : null
   const canRevealLocalDetail = run.sourceKind === 'REVIEW_DIAGNOSTIC' &&
     !!activeRecord && Number.isSafeInteger(activeRecord.sourceLine) &&
@@ -237,6 +238,17 @@ function App() {
     hideLocalDetail()
     setSelectedRef(ref)
     setInspectorTab('summary')
+  }
+
+  function goToReviewLine(target: TraceRecord | null) {
+    if (!target) return
+    hideLocalDetail()
+    setFilter('all')
+    setViewMode('raw')
+    const section = run.sections.find(part => part.records.some(item => item.ref === target.ref))
+    if (section) setExpanded(previous => new Set(previous).add(section.id))
+    setSelectedRef(target.ref)
+    setInspectorTab('source')
   }
 
   function recordPosition(record: TraceRecord) {
@@ -569,6 +581,22 @@ function App() {
                     } : {}),
                   }, null, 2)}</pre>
                   <div className="raw-placeholder"><strong>Provenance subset only</strong><span>Raw material content is not included. The viewer does not transmit files or assert complete owner validation.</span></div>
+                  {run.sourceKind === 'REVIEW_DIAGNOSTIC' && (
+                    <section className="review-line-context" aria-label="Source file adjacency">
+                      <div className="inspector-label">PHYSICAL FILE CONTEXT</div>
+                      <p>Adjacent JSONL lines only. File order does not establish causality, Owner sequence or a cross-Run association.</p>
+                      <div className="review-line-actions">
+                        <button type="button" disabled={!neighbors.previous}
+                          onClick={() => goToReviewLine(neighbors.previous)}>
+                          Previous line{neighbors.previous ? ' · ' + neighbors.previous.sourceLine : ''}
+                        </button>
+                        <button type="button" disabled={!neighbors.next}
+                          onClick={() => goToReviewLine(neighbors.next)}>
+                          Next line{neighbors.next ? ' · ' + neighbors.next.sourceLine : ''}
+                        </button>
+                      </div>
+                    </section>
+                  )}
                 </>
               )}
               {inspectorTab === 'links' && (
