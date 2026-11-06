@@ -117,6 +117,21 @@ def main():
                 "(node) => getComputedStyle(node).color") == "rgb(116, 139, 165)"
             assert surfaces[".turn-body"] == surfaces[".turn-card"]
             checks.append("Skill Studio light palette restored without breaking dense trace rows")
+            overview = page.locator(".page-heading")
+            assert page.locator(".breadcrumb").count() == 0
+            assert overview.locator(".eyebrow").inner_text() == "RUN OVERVIEW"
+            assert overview.locator("h1").get_attribute("title") == overview.locator("h1").inner_text()
+            assert overview.locator("p").get_attribute("title") == overview.locator("p").inner_text()
+            assert "DSH-inspired" in overview.locator("p").inner_text()
+            for width in (1600, 1180):
+                page.set_viewport_size({"width": width, "height": 1000})
+                title_box = overview.locator("h1").bounding_box()
+                subtitle_box = overview.locator("p").bounding_box()
+                assert overview.bounding_box()["height"] <= 38
+                assert abs((title_box["y"] + title_box["height"] / 2) -
+                           (subtitle_box["y"] + subtitle_box["height"] / 2)) <= 5
+            page.set_viewport_size({"width": 1600, "height": 1000})
+            checks.append("Run Overview label, title and subtitle use one compact row at desktop widths")
             assert page.get_by_text("Source records", exact=True).is_visible()
             assert page.get_by_text("Source authorities", exact=True).is_visible()
             assert page.locator(".metric").first.bounding_box()["height"] <= 58
@@ -329,6 +344,9 @@ def main():
             page.set_viewport_size({"width": 680, "height": 860})
             assert picker.is_visible()
             assert page.locator(".sidebar-bottom").is_visible()
+            assert page.locator(".page-heading").bounding_box()["height"] <= 38
+            assert page.locator(".page-heading h1").is_visible()
+            assert page.locator(".page-heading p").is_visible()
             assert page.get_by_role("button", name="File", exact=True).is_visible()
             assert page.get_by_role("contentinfo", name="Workbench status").is_visible()
             assert picker.locator("option").count() == 5
