@@ -116,6 +116,16 @@ def main():
             assert page.locator(".inspector .status.uncertain").inner_text() == "UNKNOWN"
             checks.append("Focus unknown finds Predicate without treating it as terminal failure")
 
+            page.get_by_role("button", name="Source", exact=True).click()
+            assert '"sourceLine": 1' in page.locator(".source-preview").inner_text()
+            assert page.get_by_role("button", name="Previous line", exact=True).is_disabled()
+            page.get_by_role("button", name="Next line · 2", exact=True).click()
+            assert '"sourceLine": 2' in page.locator(".source-preview").inner_text()
+            page.get_by_role("button", name="Previous line · 1", exact=True).click()
+            assert '"sourceLine": 1' in page.locator(".source-preview").inner_text()
+            assert "does not establish causality" in page.locator(".review-line-context").inner_text()
+            checks.append("Source Inspector traverses physical file neighbors, never inferred causal refs")
+
             page.get_by_role("button", name="All", exact=True).click()
             page.locator(".timeline .trace-event").filter(has_text="CALL_RESULT").first.click()
             assert page.locator(".local-detail-fields").count() == 0
