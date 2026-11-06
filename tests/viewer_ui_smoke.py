@@ -70,7 +70,14 @@ def main():
             splitter = page.get_by_role("separator", name="Resize Inspector width")
             inspector = page.locator(".inspector")
             assert abs(inspector.bounding_box()["width"] - grown) <= 3
-            checks.append("Desktop Inspector divider drags wider and persists on reload")
+            page.get_by_role("button", name="View", exact=True).click()
+            page.get_by_role("menuitemcheckbox", name="Show Inspector").click()
+            assert not splitter.is_visible()
+            page.get_by_role("button", name="View", exact=True).click()
+            page.get_by_role("menuitemcheckbox", name="Show Inspector").click()
+            assert splitter.is_visible()
+            assert abs(inspector.bounding_box()["width"] - grown) <= 3
+            checks.append("Desktop Inspector divider drags wider and persists across reload and visibility")
 
             splitter.focus()
             prior = int(splitter.get_attribute("aria-valuenow"))
