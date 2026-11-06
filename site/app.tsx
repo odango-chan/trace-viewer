@@ -635,8 +635,7 @@ function App() {
               <button type="button" className={filter === 'exceptions' ? 'tool active' : 'tool'} onClick={() => setFilter('exceptions')}>Exceptions</button>
               <button type="button" className="tool border-left" onClick={focusUnknown}>Focus unknown</button>
               <button type="button" className="tool" onClick={locateSelected} disabled={!activeRecord}>Locate selected</button>
-              <button type="button" className="tool" onClick={() => setExpanded(new Set(run.sections.map(item => item.id)))}>Expand all</button>
-              <button type="button" className="tool" onClick={() => setExpanded(new Set())}>Collapse normal</button>
+
             </div>
           </div>
           <div className="view-selector" role="group" aria-label="Console-inspired trace reading mode">
