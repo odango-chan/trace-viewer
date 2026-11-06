@@ -161,7 +161,7 @@ def main():
             assert page.locator(".brand-copy strong").evaluate(
                 "(node) => getComputedStyle(node).color") == "rgb(35, 53, 80)"
             assert page.locator(".sidebar-caption").first.evaluate(
-                "(node) => getComputedStyle(node).color") == "rgb(116, 139, 165)"
+                "(node) => getComputedStyle(node).color") == "rgb(82, 106, 125)"
             assert surfaces[".turn-body"] == surfaces[".turn-card"]
             checks.append("Skill Studio light palette restored without breaking dense trace rows")
             overview = page.locator(".page-heading")
@@ -195,6 +195,52 @@ def main():
             assert "synthetic:model-req-1" in page.locator(".ledger-event .ledger-ref").first.inner_text()
             assert page.locator(".ledger-event .event-side").first.is_visible()
             checks.append("Readable source ledger shows folded interaction, authority, exact ref, status and position")
+            type_proof = page.evaluate("""() => {
+                const selectors = [
+                    '.ledger-event-main strong', '.ledger-event-main small',
+                    '.ledger-event .ledger-kind', '.ledger-event .ledger-authority',
+                    '.ledger-event .ledger-ref', '.ledger-event .event-side small',
+                    '.sidebar-section-title', '.section-index .sidebar-record',
+                    '.inspector-title', '.inspector-description',
+                    '.inspector-label', '.properties dt', '.properties dd',
+                ]
+                const samples = Object.fromEntries(selectors.map(selector => {
+                    const node = document.querySelector(selector)
+                    const style = getComputedStyle(node)
+                    return [selector, {color: style.color, fontSize: parseFloat(style.fontSize)}]
+                }))
+                const root = getComputedStyle(document.documentElement)
+                return {samples, palette: [
+                    root.getPropertyValue('--bg').trim(),
+                    root.getPropertyValue('--accent').trim(),
+                    root.getPropertyValue('--type-strong').trim(),
+                    root.getPropertyValue('--type-body').trim(),
+                    root.getPropertyValue('--type-meta').trim(),
+                ]}
+            }""")
+            assert type_proof["palette"] == ["#f5f7fb", "#0c8e7b",
+                "#20314a", "#41586d", "#526a7d"]
+            for selector, minimum in {
+                ".ledger-event-main strong": 12,
+                ".ledger-event-main small": 11,
+                ".ledger-event .ledger-kind": 10,
+                ".ledger-event .ledger-authority": 10,
+                ".ledger-event .ledger-ref": 10,
+                ".ledger-event .event-side small": 10,
+                ".sidebar-section-title": 11,
+                ".section-index .sidebar-record": 11,
+                ".inspector-title": 15,
+                ".inspector-description": 12,
+                ".inspector-label": 10,
+                ".properties dt": 11,
+                ".properties dd": 12,
+            }.items():
+                assert type_proof["samples"][selector]["fontSize"] >= minimum, (selector, type_proof["samples"][selector])
+            assert type_proof["samples"][".ledger-event-main strong"]["color"] == "rgb(32, 49, 74)"
+            assert type_proof["samples"][".ledger-event-main small"]["color"] == "rgb(65, 88, 109)"
+            assert type_proof["samples"][".properties dd"]["color"] == "rgb(32, 49, 74)"
+            assert type_proof["samples"][".ledger-event .ledger-kind"]["color"] == "rgb(12, 118, 104)"
+            checks.append("Source ledger, Explorer and Inspector use readable primary / body / metadata typography")
             row = page.locator(".ledger-event").first
             assert row.locator(".ledger-event-main strong").is_visible()
             assert row.locator(".ledger-event-main small").is_visible()
