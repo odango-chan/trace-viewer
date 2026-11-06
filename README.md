@@ -14,7 +14,7 @@
 
 Viewer 采用 React 19 + TypeScript + esbuild 的浏览器只读架构，静态部署于 GitHub Pages。与 Skill Studio 共用浅色视觉语言（`#f5f7fb` 背景、`#0c8e7b` 青绿交互强调色），但不引入 Studio 专用的 React Flow/ELK/Monaco：这里阅读的是真实来源记录，而非编辑流程图。
 
-默认内置四个**合成**示例，通过左侧栏底部 **Built-in examples** 下拉框切换。左侧上方 **Local runs** 仅列出用户在浏览器中手动导入的轨迹。顶部 **View** 菜单可切换四种阅读模式与 Inspector 可见性；在大屏幕（>1150px）可拖动 Trace 与 Inspector 之间的分隔线调节右栏宽度（默认 380px），键盘左右方向键微调、Home/End 调至边界、双击恢复默认；宽度仅保存在本浏览器，不上传。窄屏下 Inspector 仍排列在 Trace 下方，不提供垂直拖拽；**Navigate** 提供异常定位、来源定位和章节展开/折叠；**Help** 提供入门、来源语义说明与版本范围。底部状态栏显示来源类别、当前记录和 Source record 数，所有操作均只读。真实诊断、材料或 Owner 证据不会作为公开示例打包上传。
+默认内置五个**合成**示例，通过左侧栏底部 **Built-in examples** 下拉框切换。默认示例是按原 [ca-console Release PDU Session 10 完整轨迹原型](https://github.com/odango-chan/ca-console/blob/main/docs/examples/trajectory-prototype.html) 重新编写的 **STEP 0–4** 教学故事（setup / Skill routing / query / release+OUTCOME_UNKNOWN+reconcile / confirm / final response）。右侧 Inspector 的 **Scenario** 页签可查看明确标注为模拟的 System、Context、Skill、Tools、Response、Tool Call/Result 和 Runtime 证据解释；它们**不是**原始 Model Snapshot、原生 Owner 记录或真实 5GC 结果。先前四个小案例仍原样保留，用于语义回归。左侧上方 **Local runs** 仅列出用户在浏览器中手动导入的轨迹。顶部 **View** 菜单可切换四种阅读模式与 Inspector 可见性；在大屏幕（>1150px）可拖动 Trace 与 Inspector 之间的分隔线调节右栏宽度（默认 380px），键盘左右方向键微调、Home/End 调至边界、双击恢复默认；宽度仅保存在本浏览器，不上传。窄屏下 Inspector 仍排列在 Trace 下方，不提供垂直拖拽；**Navigate** 提供异常定位、来源定位和章节展开/折叠；**Help** 提供入门、来源语义说明与版本范围。底部状态栏显示来源类别、当前记录和 Source record 数，所有操作均只读。真实诊断、材料或 Owner 证据不会作为公开示例打包上传。
 
 这是为未来可选 localhost 服务预留的**应用式 Web UI 外壳**，当前仍然是 React + TypeScript + 静态页面，未实现本地服务、文件监控、桌面系统集成或原生文件系统访问。
 

@@ -21,6 +21,10 @@ type TraceRecord = {
   materialRef?: string | null
   sourceLocator?: string
   stage?: string
+  illustration?: {
+    fields: {label: string; value: string}[]
+    panels: {title: string; content: string}[]
+  }
 }
 type Section = {
   id: string
@@ -60,7 +64,7 @@ type ReviewFinding = {
 }
 type ReturnSelection = {ref: string; tab: InspectorTab}
 type ViewMode = 'readable' | 'model' | 'owners' | 'raw'
-type InspectorTab = 'summary' | 'source' | 'links'
+type InspectorTab = 'summary' | 'source' | 'links' | 'scenario'
 type MainMenu = 'file' | 'view' | 'navigate' | 'help'
 type HelpTopic = 'quick' | 'semantics' | 'about'
 type ExampleRun = {
@@ -197,7 +201,10 @@ function App() {
   const [sidebarShowAll, setSidebarShowAll] = useState<Set<string>>(() => new Set())
   const [runId, setRunId] = useState(syntheticRuns[0].id)
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultOpenSections(syntheticRuns[0])))
-  const [selectedRef, setSelectedRef] = useState<string>(syntheticRuns[0].sections[1].records[2].ref)
+  const [selectedRef, setSelectedRef] = useState<string>(() => {
+    const initialRecords = syntheticRuns[0].sections.flatMap(section => section.records)
+    return (initialRecords.find(isException) ?? initialRecords[0])?.ref ?? ''
+  })
   // At compact widths the Inspector moves below the Trace; the vertical
   // splitter only exists on three-column desktop layouts.
   const maxInspectorWidth = Math.max(MIN_INSPECTOR_WIDTH,
@@ -912,6 +919,8 @@ function App() {
               <div className="inspector-tabs" role="group" aria-label="Inspector detail">
                 {([
                   ['summary', 'Summary'], ['source', 'Source'], ['links', 'Lineage'],
+                  ...(run.sourceKind === 'SYNTHETIC' && activeRecord.illustration
+                    ? [['scenario', 'Scenario'] as [InspectorTab, string]] : []),
                 ] as [InspectorTab, string][]).map(([tab, label]) => (
                   <button key={tab} type="button" aria-pressed={inspectorTab === tab}
                     className={inspectorTab === tab ? 'inspector-tab active' : 'inspector-tab'}
@@ -926,6 +935,25 @@ function App() {
                     <dt>Record kind</dt><dd>{activeRecord.kind}</dd>
                     <dt>{activeRecord.ownerSequence === null ? 'Review file line' : 'Local sequence'}</dt><dd>{activeRecord.ownerSequence ?? activeRecord.sourceLine ?? 'UNAVAILABLE'}</dd>
                   </dl>
+                  {run.sourceKind === 'SYNTHETIC' && activeRecord.illustration && (
+                    <section className="scenario-facts" aria-label="Illustrative scenario facts">
+                      <div className="inspector-label">SCRIPTED CONTEXT · NOT CAPTURED</div>
+                      {activeRecord.illustration.fields.length > 0 && (
+                        <dl className="properties">
+                          {activeRecord.illustration.fields.map(field => (
+                            <React.Fragment key={field.label}>
+                              <dt>{field.label}</dt><dd>{field.value}</dd>
+                            </React.Fragment>
+                          ))}
+                        </dl>
+                      )}
+                      {activeRecord.illustration.panels.length > 0 &&
+                        <button type="button" className="scenario-detail-link"
+                          onClick={() => setInspectorTab('scenario')}>
+                          View model / tool / evidence details
+                        </button>}
+                    </section>
+                  )}
                   {activePresentationRow?.isFolded && (
                     <>
                       <div className="inspector-label">FOLDED INTERACTION</div>
@@ -968,6 +996,25 @@ function App() {
                     </section>
                   )}
                 </>
+              )}
+              {inspectorTab === 'scenario' && run.sourceKind === 'SYNTHETIC' && activeRecord.illustration && (
+                <section className="scenario-detail" aria-label="Illustrative scenario detail">
+                  <p className="scenario-disclaimer"><strong>SYNTHETIC SCENARIO ONLY.</strong> These details were authored for the public Console reference. They are not captured Model inputs, Tool payloads, Runtime evidence or verified network facts.</p>
+                  {activeRecord.illustration.fields.length > 0 &&
+                    <dl className="properties">
+                      {activeRecord.illustration.fields.map(field => (
+                        <React.Fragment key={field.label}>
+                          <dt>{field.label}</dt><dd>{field.value}</dd>
+                        </React.Fragment>
+                      ))}
+                    </dl>}
+                  {activeRecord.illustration.panels.map(panel => (
+                    <section className="scenario-panel" key={panel.title}>
+                      <div className="inspector-label">{panel.title}</div>
+                      <pre>{panel.content}</pre>
+                    </section>
+                  ))}
+                </section>
               )}
               {inspectorTab === 'source' && (
                 <>

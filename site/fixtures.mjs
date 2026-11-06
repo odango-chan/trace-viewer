@@ -1,8 +1,11 @@
+import { consoleReleaseRun } from './console-release-fixture.mjs'
+
 /**
  * Educational, non-authoritative synthetic traces.
  * NO user identifiers, real runtime events, credentials or model prompts.
  */
 export const samples = Object.freeze([
+  consoleReleaseRun,
   {
     id: 'synthetic-agent-recovery',
     sourceKind: 'SYNTHETIC',

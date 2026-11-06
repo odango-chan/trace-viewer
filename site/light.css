@@ -1143,3 +1143,33 @@ html,body,.app-shell,.workbench{background:var(--bg)}
     user-select:none!important;cursor:col-resize!important;
   }
 }
+
+/* Synthetic Console story details: typed demo facets and scannable panel content.
+   Never style imported source material as if these simulated panels were verified. */
+.scenario-facts{
+  border:1px solid #dce7eb;background:#f9fcfb;
+  border-radius:7px;padding:10px;margin:0 0 15px;
+}
+.scenario-facts .inspector-label{margin-bottom:8px;color:#37675f}
+.scenario-facts .properties{margin-bottom:9px;gap:7px 8px;grid-template-columns:93px minmax(0,1fr)}
+.scenario-detail-link{
+  border:1px solid #b8dcd3;border-radius:6px;
+  background:#fff;color:#0c7668;padding:7px 9px;
+  font-size:11px;font-weight:700;text-align:left;
+}
+.scenario-detail-link:hover{background:#e9f6f1}
+.scenario-disclaimer{
+  border-left:3px solid #0c8e7b;background:#f3faf7;
+  padding:10px 11px;margin:0 0 14px;
+  color:#41586d;font-size:11px;line-height:1.5;
+}
+.scenario-disclaimer strong{color:#0c7668}
+.scenario-detail>.properties{margin-bottom:17px}
+.scenario-panel{border-top:1px solid #e4ebf0;padding-top:12px;margin-top:13px}
+.scenario-panel .inspector-label{margin-bottom:7px;color:#365c69}
+.scenario-panel pre{
+  margin:0;white-space:pre-wrap;overflow-wrap:anywhere;
+  font:11px/1.58 ui-monospace,SFMono-Regular,Consolas,monospace;
+  color:#30485c;background:#f7fafc;
+  padding:10px;border:1px solid #e2eaf1;border-radius:7px;
+}

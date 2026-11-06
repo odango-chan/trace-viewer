@@ -31,6 +31,23 @@
 | Native Agent Demo TraceStore v2 importer | `scripts/native_trace_audit.py` 仅线下结构检查 | NOT_STARTED (browser) | audit 不等于源 Loader、Material 阅读及真正导入 |
 | Phoenix 嵌入/深链 | Phoenix PoC 独立运行 | NOT_STARTED | 不能把 Phoenix 项目 UI 当 CA 事实数据库 |
 
+## 2026-11-06 补充：完整 Console Release 示范内容回归
+
+**新增示例为合成脚本内容对照，不是完全 Console 产品功能对等，更不是 Owner-native 数据迁移。** 原四个专项 Fixture 继续保留。新增的 `site/console-release-fixture.mjs` 作为默认示例，按原 `trajectory-prototype.html` 的叙事边界重写：
+
+| 原 Console 阶段 | 新默认示例 | 可读信息 |
+|---|---|---|
+| Resolved Setup / Goal | ENTRY | ProductTask、Agent/MCP 准备、模拟用户目标 |
+| STEP 0 Skill selection | STEP 0 | Eligibility、Model routing input/response、Host load request、Runtime load、注入、execution binding、Goal tools |
+| STEP 1 Query | STEP 1 | 模拟 Model request/response、query ToolCall/Result、ESTABLISHED 状态来源 |
+| STEP 2 Release anomaly | STEP 2 | Authorization、Assurance、Dispatch、Fabric 请求/响应丢失、Runtime OUTCOME_UNKNOWN、World 状态证据、Verification、Reconcile、Runtime SUCCEEDED、原始 ToolResult delivery |
+| STEP 3 Confirm | STEP 3 | 再次 query、KNOWN_ABSENT 观察与 ToolResult |
+| STEP 4 Final | STEP 4 | 最终 ModelInput/Output 与独立的 Task terminal |
+
+右侧 Inspector 保留来源身份、原始记录 Ref 和显式 lineage，并仅对带有 **synthetic-only `illustration`** 的内置来源记录开放 **Scenario** 详情。包括模拟的 System / Context / Skill / Tools / Response、Tool Call/Schema/Delivery 与 Runtime 判据/诊断。字段与解释是独立重新编写的公开教学文本；即使与 Console 原型故事相似，也**不得**称为采集到的真实 Model input、Evidence、Runtime/Host 状态、网络事实或材料闭包。真实本地导入不能使用该 synthetic-only 面板；未提供真实材料时仍显示 UNAVAILABLE / WITHHELD。
+
+本次只做**一个完整的示例故事**；原 Console 异常库的其他场景仍未迁入，更不代表 Runtime 六阶段已经由所有真实 Producer 发布。现有投影仍以明确 ref 配对，不按卡片邻接推断跨 Owner 关系。
+
 ## 产品交互守则
 
 1. 首页采用浅色三栏，左侧运行示例、中央可折叠 Turn/Step、右侧 Inspector。默认 Readable；异常所在 Section 默认展开。

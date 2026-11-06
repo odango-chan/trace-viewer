@@ -206,8 +206,32 @@ def main():
             page.get_by_text("SYNTHETIC DATA", exact=True).wait_for(timeout=15000)
             picker = page.get_by_role("combobox", name="Choose demo example")
             assert picker.is_visible()
-            assert picker.input_value() == "synthetic-agent-recovery"
-            assert picker.locator("option").count() == 5
+            assert picker.input_value() == "synthetic-console-release-session-10"
+            assert picker.locator("option").count() == 6
+            assert page.locator(".page-heading h1").inner_text() == "Release PDU Session 10 · Full Console story"
+            assert page.locator(".sidebar-section").count() == 6
+            assert "SCRIPTED CONTEXT · NOT CAPTURED" in page.locator(".inspector").inner_text()
+            assert "OUTCOME_UNKNOWN" in page.locator(".inspector-title").inner_text()
+            page.get_by_role("button", name="Scenario", exact=True).click()
+            scenario = page.get_by_role("region", name="Illustrative scenario detail")
+            assert "SYNTHETIC SCENARIO ONLY" in scenario.inner_text()
+            assert "not captured Model inputs" in scenario.inner_text()
+            assert "Runtime outcome uncertainty" in scenario.inner_text()
+            checks.append("Full Console Release story is default with six phases and scripted outcome context")
+
+            page.get_by_role("button", name="Expand STEP 1 · Query current state").click()
+            page.locator(".sidebar-record").filter(has_text="Model input · Verify state").click()
+            page.get_by_role("button", name="Scenario", exact=True).click()
+            scenario = page.get_by_role("region", name="Illustrative scenario detail")
+            for label in ("System · simulated", "Context · simulated",
+                          "Skill · simulated", "Tools · simulated"):
+                assert scenario.get_by_text(label, exact=True).is_visible()
+            assert "query_pdu_session" in scenario.inner_text()
+            assert "not an original System Prompt" in scenario.inner_text() or "Not an original System Prompt" in scenario.inner_text()
+            assert '"sourceKind": "SYNTHETIC"' not in scenario.inner_text()
+            checks.append("Console synthetic Model Inspector exposes System, Context, Skill and Tools without claiming captured payload")
+
+            page.get_by_role("combobox", name="Choose demo example").select_option(label="Agent Turn · Release, uncertainty & reconcile")
             assert page.locator(".run-list .run-option").count() == 0
             assert page.locator(".run-empty").is_visible()
             assert page.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()") == "#0c8e7b"
@@ -512,7 +536,7 @@ def main():
             assert page.locator(".page-heading p").is_visible()
             assert page.get_by_role("button", name="File", exact=True).is_visible()
             assert page.get_by_role("contentinfo", name="Workbench status").is_visible()
-            assert picker.locator("option").count() == 5
+            assert picker.locator("option").count() == 6
             page.set_viewport_size({"width": 1600, "height": 1000})
             checks.append("Built-in example picker remains accessible on narrow screens")
 
