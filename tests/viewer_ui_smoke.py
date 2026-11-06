@@ -39,6 +39,7 @@ def main():
             assert page.locator(".inspector-title").inner_text() == "Host delivery interrupted"
             assert "RESULT_UNKNOWN" in page.locator(".inspector").inner_text()
             page.get_by_role("button", name="All", exact=True).click()
+            page.get_by_role("button", name="Readable", exact=True).click()
             assert "Runtime SUCCEEDED" in page.locator(".timeline").inner_text()
             checks.append("Host RESULT_UNKNOWN distinct from Runtime SUCCEEDED")
             page.get_by_role("button", name="Collapse normal").click()
