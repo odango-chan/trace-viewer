@@ -6,7 +6,7 @@
 
 ## 本地只读 Viewer 使用方式
 
-页面左侧可以导入现有原生 TraceStore v2 目录、归档诊断 JSONL，或一份单独的诊断报告 JSON。诊断 JSONL 的有限字段需在 Inspector 中明确点击 **Show allowed local fields** 才展示；在 **Source** 页签还可查看前后物理文件行，**不推断因果关系**。独立诊断报告只显示来源允许的安全摘要，**不是同一 Run 的轨迹或已经关联的 Owner 证据**；切换 Run 后会隐藏，需要手动再次打开。
+页面左侧可以导入现有原生 TraceStore v2 目录、归档诊断 JSONL，或一份单独的诊断报告 JSON。诊断 JSONL 的有限字段需在 Inspector 中明确点击 **Show allowed local fields** 才展示；在 **Source** 页签还可查看前后物理文件行，**不推断因果关系**。 现在 Inspector 还支持当前 section 内的 **Previous / Next record**、**Back to prior source** 和工具栏 **Locate selected**（展开并定位精确来源）；这里的前后关系仅是展示顺序，既不是 Owner-local sequence，也不是跨 Owner 因果关系。独立诊断报告只显示来源允许的安全摘要，**不是同一 Run 的轨迹或已经关联的 Owner 证据**；切换 Run 后会隐藏，需要手动再次打开。
 
 真实 P8-D4 attempt 2 JSONL（106 行）与独立 attempt 1 诊断报告的安全投影，均已在授权私有 Chromium 环境验收；公开合成浏览器交互 **14/14 PASS**。只有诊断来源中的物理行邻接可导航，**跨 Owner 因果关联、真实原生 Run 与材料闭包仍未验证**。详见 [V1 归档实验](docs/experiments/real-p8d4-review-import.md) 与 [PR #2](https://github.com/odango-chan/trace-viewer/pull/2)。
 
