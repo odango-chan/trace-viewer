@@ -93,6 +93,22 @@ def main():
             assert "does not establish causality" in page.locator(".review-line-context").inner_text()
             checks.append("Real source adjacent line navigation preserves file-only provenance")
 
+            # Review import groups physical lines into 25-line presentation sections.
+            # Section navigation never crosses that group boundary implicitly.
+            select_line(page, TRACE, 26)
+            page.get_by_role("button", name="Summary", exact=True).click()
+            context = page.get_by_role("region", name="Reading context")
+            assert "1 / 25 in section" in context.inner_text()
+            assert page.get_by_role("button", name="Previous record", exact=True).is_disabled()
+            page.get_by_role("button", name="Next record", exact=True).click()
+            page.get_by_role("button", name="Source", exact=True).click()
+            assert '"sourceLine": 27' in page.locator(".source-preview").inner_text()
+            page.get_by_role("button", name="Back to prior source", exact=True).click()
+            assert '"sourceLine": 26' in page.locator(".source-preview").inner_text()
+            page.get_by_role("button", name="Locate selected", exact=True).click()
+            assert page.locator(".timeline .trace-event.selected").count() == 1
+            checks.append("Real section-scoped context navigates and returns without joining event streams")
+
             # The separate, real attempt-1 diagnosis must not become an event or join.
             baseline = page.locator(".run-list .run-option").count()
             page.locator("#review-finding-json").set_input_files(str(FINDING))
