@@ -40,7 +40,14 @@ def main():
             assert surfaces[".turn-header"] == "rgb(243, 247, 250)"
             assert len(set(surfaces.values())) >= 5
             checks.append("Distinct slate explorer, canvas, inspector and white trajectory surfaces")
+            assert page.get_by_text("Source records", exact=True).is_visible()
+            assert page.get_by_text("Source authorities", exact=True).is_visible()
+            assert page.locator(".metric").first.bounding_box()["height"] <= 58
+            assert page.locator(".timeline").bounding_box()["y"] < 450
             page.locator(".turn-card .turn-header").first.click()
+            assert page.locator(".timeline .event-kind").first.is_visible()
+            assert "MODEL_" in page.locator(".timeline .event-kind").first.inner_text()
+            checks.append("Compact above-fold trajectory retains explicit source kinds and accurate totals")
             assert page.locator(".trace-event .event-meta").filter(has_text="Model Interaction").count() >= 1
             checks.append("Readable view folds explicit Model Request/Response")
             page.get_by_role("button", name="All owners", exact=True).click()
