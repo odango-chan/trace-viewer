@@ -288,11 +288,18 @@ function App() {
   function focusUnknown() {
     const record = findPrimaryUnknown(run) as TraceRecord | null
     if (!record) return
-    navigateToRecord(record)
+    if (record.ref === selectedRef) {
+      setViewMode('raw')
+      const section = run.sections.find(part=>part.records.some(item=>item.ref===record.ref))
+      if (section) setExpanded(previous=>new Set(previous).add(section.id))
+      setInspectorTab('summary')
+      requestLocate(record.ref)
+    } else navigateToRecord(record)
     setFilter('exceptions')
   }
 
   function selectRecord(ref: string) {
+    setLocateRequest(null)
     if (ref === selectedRef) {
       setInspectorTab('summary')
       return
