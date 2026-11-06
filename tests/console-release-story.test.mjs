@@ -82,25 +82,25 @@ test('scripted knowledge boundaries separate model input/output and Tool Call/To
   const panels = id => byId(id).illustration?.panels ?? []
   for (const id of ['route-request','query1-input','release-input','query2-input','final-input']) {
     assert.ok(panels(id).length, id + ' must carry the illustrative input surface')
-    assert.ok(panels(id).every(panel => !/^(Response|Output|Delivery)\\b/i.test(panel.title)),
+    assert.ok(panels(id).every(panel => !/^(Response|Output|Delivery)\b/i.test(panel.title)),
       id + ' must not show a later output on the model request')
   }
   for (const id of ['route-response','query1-response','release-response','query2-response','final-response']) {
-    assert.ok(panels(id).some(panel => /^(Response|Output)\\b/i.test(panel.title)),
+    assert.ok(panels(id).some(panel => /^(Response|Output)\b/i.test(panel.title)),
       id + ' must place generated output on the response source')
   }
   for (const id of ['query1-call','release-call','query2-call']) {
     const rec=byId(id)
     assert.ok(rec.illustration, id)
     assert.ok(rec.illustration.fields.every(field => field.label !== 'Result'), id)
-    assert.ok(panels(id).every(panel => !/^Delivery\\b/i.test(panel.title)), id)
+    assert.ok(panels(id).every(panel => !/^Delivery\b/i.test(panel.title)), id)
     assert.match(panels(id).find(panel => panel.title === 'Result availability').content, /UNAVAILABLE/)
     assert.equal(rec.status,'REQUESTED')
   }
   for (const id of ['query1-result','release-result','query2-result']) {
     const rec=byId(id)
     assert.ok(rec.illustration.fields.some(field => field.label === 'Result'), id)
-    assert.ok(panels(id).some(panel => /^Delivery\\b/i.test(panel.title)), id)
+    assert.ok(panels(id).some(panel => /^Delivery\b/i.test(panel.title)), id)
     assert.equal(rec.status,'DELIVERED')
   }
   assert.match(panels('release-unknown').at(0).content, /Host RESULT_UNKNOWN/)
