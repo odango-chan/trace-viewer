@@ -494,3 +494,159 @@ body,.app-shell{background:var(--viewer-canvas)}
   .turn-body{padding-left:8px}
   .event-kind{font-size:8px}
 }
+
+/* Slate workbench: intentional dark navigation and medium-tone reading surfaces.
+   Maintain light document content, exact provenance and semantic status colors. */
+:root{
+  --viewer-sidebar:#2c4256;
+  --viewer-canvas:#d0dbe5;
+  --viewer-inspector:#cbd8e3;
+  --viewer-card:#ecf2f7;
+  --viewer-edge:#a9bbc9;
+  background:var(--viewer-canvas);
+}
+html,body,.app-shell,.workbench{background:var(--viewer-canvas)}
+.topbar{
+  background:#24394c;border-bottom:2px solid #416b77;
+  box-shadow:0 3px 12px #233b4f24;
+}
+.brand-copy strong{color:#f0f7fa}
+.brand-copy small,.header-context{color:#aec6d5}
+.header-divider{border-color:#5c7183}
+.build-badge{background:#385367;color:#d4e7ef}
+.synthetic-badge{background:#594a32;color:#ffe4aa;border-color:#837046}
+.sidebar{
+  background:var(--viewer-sidebar);
+  border-right:1px solid #1d3448;
+  box-shadow:inset -1px 0 #50677a;
+}
+.sidebar-heading{color:#a5bfd0}
+.sidebar-caption{color:#c4d9e6;border-left-color:#63bdae}
+.sidebar-divider{border-color:#516a7d}
+.import-block{
+  background:#354d61;border-color:#577084;box-shadow:0 1px 6px #0d25331a;
+}
+.import-block label{color:#e1eff5}
+.import-block input{color:#c4d8e4}
+.import-block small{color:#a9c4d6}
+.import-block input::file-selector-button{
+  background:#dcebe8;color:#185c55;border-color:#a1c6be;
+}
+.import-block input::file-selector-button:hover{background:#c5e3d9}
+.run-empty{color:#b9cedc}
+.run-option{color:#d4e6f0}
+.run-option-copy small{color:#a9c4d4}
+.run-option:hover,.section-index button:hover{background:#405b6e;color:#f5fbff}
+.run-option.active{
+  background:#245a62;border-color:#5da99a;color:#edfbf7
+}
+.run-option.active .run-option-icon{background:#397e77;color:#e1fbf1}
+.section-index button{color:#d1e3ee}
+.section-index-num{color:#9ebccc}
+.section-index button:hover{color:#f2fcfa}
+.sidebar-bottom{
+  background:#253a4e;border-top:1px solid #527085;
+  box-shadow:0 -2px 10px #162d3e29;
+}
+.example-picker label{color:#d3e7ef}
+.example-picker label span{background:#3b5b6c;color:#d5e7ed}
+.example-picker select{
+  background:#e4eff1;color:#1b5660;border-color:#6ba9a0;
+}
+.example-picker select:hover{background:#f1faf7}
+.example-picker small{color:#b2ccd7}
+.sidebar-privacy{border-color:#425e71;color:#aac7d3}
+.sidebar-privacy .indicator{background:#63c6ac}
+.canvas{background:var(--viewer-canvas);box-shadow:inset 1px 0 #f0f4f7}
+.breadcrumb,.eyebrow{color:#456479}
+.page-heading{border-bottom-color:#adbfcc}
+.page-heading h1{color:#1b354a}
+.page-heading p{color:#47657b}
+.metric-row{
+  background:#e3ebf2;border:1px solid #b1c3d0;
+  box-shadow:0 1px 5px #304a610c;
+}
+.metric span{color:#46677d}
+.metric strong{color:#1c384b}
+.metric:not(:last-child){border-right-color:#b7c9d7}
+.info-note{
+  background:#c4e0da;border-color:#91bdb1;
+  color:#315f59;
+}
+.info-note strong{color:#124e47}
+.info-note-icon{background:#a9d5ca;color:#135d53}
+.trace-heading h2{color:#1f3b52}
+.trace-heading p,.trajectory-count,.view-hint{color:#506e85}
+.view-selector{background:#bacbd8;border-color:#9dafc0}
+.view-mode{color:#294d67}
+.view-mode.active{background:#e9f5f1;color:#08695d;border-color:#77b6a3}
+.tool{color:#395c74}
+.tool:hover{background:#bdd4d6;color:#105e59}
+.tool.active{background:#b6dcd1;color:#0b6459}
+.timeline{background:transparent}
+.turn-card{
+  background:var(--viewer-card);border-color:var(--viewer-edge);
+  box-shadow:0 2px 9px #314c621b;
+}
+.turn-card.has-warning{border-color:#c7a573}
+.turn-header{background:#d5e1eb}
+.turn-header:hover{background:#c8d9e4}
+.turn-number{background:#b8cbd9;color:#365a72}
+.turn-title strong{color:#203d52}
+.turn-title small{color:#4d6b81}
+.turn-count{background:#bfcfdc;color:#34536c}
+.turn-body{background:var(--viewer-card);border-top-color:#b4c6d3}
+.trace-event{border-bottom-color:#dae4eb}
+.trace-event:hover{background:#d7e9e7}
+.trace-event.selected,.owner-lane .trace-event.selected{
+  background:#c1e3d9;border-color:#6aafa1;
+  box-shadow:inset 3px 0 #0c8e7b;
+}
+.event-meta,.event-detail small,.event-side small{color:#526f83}
+.event-detail strong{color:#213d52}
+.event-kind{color:#356a81}
+.event-glyph{background:#cddde5;color:#276c7b}
+.trace-event.selected .event-glyph{background:#9fcec1;color:#0b5c51}
+.event-glyph.glyph-warning,.trace-event.selected .event-glyph.glyph-warning{
+  background:#f5d9b6;color:#875215
+}
+.owner-lane{
+  background:#d7e3eb;border-color:#aebfce;
+}
+.lane-heading{border-bottom-color:#aebfce;color:#3c607c}
+.lane-heading span{background:#bdcfde;color:#345c76}
+.lane-empty{color:#566f83}
+.inspector{
+  background:var(--viewer-inspector);border-left:1px solid #91a9ba;
+  box-shadow:inset 1px 0 #e4edf3;
+}
+.inspector-top,.inspector-tabs{border-color:#aabeca}
+.inspector-title{color:#213d50}
+.inspector-description,.inspector-label{color:#48677f}
+.inspector-tab{color:#47687f}
+.inspector-tab.active{color:#0b695e;border-color:#0b8b79}
+.properties dt{color:#4c6b81}
+.properties dd{color:#203d53}
+.ref-item,.paired-sources button,.source-preview{
+  background:#e2eaf1;border-color:#aebfcc;color:#2e4e66;
+}
+.ref-item:not(:disabled):hover,.paired-sources button:hover{background:#d1e6e6}
+.raw-placeholder,.review-line-context{background:#dce6ef;border-color:#acbdcc;color:#536f82}
+.reading-context{background:#bfdcd4;border-color:#8dbdad}
+.reading-context>strong{color:#155b51}
+.reading-context p,.reading-context-top{color:#3e6e65}
+.reading-actions button,.reading-context-top button,.review-line-actions button{
+  background:#e4f1ef;border-color:#98beb4;color:#17665a
+}
+.reading-actions button:not(:disabled):hover,
+.reading-context-top button:not(:disabled):hover,
+.review-line-actions button:not(:disabled):hover{background:#d3e9e2}
+.local-detail{background:#e0eaf1;border-color:#abbecc}
+.inspector-bottom{border-color:#9fb4c4;color:#577489}
+.finding-report{background:#edf0f0;border-color:#b9c2c7}
+@media(max-width:750px){
+  .sidebar{background:var(--viewer-sidebar)}
+  .sidebar-bottom{background:#253a4e}
+  .canvas{background:var(--viewer-canvas);box-shadow:none}
+  .turn-header{background:#d5e1eb}
+}
